@@ -71,7 +71,7 @@ The column permutation functions $q(j)$ (for $j \in 0 \dots n-1$) are partitione
 
 >! 5-Piece Step with Boundary Pins:
 
->! Because composites sharing factors with 2 and 3 create diagonal resonances, a m The columns are split into three structural thirds with step $+3$ and systematic block jumps:ore delicate 5-piece layout with boundary pins is required.
+>! Because composites sharing factors with 2 and 3 create diagonal resonances, a more delicate 5-piece layout with boundary pins is required.
 
 >! Let $d = \lfloor n/2 \rfloor$:
 
