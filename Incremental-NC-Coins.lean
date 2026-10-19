@@ -1,6 +1,6 @@
 /-
 
-Consider the following 8x8 "latin square" which is an "universal board"
+Consider the following 8x8 "latin square" which is an "incremental board"
 
 1 2 3 4 5 6 7 8
 5 8 2 7 6 1 4 3
@@ -14,9 +14,9 @@ Consider the following 8x8 "latin square" which is an "universal board"
 
 It is constructed as follows :
 
-The construction of the universal board builds the numbering layer by layer:
+The construction of the incremental board builds the numbering layer by layer:
 
-- Start with a valid n‑queens solution for the first layer (values equal to 1).
+- Start with a valid n‑coins solution for the first layer (values equal to 1).
 
 1 0 0 0 0 0 0 0
 0 0 0 0 0 1 0 0
@@ -28,7 +28,7 @@ The construction of the universal board builds the numbering layer by layer:
 0 0 0 0 1 0 0 0
 
 - For each next value c (from 2 to n), we choose a permutation
-(one new queen per row and column) such that the cumulative set
+(one new coin per row and column) such that the cumulative set
 of cells with values ≤ c satisfies the diagonal bound
 (at most c occupied cells on any diagonal).
 
@@ -46,11 +46,11 @@ for c = 2
 and so on
 
 A key point: the new permutation alone (the cells with value exactly c)
-need not be a valid n-queens solution. It can have diagonal conflicts,
-as long as the total number of queens on any diagonal after adding it
+need not be a valid n-coins solution. It can have diagonal conflicts,
+as long as the total number of coins on any diagonal after adding it
 does not exceed c.
 
-Thus, the universal board is not a simple sum of independent n-queens solutions.
+Thus, the incremental board is not a simple sum of independent n-coins solutions.
 
 Consider, again,
 
@@ -65,7 +65,7 @@ Consider, again,
 
 take 1 <= c <= n and change every k <= c by 1 and every k > c by 0
 
-for n = 1 one obtains an (n, 1) queens solution
+for n = 1 one obtains an (n, 1) coins solution
 
 1 0 0 0 0 0 0 0
 0 0 0 0 0 1 0 0
@@ -76,7 +76,7 @@ for n = 1 one obtains an (n, 1) queens solution
 0 1 0 0 0 0 0 0
 0 0 0 0 1 0 0 0
 
-for n = 2 one obtains an (n, 2) queens solution
+for n = 2 one obtains an (n, 2) coins solution
 
 1 1 0 0 0 0 0 0
 0 0 1 0 0 1 0 0
@@ -89,8 +89,8 @@ for n = 2 one obtains an (n, 2) queens solution
 
 and so on
 
-so far for the connection of universal boards and (n, c) queens solutions :
-universal boards are n (n, c) queens solutions on one board.
+so far for the connection of incremental boards and (n, c) coins solutions :
+incremental boards are n (n, c) coins solutions on one board.
 
 
 for every n there exist a n nxn Latin Square Ln with Ln[i,j] = (i+j) mod n
@@ -113,9 +113,9 @@ adding the "all-ones" matrix to it yields
 4 5 1 2 3
 5 1 2 3 4
 
-it is not a universal board, but, here is a conjecture (from my twin brother Marc)
+it is not a incremental board, but, here is a conjecture (from my twin brother Marc)
 
-for all n >= 7 there exists a permutation q such that  Un[i][j] = 1 + (i+q[j] mod n) is a universal board.
+for all n >= 7 there exists a permutation q such that  Un[i][j] = 1 + (i+q[j] mod n) is a incremental board.
 
 There exist "families" of such permutations for specific numbers n,
 for example, if gcd(n, 6) = 1, then q(j) = -2j mod n is a solution.
