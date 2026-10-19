@@ -16,4 +16,4 @@ work in a few ways.
 
 - execution is order n faster
 
-- we provide a formal proof.
+- we provide a formal proof
