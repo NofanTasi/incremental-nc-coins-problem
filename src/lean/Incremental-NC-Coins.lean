@@ -1,7 +1,7 @@
 import Mathlib
 
 /-!
-# Executable Incremental Latin Square (Universal Board) Generator
+# Executable Incremental Latin Square (Incremental Board) Generator
 
 This program directly implements the constructive definitions from `IncrementalCyclic.lean`
 and `n_c_coins_from_incremental.lean`.
@@ -82,14 +82,14 @@ def getC (n : ℕ) (j : ℕ) : ℕ :=
   else if n % 6 = 3 ∧ n ≥ 27 then q4 n j
   else 0
 
-/-- Non-cyclic universal Latin square for n = 4 -/
+/-- Non-cyclic incremental Latin square for n = 4 -/
 def L4 : ℕ → ℕ → ℕ
   | 0, 0 => 2 | 0, 1 => 0 | 0, 2 => 1 | 0, _ => 3
   | 1, 0 => 1 | 1, 1 => 3 | 1, 2 => 2 | 1, _ => 0
   | 2, 0 => 0 | 2, 1 => 2 | 2, 2 => 3 | 2, _ => 1
   | _, 0 => 3 | _, 1 => 1 | _, 2 => 0 | _, _ => 2
 
-/-- Non-cyclic universal Latin square for n = 6 -/
+/-- Non-cyclic incremental Latin square for n = 6 -/
 def L6 : ℕ → ℕ → ℕ
   | 0, 0 => 1 | 0, 1 => 0 | 0, 2 => 2 | 0, 3 => 3 | 0, 4 => 5 | 0, _ => 4
   | 1, 0 => 3 | 1, 1 => 1 | 1, 2 => 4 | 1, 3 => 0 | 1, 4 => 2 | 1, _ => 5
@@ -104,24 +104,24 @@ def cellValue (n : ℕ) (i j : ℕ) : ℕ :=
   else if n = 6 then L6 i j
   else (i + getC n j) % n
 
-/-- Generates the complete n × n universal Latin square board as an `Array (Array ℕ)` in O(n²) time. -/
+/-- Generates the complete n × n incremental Latin square board as an `Array (Array ℕ)` in O(n²) time. -/
 def generateBoard (n : ℕ) : Array (Array ℕ) :=
   Array.ofFn (fun (i : Fin n) =>
     Array.ofFn (fun (j : Fin n) => cellValue n i.val j.val))
 
-/-- Pretty-prints the n × n universal board. -/
+/-- Pretty-prints the n × n incremental board. -/
 def printBoard (n : ℕ) : IO Unit := do
   if n = 2 ∨ n = 3 then
-    IO.println s!"No universal board exists for n = {n}."
+    IO.println s!"No incremental board exists for n = {n}."
   else
-    IO.println s!"=== Universal Board ({n} × {n}) ==="
+    IO.println s!"=== Incremental Board ({n} × {n}) ==="
     for i in [:n] do
       let mut rowStr := ""
       for j in [:n] do
         rowStr := rowStr ++ s!"{cellValue n i j} "
       IO.println rowStr
 
-/-- Pretty-prints the (n, c)-coins solution obtained by thresholding the universal board at `< c`.
+/-- Pretty-prints the (n, c)-coins solution obtained by thresholding the incremental board at `< c`.
     A cell is marked with 'C' (or '1') if occupied by a coin/coin, and '.' (or '0') otherwise. -/
 def printCoinsBoard (n c : ℕ) : IO Unit := do
   if n = 2 ∨ n = 3 then
@@ -216,7 +216,7 @@ def promptNat (prompt : String) : IO ℕ := do
 /-- Main entry point: interactive prompt if run without arguments, or CLI flags if provided. -/
 def main (args : List String) : IO Unit := do
   match args with
-  | ["--universal", nStr] =>
+  | ["--incremental", nStr] =>
     let n := nStr.toNat?.getD 8
     printBoard n
     -- IO.println s!"Verifying incremental property for n = {n}..."
@@ -238,10 +238,10 @@ def main (args : List String) : IO Unit := do
   | _ =>
     -- Interactive Mode
     IO.println "=========================================================="
-    IO.println "  Universal Board & Generalized (n, c)-Coins Generator   "
+    IO.println "  Incremental Board & Generalized (n, c)-Coins Generator   "
     IO.println "=========================================================="
     IO.println "Choose an option:"
-    IO.println "  1. Generate Universal Board (size n × n)"
+    IO.println "  1. Generate Incremental Board (size n × n)"
     IO.println "  2. Generate (n, c)-Coins Solution (threshold c < n)"
     let choice ← promptNat "Enter choice (1 or 2): "
     if choice == 2 then
