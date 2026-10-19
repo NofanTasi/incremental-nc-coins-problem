@@ -1,4 +1,4 @@
-# universal-incremental-nc-coins-problem
+# incremental-nc-coins-problem
 
 We formally prove (Lean), verify and construct by code (Julia, Haskell):
 
