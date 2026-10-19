@@ -5,10 +5,9 @@ We formally prove (Lean), verify and construct (Julia, Haskell):
 One incremental n x n Latin square can encode, given n,
 **all** it's nc-coins problem solutions, for **all** capacities c.
 
-Our work improves upon
-1990s 'Mao-Hua Le, Weixuan Li and T. Wang':
-"A generalization of the n-queen problem"
-work in a few ways.
+Our work improves upon 1990s 'Mao-Hua Le, Weixuan Li and T. Wang':
+
+"A generalization of the n-queen problem" work in a few ways.
 
 - we introduce a single Cyclic Latin square approach
 
