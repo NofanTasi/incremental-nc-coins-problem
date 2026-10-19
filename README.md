@@ -12,7 +12,7 @@ work in a few ways.
 
 - we introduce a single Cyclic Latin square approach
 
-- the set of cases is much shorter
+- the set of cases is much smaller
 
 - execution is order n faster
 
