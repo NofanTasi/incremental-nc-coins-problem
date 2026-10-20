@@ -218,6 +218,24 @@ function print_coins_solution(n, c)
     end
 end
 
+# ============================================================================
+# uncomment one of the two triples of lines below for interpretation
+# ============================================================================
+
+# r = collect(4:32)
+# solve(r,print_q=true,print_L=true,print_I=true,verify=true)
+# exit(0)
+
+# or
+
+# r = collect(4:1024)
+# solve(r,print_q=false,print_L=false,print_I=false,verify=false,benchmark=false)
+# exit(0)
+
+# ============================================================================
+# uncomment the lines below for compilation
+# ============================================================================
+
 function main()
     if isempty(ARGS)
         println("==========================================================")

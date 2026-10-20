@@ -11,6 +11,16 @@ $ ./build.sh
 
 an executable is generated in `bin/run/haskell`
 
+you can run the executable interactively, or, for example using
+
+./Incremental-NC-Coins --incremental 8
+./Incremental-NC-Coins --coins 8 3
+./Incremental-NC-Coins --stream 8
+./Incremental-NC-Coins --stream 8 25
+./Incremental-NC-Coins --stream-coins 8 3
+./Incremental-NC-Coins --stream-coins 8 3 25
+./Incremental-NC-Coins --demo-laziness 1000000 500 100
+
 ### clean
 
 ```bash
@@ -31,6 +41,11 @@ $ ./build.sh
 $ cd ..
 ```
 an executable is generated in `bin/run/julia`
+
+you can run the executable interactively, or, for example using
+
+./Incremental-NC-Coins --incremental 8
+./Incremental-NC-Coins --coins 8 3
 
 ### clean
 
@@ -73,7 +88,9 @@ $ ./build.sh
 $ cd ..
 ```
 
-an pdf file is generated in `bin/doc/pdf`
+a pdf file is generated in `bin/doc/pdf`
+
+nothing to run :-) just read it
 
 ### clean
 
