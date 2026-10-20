@@ -1,23 +1,14 @@
 Intro
 
-1:1 cooperating with "FirstName LastName" I managed to formally prove the conjecture stated in OP as 
-bonus.
+1:1 cooperating with @FirstNameLastName I managed to formally prove the conjecture stated in OP as bonus.
 
-Since I am a bit stronger than him in using Lean, I was better placed to implement some of the ideas
-that came up during past months in Lean.
+Since I am a bit stronger than him in using Lean, I was better placed to implement some of the ideas that came up during past months in Lean.
 
-**caveat**: both me and he have used AI to do some of the heavy lifting work. In fact this post,
-with exception of this Intro, was written by AI, and, I am affirmative to admit this: it is a well
-written summary of the solution. We did not keep track of the contributions of one another and AI.
-In fact, several contributions ware inspired by answers and comments here and in the in OP
-referenced related other stack exchange posts.
+**caveat**: both me and he have used AI to do some of the heavy lifting work. In fact this post, with exception of this Intro, was written by AI, and, I am affirmative to admit this: it is a well written summary of the solution. We did not keep track of the contributions of one another and AI.In fact, several contributions were inspired by answers and comments here and in the in OPs referenced related other stack exchange posts.
 
-In appendix I will add formal the Lean proof and a somewhat compact Julia implementation which finds
-the solutions very fast up to huge numbers $n$. In fact, we did some benchmarks and the speed seems
-an order of magnitude $n$ faster than the mathoverflow#510135 answer code implementing the
-'Le Maohua, Li Weixuan and Edward T.Wang' paper verbatim. This should perhaps not come as a
-surprise: all $(n,c)$-coins solutions for **all** $c$, given $n$, are incrementally encoded on
-**one** single $n \times n$ square board.
+Anyway, we knew *what* needed to be done but *how* precisely doing it was tedious. A typical AI "heavy-lifting" task.
+
+In appendix find git repo containing formal the Lean proof and a somewhat compact Julia implementation which finds the solutions very fast up to huge numbers $n$. In fact, we did some benchmarks and the speed seems an order of magnitude $n$ faster than the mathoverflow#510135 answer code implementing the 'Le Maohua, Li Weixuan and Edward T.Wang' paper verbatim. This should perhaps not come as a surprise: all $(n,c)$-coins solutions for **all** $c$, given $n$, are incrementally encoded on **one** single $n \times n$ square board.
 
 notes:
 
@@ -29,53 +20,41 @@ notes:
 
 The Incremental Board
 
-Instead of constructing a separate configuration for each threshold $c$ (which leads to tedious,
-disjoint case-splits), we establish a stronger structural object: a single **Incremental Board**
-represented by an $n \times n$ incremental Latin square $L$. 
+Instead of constructing a separate configuration for each threshold $c$ (which leads to tedious, disjoint case-splits), we establish a stronger structural object: a single **Incremental Board** represented by an $n \times n$ incremental Latin square $L$. 
 
 An $n \times n$ Latin square $L$ is **incremental** if:
-1. Every row and column is a bijection onto $\{0, \dots, n-1\}$.
-2. For every threshold $0 \le k < n$, every sum-diagonal and every difference-diagonal contains at
-most $k+1$ cells with value $L_{i,j} \le k$.
 
-Given such a square, the subsets $S_c = \{(i,j) \mid L_{i,j} < c\}$ simultaneously solve the
-$(n,c)$-coins problem for every $0 \le c \le n$, encoded on a single board.
+1. Every row and column is a bijection onto $\{0, \dots, n-1\}$.
+
+2. For every threshold $0 \le k < n$, every sum-diagonal and every difference-diagonal contains at most $k+1$ cells with value $L_{i,j} \le k$.
+
+Given such a square, the subsets $S_c = \{(i,j) \mid L_{i,j} < c\}$ simultaneously solve the $(n,c)$-coins problem for every $0 \le c \le n$, encoded on a single board.
 
 ---
 
 The Injective-Majorization Principle
 
-Verifying diagonal capacity constraints for piecewise permutations directly via interval summation
-quickly blows up in complexity. We bypass this entirely using the
-**Injective-Majorization Principle**:
+Verifying diagonal capacity constraints for piecewise permutations directly via interval summation quickly blows up in complexity. We bypass this entirely using the **Injective-Majorization Principle**:
 
 Lemma (Injective-Majorization Principle):
 
->! Let $D$ be any diagonal (sum or difference) on the board and let $v(i,j) = L_{i,j}$ be the cell
-value, **if** there exists a function $f(i,j) \le v(i,j)$ which is *injective* when restricted to
-the cells of $D$, **then** the number of cells on $D$ satisfying $v(i,j) \le k$ is at most $k+1$.
+>! Let $D$ be any diagonal (sum or difference) on the board and let $v(i,j) = L_{i,j}$ be the cell value, **if** there exists a function $f(i,j) \le v(i,j)$ which is *injective* when restricted to the cells of $D$, **then** the number of cells on $D$ satisfying $v(i,j) \le k$ is at most $k+1$.
 
 Proof Sketch: 
 
->! For every cell $(i,j) \in D$ where $v(i,j) \le k$, we have $0 \le f(i,j) \le v(i,j) \le k$.
-Because $f$ is injective along $D$, these values map one-to-one into the discrete range
-$\{0, 1, \dots, k\}$, which has size $k+1$. By the Pigeonhole Principle, the number of such cells
-cannot exceed $k+1$. $\blacksquare$
+>! For every cell $(i,j) \in D$ where $v(i,j) \le k$, we have $0 \le f(i,j) \le v(i,j) \le k$. Because $f$ is injective along $D$, these values map one-to-one into the discrete range $\{0, 1, \dots, k\}$, which has size $k+1$. By the Pigeonhole Principle, the number of such cells cannot exceed $k+1$. $\blacksquare$
 
-This reduces checking simultaneous diagonal inequalities to finding simple, well-behaved lower
-bounds that are injective along diagonals.
+This reduces checking simultaneous diagonal inequalities to finding simple, well-behaved lower bounds that are injective along diagonals.
 
 ---
 
 Constructing the Cyclic Latin Squares via Column Permutations
 
-For $n = 5$ and all $n \ge 7$, the incremental board can be constructed compactly as a cyclic Latin
-square defined by:
+For $n = 5$ and all $n \ge 7$, the incremental board can be constructed compactly as a cyclic Latin square defined by:
 
->! $$L_{i,j} = (i + q(j)) \bmod n$$ with values mapped to $[ 1 \dots n ]$
+>! $$L_{i,j} = (i + q(j)) \bmod n$$ with values mapped to $\{ 1, \dots, n \}$
 
-The column permutation functions $q(j)$ (for $j \in 0 \dots n-1$) are partitioned into four infinite
-residue families modulo 6:
+The column permutation functions $q(j)$ (for $j \in 0 \dots n-1$) are partitioned into four infinite residue families modulo 6:
 
 1. Family 1: $n \equiv 1, 5 \pmod 6 \quad (n \ge 5)$
 
@@ -96,8 +75,7 @@ residue families modulo 6:
 
 >! 5-Piece Step with Boundary Pins:
 
->! Because composites sharing factors with 2 and 3 create diagonal resonances, a more delicate
-5-piece layout with boundary pins is required.
+>! Because composites sharing factors with 2 and 3 create diagonal resonances, a more delicate 5-piece layout with boundary pins is required.
 
 >! Let $d = \lfloor n/2 \rfloor$:
 
@@ -117,8 +95,7 @@ residue families modulo 6:
 
 Exceptional Small Cases
 
->! For small dimensions not covered by the asymptotic bounds above ($n \in \{4, 6, 8, 9, 15, 21\}$),
-explicit non-cyclic incremental squares handle the base cases.
+>! For small dimensions not covered by the asymptotic bounds above ($n \in \{8, 9, 15, 21\}$), explicit cyclic incremental squares handle the base cases (see code in git for those permutations). For small dimensions ($n \in \{4, 6\}$), explicit **non**-cyclic incremental squares handle the base cases.
 
 >! For instance, at $n = 6$, the non-cyclic incremental square is given by:
 
@@ -126,5 +103,11 @@ explicit non-cyclic incremental squares handle the base cases.
 
 ----
 
-For Lean, Haskell and Lean code: see https://github.com/NofanTasi/incremental-nc-coins-problem.git
+Appendix
+
+For Lean, Haskell and Lean code:
+
+see https://github.com/NofanTasi/incremental-nc-coins-problem.git
+
+
 
