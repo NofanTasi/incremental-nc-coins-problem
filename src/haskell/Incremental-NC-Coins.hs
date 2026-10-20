@@ -219,6 +219,12 @@ main = do
         -- putStrLn $ "Incremental verification: " ++ show (verifyCoins n 1)
       Nothing -> putStrLn "Invalid n"
 
+    ["--coins", nStr, cStr] -> case (readMaybe nStr, readMaybe cStr) of
+      (Just n, Just c) -> do
+        printCoins n c
+        -- putStrLn $ "Verification result: " ++ show (verifyCoins n c)
+      _ -> putStrLn "Invalid arguments"
+      
     ["--stream", nStr] -> case readMaybe nStr of
       Just n -> streamIncremental n 25
       Nothing -> putStrLn "Invalid n"
@@ -234,12 +240,6 @@ main = do
     ["--stream-coins", nStr, cStr, delayStr] -> case (readMaybe nStr, readMaybe cStr, readMaybe delayStr) of
       (Just n, Just c, Just delayMs) -> streamCoins n c delayMs
       _ -> putStrLn "Invalid arguments for --stream-coins"
-
-    ["--coins", nStr, cStr] -> case (readMaybe nStr, readMaybe cStr) of
-      (Just n, Just c) -> do
-        printCoins n c
-        -- putStrLn $ "Verification result: " ++ show (verifyCoins n c)
-      _ -> putStrLn "Invalid arguments"
 
     ["--demo-laziness", nStr, cStr, kStr] -> case (readMaybe nStr, readMaybe cStr, readMaybe kStr) of
       (Just n, Just c, Just k) -> do
