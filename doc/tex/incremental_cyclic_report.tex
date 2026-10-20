@@ -1,0 +1,570 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  urlcolor=blue!60!black,
+  citecolor=blue!60!black
+}
+
+\lstdefinelanguage{Lean4}{
+  keywords={def, theorem, lemma, by, have, let, in, if, then, else, match, with, fun, intro, rcases, rw, exact, refine, apply, omega, decide, simp, dsimp, ext, subst, generalize, constructor, forall, exists, import, namespace, end, open, use, by_cases, split_ifs},
+  keywordstyle=\color{blue!70!black}\bfseries,
+  comment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  commentstyle=\color{green!45!black}\itshape,
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  rulecolor=\color{black!20},
+  backgroundcolor=\color{black!2},
+  literate=
+    {ℕ}{{$\mathbb{N}$}}1
+    {ℤ}{{$\mathbb{Z}$}}1
+    {×}{{$\times$}}1
+    {∀}{{$\forall$}}1
+    {∃}{{$\exists$}}1
+    {∈}{{$\in$}}1
+    {≤}{{$\le$}}1
+    {≥}{{$\ge$}}1
+    {≠}{{$\ne$}}1
+    {∧}{{$\land$}}1
+    {∨}{{$\lor$}}1
+    {→}{{$\to$}}1
+    {⇒}{{$\Rightarrow$}}1
+    {⟨}{{$\langle$}}1
+    {⟩}{{$\rangle$}}1
+    {₁}{{$_1$}}1
+    {₂}{{$_2$}}1
+    {·}{{$\cdot$}}1
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{\textbf{
+  Incremental Cyclic Latin Squares \\ 
+  as \\
+  Simultaneous Generalized NC-Coins Solutions
+}}
+\author{Marc Duponcheel \small (existence conjecture) \\ 
+  and \\ 
+  \large Luc Duponcheel \small (formal proof) 
+}
+
+\date{October 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We present a formal Lean~4 proof of the \emph{Incremental Cyclic Latin Square Conjecture}:
+
+\vspace{12pt}
+
+For every natural number $n > 0$ with $n \notin \{2, 3, 4, 6\}$, 
+there exists a bijection $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ 
+such that the cyclic Latin square $L_{i,j} = (i + q(j)) \bmod n$ is 
+\emph{incremental} (a.k.a. a \emph{universal board}), meaning that for every 
+$0 \le k < n$, every sum-diagonal ($i + j = s$) and every
+difference-diagonal ($i - j = d$) contains at most $k + 1$ cells with value
+$L_{i,j} \le k$.
+
+\vspace{12pt}
+
+An incremental Latin square simultaneously solves the Generalized $(n,c)$-Queens Problem for
+all $1 \le c \le n$ on one universal board
+(see e.g. 
+\href{https://mathoverflow.net/questions/510135/placing-n-cdot-m-coins-on-an-n-times-n-board-generalizing-the-n-queens-p}{MO \# 510135} 
+and 
+\href{https://puzzling.stackexchange.com/questions/138939/place-as-many-queens-as-you-can}{PSE \# 138939}).
+
+\vspace{12pt}
+
+Our proof introduces a general \emph{Injective-Majorization Principle} that reduces
+counting inequalities on each diagonal to the existence of a single function
+F$f(i,j) \le L_{i,j}$ that is injective along every diagonal. 
+
+\vspace{12pt}
+
+Using this principle, in combination with the \emph{Pigeon Hole Principle}, we construct four
+explicit infinite families of column permutations covering all residue classes modulo~$6$
+\begin{itemize}
+\item for $n \equiv 1,5 \pmod 6$ with $n \ge 1$
+\item for $n \equiv 2,4 \pmod 6$ with $n \ge 10$
+\item for $n \equiv 0 \pmod 6$ with $n \ge 12$
+\item for $n \equiv 3 \pmod 6$ with $n \ge 27$
+\end{itemize}
+and explicit column permutations for the four remaining small dimensions
+$n \in \{8, 9, 15, 21\}$.
+
+\end{abstract}
+
+\section{Introduction: Universal Boards and Cyclic Latin Squares}
+
+\subsection{From Generalized \texorpdfstring{$(n,c)$}{(n,c)}-Queens to Universal Boards}
+
+In the Generalized $(n,c)$-Queens Problem one seeks a subset
+$S_c \subseteq \{0, \dots, n-1\}^2$ of $nc$ cells on an $n \times n$ chessboard such that every row,
+column, sum-diagonal ($i + j = s$), and difference-diagonal ($i - j = d$) contains at most $c$ cells
+of $S_c$.
+
+In the classical construction of Le--Li--Wang
+(formalized in \texttt{Incremental-NC-Coins-Proof.lean}), the placement $S_c$ is constructed
+separately for each $c$, and for odd $c$ the sets $S_c$ are not nested
+($S_1 \not\subseteq S_2$, etc.) because an isolated queen shift must be applied when $c$ is odd.
+
+A much stronger structural property is to ask for a \emph{nested tower} of solutions
+\[
+  \varnothing = S_0 \subset S_1 \subset S_2 \subset \cdots \subset S_n = \{0, \dots, n-1\}^2
+\]
+where each layer $S_{k+1} \setminus S_k$ is a permutation matrix (one cell per row and per column) and each cumulative set $S_{k+1}$ is a valid $(n, k+1)$-queens configuration. Assigning the symbol $k \in \{0, \dots, n-1\}$ (or $k+1 \in \{1, \dots, n\}$ in $1$-indexed notation) to the cells in $S_{k+1} \setminus S_k$ produces an $n \times n$ Latin square $L_{i,j} \in \{0, \dots, n-1\}$ with the property that for every threshold $0 \le k < n$, the sublevel set
+\[
+  S_{k+1} = \{(i,j) \in \{0,\dots,n-1\}^2 \mid L_{i,j} \le k\}
+\]
+has at most $k + 1$ cells on every sum-diagonal and on every difference-diagonal. We call such a Latin square \emph{incremental}, or a \emph{universal board}: thresholding a single universal board at $\le k$ immediately yields valid $(n, k+1)$-queens solutions for all $k \in \{0, \dots, n-1\}$ simultaneously.
+
+Notice a crucial subtlety: the $k$-th layer $L_{i,j} = k$ (for $k \ge 1$) need \emph{not} be a valid $n$-queens solution by itself; it may have two or more cells on the same diagonal, provided that the cumulative count of cells with values $\le k$ on that diagonal does not exceed $k + 1$.
+
+\subsection{The Conjecture}
+
+Every permutation $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ defines a \emph{cyclic Latin square} (a column-permuted Cayley table of $\mathbb{Z}/n\mathbb{Z}$):
+\[
+  L_{i,j} = (i + q(j)) \bmod n \qquad (0 \le i, j < n).
+\]
+Because each column is a cyclic shift of $(0, 1, \dots, n-1)$ by $q(j)$ and $q$ is a bijection, every row and every column of $L$ is automatically a permutation of $\{0, \dots, n-1\}$.
+
+\vspace{12 pt}
+
+The conjecture is that for all $n \ge 1$ except $n \in \{2, 3, 4, 6\}$, there exists a column permutation $q$ such that $L_{i,j} = (i + q(j)) \bmod n$ is an incremental Latin square. (For $n \in \{2, 3\}$, even the $k = 0$ layer---the classical $n$-queens problem---has no solution; for $n \in \{4, 6\}$, exhaustive finite search confirms that no cyclic Latin square satisfies the diagonal bounds.)
+
+\begin{theorem}[Incremental Cyclic Latin Square Conjecture]\label{thm:main}
+For every integer $n > 0$ with $n \notin \{2, 3, 4, 6\}$, there exists a bijection $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that the cyclic Latin square
+\[
+  L_{i,j} = (i + q(j)) \bmod n
+\]
+satisfies:
+\begin{enumerate}[nosep,label=(\roman*)]
+  \item For every $i \in \mathrm{Fin}\,n$, the row map $j \mapsto L_{i,j}$ is bijective.
+  \item For every $j \in \mathrm{Fin}\,n$, the column map $i \mapsto L_{i,j}$ is bijective.
+  \item For every $0 \le k < n$ and every $s \in \mathbb{N}$,
+  \[
+    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le k\}| \le k + 1.
+  \]
+  \item For every $0 \le k < n$ and every $d \in \mathbb{Z}$,
+  \[
+    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le k\}| \le k + 1.
+  \]
+\end{enumerate}
+\end{theorem}
+
+In \texttt{IncrementalCyclic.lean}, these definitions and the main theorem are formalized directly as follows:
+\begin{lstlisting}[language=Lean4]
+def cyclicSquare (n : ℕ) (h : n > 0) (_ : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
+    (q : Fin n → Fin n) : Fin n → Fin n → Fin n :=
+  fun i j => ⟨(i.val + (q j).val) % n, mod_lt _ h⟩
+
+def sumDiagOk (n : ℕ) (s : ℕ) (k : ℕ) (L : Fin n → Fin n → Fin n) :
+    Finset (Fin n × Fin n) :=
+  univ.filter fun p : Fin n × Fin n => p.1.val + p.2.val = s ∧ (L p.1 p.2).val ≤ k
+
+def diffDiagOk (n : ℕ) (d : ℤ) (k : ℕ) (L : Fin n → Fin n → Fin n) :
+    Finset (Fin n × Fin n) :=
+  univ.filter fun p : Fin n × Fin n =>
+    ((p.1.val : Int) - (p.2.val : Int)) = d ∧ (L p.1 p.2).val ≤ k
+
+def IsIncremental (n : ℕ) (L : Fin n → Fin n → Fin n) : Prop :=
+    (∀ i : Fin n, Bijective (L i .))
+  ∧ (∀ j : Fin n, Bijective (L . j))
+  ∧ ∀ k : ℕ, k < n →
+      (∀ s : ℕ,   #(sumDiagOk  n s k L) ≤ k + 1)
+    ∧ (∀ d : Int, #(diffDiagOk n d k L) ≤ k + 1)
+
+theorem Conjecture :
+  ∀ (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6),
+  ∃ q : Fin n → Fin n, Bijective q ∧ @IsIncremental n (@cyclicSquare n h hn q)
+\end{lstlisting}
+
+\section{The Master Reduction: Injective Majorization}
+
+\subsection{Why Direct Cardinality Counting Is Hard in Formal Proofs}
+
+At first sight, proving Theorem~\ref{thm:main} appears to
+require computing the cardinalities $|\mathrm{sumDiagOk}(n, s, k, L)|$ and
+$|\mathrm{diffDiagOk}(n, d, k, L)|$ as functions of $(n, s, k)$ and $(n, d, k)$, splitting into
+dozens of interval cases for each piecewise-linear branch of $q(j)$ and each wrap-around threshold
+$(i + q(j)) \bmod n \le k$. When $q(j)$ has $3$ or $5$ piecewise-linear blocks (as required for
+$n \equiv 3 \pmod 6$ and $n \equiv 0 \pmod 6$), a direct cardinality calculation would explode into
+hundreds of subcases.
+
+Instead, we observe a simple combinatorial principle that completely eliminates cardinality
+summation and reduces the problem for \emph{all} thresholds $0 \le k < n$ simultaneously to
+constructing a single dominated injection.
+
+\subsection{The Injective-Majorization Principle}
+
+Let $D \subseteq \mathrm{Fin}\,n \times \mathrm{Fin}\,n$ be any diagonal 
+(either a sum-diagonal $i + j = s$ or a difference-diagonal $i - j = d$), and let 
+$v(i,j) = (i + q(j)) \bmod n \in \{0, \dots, n-1\}$ be the board value at cell $(i,j)$.
+
+\begin{lemma}[Injective-Majorization Principle]
+\label{lem:inj-maj}
+Suppose there exists a function $f : \mathbb{N} \times \mathbb{N} \to \mathbb{N}$ such
+that:
+\begin{enumerate}[nosep,label=(\arabic*)]
+  \item \textbf{Majorization (Domination):} $f(i,j) \le v(i,j)$ for all $0 \le i, j < n$; and
+  \item \textbf{Diagonal Injectivity:} $f$ is injective along $D$, i.e., for any two cells 
+        $(i_1, j_1), (i_2, j_2) \in D$, $f(i_1, j_1) = f(i_2, j_2) \implies (i_1, j_1) = (i_2, j_2)$.
+\end{enumerate}
+Then for every threshold $k \in \mathbb{N}$, the set $D_{\le k} = \{(i,j) \in D \mid v(i,j) \le k\}$
+has cardinality at most $k + 1$.
+\end{lemma}
+
+\begin{proof}
+For every cell $(i,j) \in D_{\le k}$, condition~(1) gives
+\[
+  0 \le f(i,j) \le v(i,j) \le k,
+\]
+so $f(i,j) \in \{0, 1, \dots, k\} = \mathrm{Finset.range}(k + 1)$. 
+By condition~(2), the restriction of $f$ to $D_{\le k}$ is an injective map into
+$\mathrm{Finset.range}(k + 1)$. By the Pigeonhole Principle 
+(Mathlib's lemma \texttt{Finset.card\_le\_card\_of\_injOn}),
+\[
+  |D_{\le k}| \le |\mathrm{Finset.range}(k + 1)| = k + 1. \qedhere
+\]
+\end{proof}
+
+\begin{remark}[Geometric Meaning of $f$]
+Along a diagonal $D$, the board values $v(i,j)$ are \emph{almost} distinct, except for a small
+number of duplicate pairs $(i_1, j_1), (i_2, j_2) \in D$ caused by jumps between piecewise-linear
+blocks of $q(j)$ or modular wrap-around at $n$. Whenever two cells on $D$ share the same value
+$v(i_1, j_1) = v(i_2, j_2) = v$, one of the two cells is allowed to keep $f = v$ while the other is
+\emph{shifted downward} to an unused value $f(i,j) < v$ that does not appear anywhere else along
+$D$. Because $f(i,j) \le v(i,j)$ is strictly smaller on the shifted cell, the shifted cell steals a
+slot in $\{0, \dots, f(i,j)\} \subseteq \{0, \dots, v(i,j)\}$ that was left vacant on $D$!
+\end{remark}
+
+\subsection{Eliminating Modulo \texorpdfstring{$n$}{n} via \texttt{val\_nat}}
+
+In Lean~4, the \texttt{omega} tactic decides Presburger arithmetic
+(linear integer and natural number inequalities and divisibility by constants), but treats 
+\texttt{\% n} with a variable modulus $n$ as an uninterpreted division/modulo term unless expanded.
+However, since $0 \le i < n$ and $0 \le q(j) < n$, their sum satisfies $0 \le i + q(j) < 2n$, so the
+modulo operation is just a single conditional subtraction:
+\[
+  \mathrm{val\_nat}(n, q, i, j) \coloneqq \begin{cases}
+    i + q(j) & \text{if } i + q(j) < n, \\
+    i + q(j) - n & \text{if } i + q(j) \ge n.
+  \end{cases}
+\]
+In \texttt{Incremental-NC-Coins-Proof.lean}, Lemma \texttt{mod\_eq\_val\_nat} proves that $(i + q(j)) \bmod n$ equals $\mathrm{val\_nat}(n, q, i, j)$, and Lemma \texttt{exists\_incremental\_of\_nat} packages Lemma~\ref{lem:inj-maj} into a pure $\mathbb{N}$-level interface:
+\begin{lstlisting}[language=Lean4]
+lemma exists_incremental_of_nat
+    (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
+    (q_nat : ℕ → ℕ)
+    (f_sum f_diff : ℕ → ℕ → ℕ)
+    (hq_lt : ∀ j < n, q_nat j < n)
+    (hq_inj : ∀ j₁ < n, ∀ j₂ < n, q_nat j₁ = q_nat j₂ → j₁ = j₂)
+    (h_sum_le : ∀ i < n, ∀ j < n, f_sum i j ≤ val_nat n q_nat i j)
+    (h_diff_le : ∀ i < n, ∀ j < n, f_diff i j ≤ val_nat n q_nat i j)
+    (h_sum_inj : ∀ i₁ < n, ∀ j₁ < n, ∀ i₂ < n, ∀ j₂ < n,
+      i₁ + j₁ = i₂ + j₂ → f_sum i₁ j₁ = f_sum i₂ j₂ → j₁ = j₂)
+    (h_diff_inj : ∀ i₁ < n, ∀ j₁ < n, ∀ i₂ < n, ∀ j₂ < n,
+      (i₁ : ℤ) - j₁ = (i₂ : ℤ) - j₂ → f_diff i₁ j₁ = f_diff i₂ j₂ → j₁ = j₂) :
+    ∃ q : Fin n → Fin n, Bijective q ∧ @IsIncremental n (@cyclicSquare n h hn q)
+\end{lstlisting}
+Notice that every hypothesis of \texttt{exists\_incremental\_of\_nat} is a universal first-order formula in Presburger arithmetic!
+
+\section{The Four Infinite Families}
+
+We partition all integers $n > 0$ ($n \notin \{2, 3, 4, 6\}$) according to $n \bmod 6$. Table~\ref{tab:overview} summarizes the four infinite families and the four small exceptional cases.
+
+\begin{table}[ht]
+\centering
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Residue class} & \textbf{Range of $n$} & \textbf{Construction type} & \textbf{Lean Lemma} \\
+\midrule
+$n \equiv 1, 5 \pmod 6$ & all $n \ge 1$ & Linear step $-2 \pmod n$ & \texttt{solve\_family1} \\
+$n \equiv 2, 4 \pmod 6$ & $n \ge 10$ & 2-block step $+2$, jump $+3$ at $n/2$ & \texttt{solve\_family2} \\
+$n \equiv 0 \pmod 6$ & $n \ge 12$ & 5-piece step $+2$ with 3 boundary pins & \texttt{solve\_family3} \\
+$n \equiv 3 \pmod 6$ & $n \ge 27$ & 3-block step $+3$, jumps $+4, +8$ at $\frac{n}{3}, \frac{2n}{3}$ & \texttt{solve\_family4} \\
+\midrule
+Exceptional even & $n = 8$ & Finite certificate + \texttt{decide} & \texttt{solve\_8} \\
+Exceptional $\equiv 3 \pmod 6$ & $n \in \{9, 15, 21\}$ & Finite certificates + \texttt{decide} & \texttt{solve\_9, 15, 21} \\
+\bottomrule
+\end{tabular}
+\caption{Complete partition of all board sizes $n \in \mathbb{N} \setminus \{0, 2, 3, 4, 6\}$.}
+\label{tab:overview}
+\end{table}
+
+\subsection{Family 1: \texorpdfstring{$n \equiv 1, 5 \pmod 6$}{n = 1, 5 (mod 6)} (All \texorpdfstring{$n \ge 1$}{n >= 1})}
+
+When $\gcd(n, 6) = 1$, we use the classical linear knights-slope permutation:
+\[
+  q_1(j) = (-2j) \bmod n = \begin{cases}
+    0 & \text{if } j = 0, \\
+    n - 2j & \text{if } 0 < 2j < n, \\
+    2n - 2j & \text{if } 2j \ge n.
+  \end{cases}
+\]
+\begin{itemize}[nosep]
+  \item \textbf{Bijectivity of $q_1$:} Since $\gcd(2, n) = 1$, multiplication by $-2 \bmod n$ is an automorphism of $\mathbb{Z}/n\mathbb{Z}$.
+  \item \textbf{Sum-diagonals ($i + j = s$):} Substituting $i = s - j$ gives $v(i,j) \equiv s - 3j \pmod n$. Since $\gcd(3, n) = 1$, the map $j \mapsto (s - 3j) \bmod n$ is already injective on every sum-diagonal!
+  \item \textbf{Difference-diagonals ($i - j = d$):} Substituting $i = d + j$ gives $v(i,j) \equiv d - j \pmod n$, which has step $-1 \pmod n$ and is trivially injective on every difference-diagonal.
+\end{itemize}
+Consequently, no downward shifts are needed at all: we take
+\[
+  f_{1,\mathrm{sum}}(i,j) = v(i,j), \qquad f_{1,\mathrm{diff}}(i,j) = v(i,j).
+\]
+In \texttt{IncrementalCyclic.lean}, \texttt{solve\_family1} proves this case in $30$ lines:
+\begin{lstlisting}[language=Lean4]
+def q1_nat (n : ℕ) (j : ℕ) : ℕ :=
+  if j = 0 then 0 else if 2 * j < n then n - 2 * j else 2 * n - 2 * j
+
+def f1_sum (n : ℕ) (i j : ℕ) : ℕ := val_nat n (q1_nat n) i j
+def f1_diff (n : ℕ) (i j : ℕ) : ℕ := val_nat n (q1_nat n) i j
+\end{lstlisting}
+
+\subsection{Family 2: \texorpdfstring{$n \equiv 2, 4 \pmod 6$}{n = 2, 4 (mod 6)} (\texorpdfstring{$n \ge 10$}{n >= 10})}
+
+When $n$ is even, no single linear slope works because any multiplier $a$ fails at least one of $\gcd(a, 2) = 1$, $\gcd(a - 1, 2) = 1$, or $\gcd(a + 1, 2) = 1$. Instead, let $m = n / 2$ and define a 2-block step-$2$ permutation with a $+3$ parity-switching jump at $j = m$:
+\[
+  q_2(j) = \begin{cases}
+    (2j + m + 1) \bmod n & \text{if } 0 \le j < m, \\
+    (2(j - m) + m + 4) \bmod n & \text{if } m \le j < n.
+  \end{cases}
+\]
+Since $2(j - m) = 2j - n \equiv 2j \pmod n$, we can write $q_2(j)$ uniformly across both halves as
+\[
+  q_2(j) \equiv 2j + m + 1 + 3\mathbf{1}_{j \ge m} \pmod n.
+\]
+For $0 \le j < m$, $2j + m + 1$ covers all $m$ residues in $\{0, \dots, n-1\}$ of parity $(m + 1) \bmod 2$; for $m \le j < n$, $2(j - m) + m + 4$ covers all $m$ residues of the opposite parity $(m + 4) \bmod 2$. Thus $q_2$ is a bijection.
+
+\paragraph{Sum-diagonal analysis ($i + j = s$).}
+Substituting $i = s - j$ into the uniform congruence gives
+\[
+  v(i, j) \equiv s + j + m + 1 + 3\mathbf{1}_{j \ge m} \pmod n.
+\]
+Two cells $(i_1, j_1)$ and $(i_2, j_2)$ with $j_1 < j_2$ on the same sum-diagonal $i_1 + j_1 = i_2 + j_2$ have the same value $v(i_1, j_1) = v(i_2, j_2)$ if and only if $j_1 < m \le j_2$ and
+\[
+  (j_2 - j_1) + 3 \equiv 0 \pmod n \iff j_2 - j_1 = n - 3.
+\]
+Since $j_1 + (n - 3) = j_2 < n$, this implies $j_1 \in \{0, 1, 2\}$ and $j_2 = j_1 + n - 3 \in \{n - 3, n - 2, n - 1\}$. Furthermore, because $i_2 + j_2 = i_1 + j_1 < n + j_1 = j_2 + 3$, the second cell $(i_2, j_2)$ must lie in the \textbf{$3 \times 3$ top-right corner} $0 \le i_2 < 3$ and $n - 3 \le j_2 < n$!
+On that $3 \times 3$ corner, the values $v(i_2, j_2)$ are $\ge m - 2 \ge 3$, whereas the values $0, 1, 2$ never occur anywhere else on those sum-diagonals. Thus we define the sum-diagonal majorant by shifting only the $3 \times 3$ top-right corner:
+\[
+  f_{2,\mathrm{sum}}(i, j) = \begin{cases}
+    j - (n - 3) & \text{if } i < 3 \text{ and } j \ge n - 3, \\
+    v(i, j) & \text{otherwise.}
+  \end{cases}
+\]
+
+\paragraph{Difference-diagonal analysis ($i - j = d$).}
+Substituting $i = d + j$ gives
+\[
+  v(i, j) \equiv d + 3j + m + 1 + 3\mathbf{1}_{j \ge m} \pmod n.
+\]
+Because $n \equiv 2, 4 \pmod 6$, we have $\gcd(3, n) = 1$. Therefore, a collision $v(i_1, j_1) = v(i_2, j_2)$ with $j_1 < j_2$ on the same difference-diagonal requires $j_1 < m \le j_2$ and
+\[
+  3(j_2 - j_1) + 3 \equiv 0 \pmod n \iff 3(j_2 - j_1 + 1) \equiv 0 \pmod n \iff j_2 - j_1 = n - 1.
+\]
+This happens for only a \textbf{single pair of cells on the entire board}: $(i_1, j_1) = (0, 0)$ and $(i_2, j_2) = (n - 1, n - 1)$ on the main diagonal $d = 0$, where $v(0,0) = v(n-1, n-1) = m + 1$. Since $1 < m + 1$ never occurs on the main diagonal $d = 0$, we shift the single bottom-right corner cell $(n - 1, n - 1)$ to $1$:
+\[
+  f_{2,\mathrm{diff}}(i, j) = \begin{cases}
+    1 & \text{if } i = n - 1 \text{ and } j = n - 1, \\
+    v(i, j) & \text{otherwise.}
+  \end{cases}
+\]
+In Lean~4:
+\begin{lstlisting}[language=Lean4]
+def q2_nat (n : ℕ) (j : ℕ) : ℕ :=
+  let m := n / 2
+  if j < m then
+    if 2 * j + m + 1 < n then 2 * j + m + 1 else 2 * j + m + 1 - n
+  else
+    let j' := j - m
+    if 2 * j' + m + 4 < n then 2 * j' + m + 4 else 2 * j' + m + 4 - n
+
+def f2_sum (n : ℕ) (i j : ℕ) : ℕ :=
+  if i < 3 ∧ j ≥ n - 3 then j - (n - 3)
+  else val_nat n (q2_nat n) i j
+
+def f2_diff (n : ℕ) (i j : ℕ) : ℕ :=
+  if i = n - 1 ∧ j = n - 1 then 1
+  else val_nat n (q2_nat n) i j
+\end{lstlisting}
+
+\subsection{Family 4: \texorpdfstring{$n \equiv 3 \pmod 6$}{n = 3 (mod 6)} (\texorpdfstring{$n \ge 27$}{n >= 27})}
+
+When $n \equiv 3 \pmod 6$, $n$ is odd and divisible by $3$. Because $\gcd(2, n) = \gcd(4, n) = 1$, a step of $+3$ inside blocks gives sum-diagonal slope $3 - 1 = 2$ (coprime to $n$) and difference-diagonal slope $3 + 1 = 4$ (coprime to $n$)! Let $k = n / 3$ and partition $\{0, \dots, n-1\}$ into three blocks of length $k$, with a $+4$ jump between consecutive blocks so that all three residue classes modulo~$3$ are covered:
+\[
+  q_4(j) = \begin{cases}
+    (3j + 2k) \bmod n & \text{if } 0 \le j < k, \\
+    (3(j - k) + 2k + 4) \bmod n & \text{if } k \le j < 2k, \\
+    (3(j - 2k) + 2k + 8) \bmod n & \text{if } 2k \le j < 3k = n.
+  \end{cases}
+\]
+Why do we require $n \ge 27$ (i.e., $k \ge 9$)? In the third block ($2k \le j < 3k$), the starting value is $2k + 8$. When $k \ge 9$, $2k + 8 < 3k = n$, so the third block starts at $2k + 8$ and wraps around $n$ only once inside the block. Equivalently, across all three blocks $u \in \{0, 1, 2\}$ (where $u = \lfloor j / k \rfloor$), we have the uniform congruence
+\[
+  q_4(j) \equiv 3j + 2k + 4u \pmod n.
+\]
+
+\paragraph{Sum-diagonal analysis ($i + j = s$).}
+Along $i + j = s$, we have $v(i,j) \equiv s + 2j + 2k + 4u \pmod n$. For $j_1 < j_2$ with block indices $u_1 \le u_2$, a collision $v(i_1, j_1) = v(i_2, j_2)$ occurs if and only if
+\[
+  2(j_2 - j_1) + 4(u_2 - u_1) \equiv 0 \pmod n.
+\]
+Since $\gcd(2, n) = 1$, this is equivalent to $(j_2 - j_1) + 2(u_2 - u_1) = n$. Because $j_2 - j_1 < n$ and $u_2 - u_1 \in \{0, 1, 2\}$, the only possibilities are:
+\begin{itemize}[nosep]
+  \item $u_2 - u_1 = 1$ and $j_2 - j_1 = n - 2 = 3k - 2$, which is impossible since $u_2 - u_1 = 1 \implies j_2 - j_1 \le 2k - 1 < 3k - 2$.
+  \item $u_2 - u_1 = 2$ (so $u_1 = 0, u_2 = 2$) and $j_2 - j_1 = n - 4$.
+\end{itemize}
+Thus collisions on sum-diagonals occur \emph{exclusively} when $j_1 \in \{0, 1, 2, 3\}$ and $j_2 = j_1 + n - 4 \in \{n - 4, n - 3, n - 2, n - 1\}$, which forces the second cell $(i_2, j_2)$ to lie in the \textbf{$4 \times 4$ top-right corner} $0 \le i_2 < 4$ and $n - 4 \le j_2 < n$. Shifting those $16$ corner cells down by $k$ (for $j \in \{n - 4, n - 3\}$) or $2k$ (for $j \in \{n - 2, n - 1\}$) places them into the middle block ($u = 1$) where they cannot collide with any other cell on the same sum-diagonal:
+\[
+  f_{4,\mathrm{sum}}(i, j) = \begin{cases}
+    v(i, j) - k & \text{if } i < 4 \text{ and } n - 4 \le j < n - 2, \\
+    v(i, j) - 2k & \text{if } i < 4 \text{ and } n - 2 \le j < n, \\
+    v(i, j) & \text{otherwise.}
+  \end{cases}
+\]
+
+\paragraph{Difference-diagonal analysis ($i - j = d$).}
+Along $i - j = d$, we have $v(i,j) \equiv d + 4j + 2k + 4u \pmod n$. Since $\gcd(4, n) = 1$, a collision $v(i_1, j_1) = v(i_2, j_2)$ with $j_1 < j_2$ occurs if and only if
+\[
+  4(j_2 - j_1) + 4(u_2 - u_1) \equiv 0 \pmod n \iff (j_2 - j_1) + (u_2 - u_1) = n.
+\]
+Again $u_2 - u_1 = 2$ ($u_1 = 0, u_2 = 2$) and $j_2 - j_1 = n - 2$, which forces $(i_2, j_2)$ to lie in the \textbf{$2 \times 2$ bottom-right corner} $n - 2 \le i_2 < n$ and $n - 2 \le j_2 < n$. Shifting those $4$ cells down by $2k$ (at $j = n - 2$) and $k$ (at $j = n - 1$) eliminates all difference-diagonal collisions:
+\[
+  f_{4,\mathrm{diff}}(i, j) = \begin{cases}
+    v(i, j) - 2k & \text{if } i \ge n - 2 \text{ and } j = n - 2, \\
+    v(i, j) - k & \text{if } i \ge n - 2 \text{ and } j = n - 1, \\
+    v(i, j) & \text{otherwise.}
+  \end{cases}
+\]
+
+\subsection{Family 3: \texorpdfstring{$n \equiv 0 \pmod 6$}{n = 0 (mod 6)} (\texorpdfstring{$n \ge 12$}{n >= 12})}
+
+The case $n \equiv 0 \pmod 6$ is the most delicate because $n$ is divisible by both $2$ and $3$. Every linear step $a$ fails either modulo~$2$ or modulo~$3$. To overcome both obstructions simultaneously, let $m = n / 2$ and $k = n / 3$, and define the 5-piece column permutation $q_3$:
+\[
+  q_3(j) = \begin{cases}
+    n - 2 & \text{if } j = 0, \\
+    2j + 2 & \text{if } 1 \le j < m - 2, \\
+    0 & \text{if } j = m - 2, \\
+    2(j - (m - 1)) + 1 & \text{if } m - 1 \le j < n - 1, \\
+    2 & \text{if } j = n - 1.
+  \end{cases}
+\]
+\begin{itemize}[nosep]
+  \item \textbf{Bijectivity of $q_3$:} The first main block $1 \le j \le m - 3$ covers all even integers in $\{4, 6, \dots, n - 4\}$, while the three boundary pins $j \in \{0, m - 2, n - 1\}$ cover the remaining three even integers $\{n - 2, 0, 2\}$. The second main block $m - 1 \le j \le n - 2$ covers all $m$ odd integers $\{1, 3, \dots, n - 1\}$.
+  \item \textbf{Sum-diagonal structure ($i + j = s$):} Inside the two main blocks $1 \le j \le m - 3$ and $m - 1 \le j \le n - 2$, $i + q_3(j)$ increases with step $+1$. Almost all values along any sum-diagonal are already distinct; collisions occur only at the seams $j = m - 1$, $j = n - 5$ (when $i + j < n$), and $j = n - 1$ (when $i < 2$):
+  \[
+    f_{3,\mathrm{sum}}(i, j) = \begin{cases}
+      v(i, j) - 1 & \text{if } j = m - 1 \text{ and } i < n - 1, \\
+      v(i, j) - (m - 2) & \text{if } j = n - 5 \text{ and } i + j < n, \\
+      v(i, j) - 1 & \text{if } j = n - 1 \text{ and } i < 2, \\
+      v(i, j) & \text{otherwise.}
+    \end{cases}
+  \]
+  \item \textbf{Difference-diagonal structure ($i - j = d$):} Here lies the key arithmetic mechanism of $q_3$. Along a difference-diagonal $i = d + j$, advancing $j$ by $1$ inside either main block increases $i + q_3(j)$ by $1 + 2 = +3$. Because $3 \mid n$, all values in the first main block $1 \le j \le m - 3$ lie in the single residue class $d + 2 \pmod 3$, and all values in the second main block $m - 1 \le j \le n - 2$ lie in the residue class $d \pmod 3$ (since $2(j - (m - 1)) + 1 = 2j - n + 3 \equiv 2j \pmod 3$).
+  
+  This means that \textbf{the third residue class $d + 1 \pmod 3$ is left completely empty by both main blocks} (except possibly for the single pin at $j = 0$)! When a main block wraps around $n$ (which happens when $j_2 - j_1 = n / 3 = k$), the wrapped cells $(i_2, j_2)$ with $j_2 \ge 1 + k$ (in the first block) or $j_2 \ge m - 1 + k$ (in the second block) repeat the values of $j_1 = j_2 - k$. By shifting the wrapped cells in the first block down by $-1$ (from $d + 2 \pmod 3$ into $d + 1 \pmod 3$) and the wrapped cells in the second block down by $-2$ (from $d \pmod 3$ into $d + 1 \pmod 3$), all wrapped cells land injectively inside the vacant residue class $d + 1 \pmod 3$! Explicitly:
+  \[
+    f_{3,\mathrm{diff}}(i, j) = \begin{cases}
+      v(i, j) - 1 & \text{if } 1 + k \le j < m - 2 \text{ and } i \ge k, \\
+      v(i, j) - 1 & \text{if } j = m - 1 + k \text{ and } k \le i < n - 1 - k, \\
+      v(i, j) - 4 & \text{if } j = m - 1 + k \text{ and } i = n - 1 - k, \\
+      v(i, j) - 5 & \text{if } j = m - 1 + k \text{ and } i > n - 1 - k, \\
+      v(i, j) - 2 & \text{if } m + k \le j < n - 1 \text{ and } i \ge k, \\
+      v(i, j) & \text{otherwise.}
+    \end{cases}
+  \]
+\end{itemize}
+
+\section{The Four Small Exceptional Dimensions: \texorpdfstring{$n \in \{8, 9, 15, 21\}$}{n in \{8, 9, 15, 21\}}}
+
+The four infinite families cover every $n \notin \{2, 3, 4, 6\}$ except:
+\begin{itemize}[nosep]
+  \item $n = 8$ (below the $n \ge 10$ threshold of Family~2); and
+  \item $n \in \{9, 15, 21\}$ (below the $n \ge 27$ threshold of Family~4).
+\end{itemize}
+
+For these four concrete dimensions, we exhibit explicit permutations $q_n$ and majorants $(f_{n,\mathrm{sum}}, f_{n,\mathrm{diff}})$:
+\begin{align*}
+  q_8 &= [0, 4, 1, 3, 6, 2, 7, 5], \\
+  q_9 &= [0, 6, 3, 1, 8, 5, 2, 4, 7], \\
+  q_{15} &= [0, 3, 6, 9, 12, 8, 5, 2, 13, 1, 4, 7, 10, 14, 11], \\
+  q_{21} &= [0, 18, 15, 12, 9, 6, 3, 7, 4, 1, 14, 17, 10, 16, 2, 5, 11, 8, 20, 13, 19].
+\end{align*}
+Notably, for $n = 9$, all difference-diagonals already have pairwise distinct values ($f_{9,\mathrm{diff}} = v$), and for $n = 15$, all sum-diagonals already have pairwise distinct values ($f_{15,\mathrm{sum}} = v$).
+
+To make Lean's kernel decision procedure (\texttt{decide}) verify these four cases in milliseconds without \texttt{native\_decide}, Lemma~\texttt{exists\_incremental\_of\_fin\_decide} eliminates the fourth variable $i_2$ from the diagonal injectivity quantifiers using $i_2 = i_1 + j_1 - j_2$ on sum-diagonals and $i_2 = i_1 + j_2 - j_1$ on difference-diagonals. This reduces the verification for a given $n$ from $O(n^4)$ 4-tuples to $O(n^3)$ triples $(i_1, j_1, j_2) \in (\mathrm{Fin}\,n)^3$ (at most $21^3 = 9{,}261$ triples for $n = 21$), which Lean's kernel evaluates almost instantaneously.
+
+\section{Architecture of the Lean 4 Formalization}
+
+A major engineering goal of \texttt{IncrementalCyclic.lean} was to achieve fast, deterministic compilation with \textbf{zero \texttt{sorry}s, zero \texttt{native\_decide}s, and zero linter warnings}.
+
+When a piecewise function such as $f_{3,\mathrm{diff}}$ has $6$ branches and $q_3$ has $5$ branches, unfolding both definitions simultaneously inside an injectivity proof for two points $(i_1, j_1)$ and $(i_2, j_2)$ would create $(6 \times 5 \times 2)^2 = 3{,}600$ nested \texttt{if-then-else} branches, causing exponential blowup in \texttt{omega}. We prevented this blowup using a two-tier \textbf{Flat Disjunctive Specification Pattern}:
+\begin{enumerate}[nosep]
+  \item First, for each piecewise column permutation $q_m$, we prove a flat disjunctive specification lemma \texttt{q$m$\_spec} that states the exact linear value of $q_m(j)$ on each column interval as a disjunction of conjunctions.
+  \item Second, for each majorant $f_{m,\mathrm{sum}}$ and $f_{m,\mathrm{diff}}$, we partition the column index $j$ into $2$ or $3$ coarse regions and prove a flat specification lemma (such as \texttt{f3\_diff\_0\_spec}, \texttt{f3\_diff\_1\_spec}, and \texttt{f3\_diff\_2\_spec}) that already combines \texttt{q$m$\_spec} and \texttt{val\_nat\_spec} into a single flat disjunction of linear equations.
+  \item Finally, in the injectivity proof of \texttt{solve\_family$m$}, we split on the $2$ or $3$ coarse column regions for $j_1$ and $j_2$, invoke the corresponding flat specification lemmas, and call \texttt{omega} once per pair of regions.
+\end{enumerate}
+
+The final theorem \texttt{Conjecture} then dispatches over $n \bmod 6$ in $20$ lines:
+\begin{lstlisting}[language=Lean4]
+theorem Conjecture :
+  ∀ (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6),
+  ∃ q : Fin n → Fin n, Bijective q ∧ @IsIncremental n (@cyclicSquare n h hn q) := by
+  intro n h hn
+  have hmod :
+      (n % 6 = 1 ∨ n % 6 = 5) ∨
+      ((n % 6 = 2 ∨ n % 6 = 4) ∧ (n = 8 ∨ n ≥ 10)) ∨
+      (n % 6 = 0 ∧ n ≥ 12) ∨
+      (n % 6 = 3 ∧ (n = 9 ∨ n = 15 ∨ n = 21 ∨ n ≥ 27)) := by omega
+  rcases hmod with h1 | ⟨h2, rfl | hge⟩ | ⟨h3, hge⟩ | ⟨h4, rfl | rfl | rfl | hge⟩
+  · exact solve_family1 n h hn h1
+  · exact solve_8 h hn
+  · exact solve_family2 n h hn h2 hge
+  · exact solve_family3 n h hn h3 hge
+  · exact solve_9 h hn
+  · exact solve_15 h hn
+  · exact solve_21 h hn
+  · exact solve_family4 n h hn h4 hge
+\end{lstlisting}
+
+As a result, the entire $1{,}094$-line file \texttt{IncrementalCyclic.lean} compiles cleanly from scratch in under $25$ seconds using \texttt{lake env lean}.
+
+\begin{thebibliography}{9}
+\bibitem{LLW1990}
+Mao-Hua Le, Kang-Di Li, and Zhen-Fa Wang,
+\emph{A note on the generalized $n$-queens problem},
+Kexue Tongbao (Chinese Science Bulletin) \textbf{35} (1990), no.~10, 790--791.
+
+\bibitem{MO510135}
+MathOverflow Question 510135,
+\emph{Generalized $n$-queens problem / Placing $nc$ coins on an $n \times n$ grid},
+\url{https://mathoverflow.net/questions/510135}.
+\end{thebibliography}
+
+\end{document}

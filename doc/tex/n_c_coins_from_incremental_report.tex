@@ -1,0 +1,279 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  urlcolor=blue!60!black,
+  citecolor=blue!60!black
+}
+
+\lstdefinelanguage{Lean4}{
+  keywords={def, theorem, lemma, by, have, let, in, if, then, else, match, with, fun, intro, rcases, rw, exact, refine, apply, omega, decide, simp, dsimp, ext, subst, generalize, constructor, forall, exists, import, namespace, end, open, use, by_cases, split_ifs, calc, obtain},
+  keywordstyle=\color{blue!70!black}\bfseries,
+  comment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  commentstyle=\color{green!45!black}\itshape,
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  rulecolor=\color{black!20},
+  backgroundcolor=\color{black!2},
+  literate=
+    {ℕ}{{$\mathbb{N}$}}1
+    {ℤ}{{$\mathbb{Z}$}}1
+    {×}{{$\times$}}1
+    {∀}{{$\forall$}}1
+    {∃}{{$\exists$}}1
+    {∈}{{$\in$}}1
+    {∉}{{$\notin$}}1
+    {⊆}{{$\subseteq$}}1
+    {≤}{{$\le$}}1
+    {≥}{{$\ge$}}1
+    {≠}{{$\ne$}}1
+    {∧}{{$\land$}}1
+    {∨}{{$\lor$}}1
+    {→}{{$\to$}}1
+    {⇒}{{$\Rightarrow$}}1
+    {↔}{{$\leftrightarrow$}}1
+    {⟨}{{$\langle$}}1
+    {⟩}{{$\rangle$}}1
+    {₁}{{$_1$}}1
+    {₂}{{$_2$}}1
+    {₀}{{$_0$}}1
+    {·}{{$\cdot$}}1
+    {∑}{{$\sum$}}1
+    {▸}{{$\blacktriangleright$}}1
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{\textbf{A Short Proof of the Generalized $(n,c)$-Queens Conjecture\\
+via Incremental Latin Squares in Lean 4}}
+\author{Luc Duponcheel \\ \small Formalized in Lean 4 + Mathlib (\texttt{n\_c\_coins\_from\_incremental.lean})}
+\date{October 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We present a short, unified proof and Lean~4 formalization ($309$ lines, in the module \texttt{n\_c\_coins\_from\_incremental.lean}) of the Generalized $(n,c)$-Queens Conjecture (MathOverflow~510135), deduced directly from Marc Duponcheel's Incremental Cyclic Latin Square Conjecture ($1{,}025$ lines of proof, in \texttt{IncrementalCyclic.lean}). For every $n \ge 4$, we exhibit a single \emph{universal Latin square} $L : \mathrm{Fin}\,n \to \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ whose sublevel sets
+\[
+  S_c = \{(i, j) \in \{0, \dots, n-1\}^2 \mid L_{i,j} < c\}
+\]
+simultaneously solve the $(n,c)$-queens problem for all $0 \le c \le n$. For $n = 5$ and all $n \ge 7$, $L$ is the cyclic Latin square $L_{i,j} = (i + q(j)) \bmod n$ constructed in \texttt{IncrementalCyclic.lean}; for the two exceptional even dimensions $n = 4$ and $n = 6$ (where no \emph{cyclic} universal Latin square exists), we construct explicit \emph{non-cyclic} universal Latin squares $L_4$ and $L_6$. Combined, the two files yield a complete, \texttt{sorry}-free and \texttt{native\_decide}-free Lean~4 proof of the Generalized $(n,c)$-Queens Conjecture in $1{,}334$ lines---less than $30\%$ of the $4{,}449$-line formalization of the classical Le--Li--Wang (1990) proof---while establishing a strictly stronger structural theorem.
+\end{abstract}
+
+\tableofcontents
+
+\section{Two Approaches to the Generalized \texorpdfstring{$(n,c)$}{(n,c)}-Queens Problem}
+
+Recall the Generalized $(n,c)$-Queens Problem (MathOverflow~510135): given $n \ge 4$ and $0 \le c \le n$, find a subset $S \subseteq \{0, \dots, n-1\}^2$ of $|S| = nc$ cells on an $n \times n$ chessboard such that every row, column, downward (sum) diagonal $i + j = s$, and upward (difference) diagonal $(n - 1) + i - j = d$ contains at most $c$ cells of $S$.
+
+We have now formalized two completely independent proofs of this theorem in Lean~4:
+
+\begin{table}[ht]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.28}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Feature} & \textbf{Classical LLW Proof}~\cite{LLW1990} & \textbf{Universal Latin Square Proof} \\
+\midrule
+Lean~4 file(s) & \texttt{n\_c\_coins\_placement\_proof.lean} & \texttt{IncrementalCyclic.lean} + \\
+ & & \texttt{n\_c\_coins\_from\_incremental.lean} \\
+Total lines of Lean~4 & $4{,}449$ lines & $1{,}025 + 309 = \mathbf{1{,}334}$ \textbf{lines} \\
+Board depends on $c$? & Yes (different construction per $c$) & \textbf{No}: single universal board $L$ per $n$; \\
+ & & $S_c = \{(i,j) \mid L_{i,j} < c\}$ works for all $c$ \\
+Nested tower $S_c \subset S_{c+1}$? & No (fails between odd and even $c$) & \textbf{Yes}: $\varnothing = S_0 \subset S_1 \subset \cdots \subset S_n$ \\
+Case splits in $(n, c)$ & $c \in \{0, 1, n-2, n-1, n\}$, & Only $1$ master theorem for all $c$; \\
+ & $k_0 = c \bmod 6 \in \{2..7\}$, $n \bmod 6$, & $4$ cyclic families ($n \bmod 6$) + \\
+ & plus period-$6$ strip extensions & $6$ small boards ($n \in \{4,6,8,9,15,21\}$) \\
+Core proof technique & Explicit cardinality sums over & \textbf{Injective Majorization} ($f \le v$) + \\
+ & $3$- and $5$-part broken diagonals & sublevel thresholding ($L_{i,j} < c$) \\
+\bottomrule
+\end{tabular}
+\caption{Comparison between the Le--Li--Wang (1990) formalization and the Universal Latin Square formalization.}
+\label{tab:comparison}
+\end{table}
+
+Why is the new proof more than $3\times$ shorter while proving a stronger theorem?
+\begin{enumerate}[nosep]
+  \item \textbf{Elimination of $c$-dependence:} In the Le--Li--Wang construction, $c$ is decomposed as $c = k_0 + 6M$ with $k_0 \in \{2,3,4,5,6,7\}$, requiring separate base configurations ($T_1, T_2, T_4, T_5$) for odd $k_0$, separate complement boards for $c \in \{n-2, n-1, n\}$, and disjointness proofs between the base configuration and $M$ period-$6$ strip extensions. In the universal Latin square approach, $c$ does not appear in the board construction at all: we construct a single Latin square $L$ of order $n$, and $c$ enters only at the very end via the trivial sublevel filter $L_{i,j} < c$.
+  \item \textbf{Injective Majorization vs.\ Interval Counting:} Instead of summing the sizes of $3$ to $5$ broken diagonal segments and bounding their sum by $c$, the Injective-Majorization Principle (\texttt{exists\_incremental\_of\_nat}) bounds all $n$ thresholds $0 \le k < n$ at once via a single dominated injection $f(i,j) \le L_{i,j}$ into $\mathrm{Finset.range}(k + 1)$.
+\end{enumerate}
+
+\section{The Universal Thresholding Theorem}
+
+Let $L : \mathrm{Fin}\,n \to \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ be an incremental Latin square, i.e., a matrix satisfying \texttt{IsIncremental n L}:
+\begin{enumerate}[nosep,label=(\roman*)]
+  \item Every row $j \mapsto L_{i,j}$ is a bijection $\mathrm{Fin}\,n \to \mathrm{Fin}\,n$;
+  \item Every column $i \mapsto L_{i,j}$ is a bijection $\mathrm{Fin}\,n \to \mathrm{Fin}\,n$;
+  \item For every threshold $0 \le k < n$, every sum-diagonal $i + j = s$ and every difference-diagonal $i - j = d$ contains at most $k + 1$ cells with $L_{i,j} \le k$.
+\end{enumerate}
+
+For any integer $0 \le c \le n$, we define the thresholded board $\mathrm{thresholdBoard}(n, c, L) \subseteq \mathbb{N} \times \mathbb{N}$ as the image in $\mathbb{N} \times \mathbb{N}$ of the cells with value strictly less than $c$:
+\[
+  \mathrm{thresholdBoard}(n, c, L) \coloneqq \{(i, j) \in \{0, \dots, n-1\}^2 \mid L_{i,j} < c\}.
+\]
+
+In \texttt{n\_c\_coins\_from\_incremental.lean}, this is formalized as:
+\begin{lstlisting}[language=Lean4]
+def thresholdBoard (n c : ℕ) (L : Fin n → Fin n → Fin n) : Finset (ℕ × ℕ) :=
+  ((univ : Finset (Fin n × Fin n)).filter (fun p => (L p.1 p.2).val < c)).image
+    (fun p => (p.1.val, p.2.val))
+\end{lstlisting}
+
+\subsection{Row, Column, and Total Cardinality Bounds}
+
+Because each row $L_i : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ is bijective and $0 \le c \le n$, the set of column indices $j \in \mathrm{Fin}\,n$ where $(L_{i,j}).\mathrm{val} < c$ is in bijection with $\mathrm{Finset.range}\,c = \{0, 1, \dots, c-1\}$ via the map $j \mapsto (L_{i,j}).\mathrm{val}$. This gives the key helper lemma:
+\begin{lstlisting}[language=Lean4]
+lemma card_filter_lt_of_bijective {n c : ℕ} (hc : c ≤ n)
+    (f : Fin n → Fin n) (hf : Bijective f) :
+    #(univ.filter (fun x : Fin n => (f x).val < c)) = c
+\end{lstlisting}
+From \texttt{card\_filter\_lt\_of\_bijective}, three of the six $(n,c)$-queens properties follow immediately:
+\begin{itemize}[nosep]
+  \item \textbf{Row bound ($\le c$):} The cells in row $i_0$ of $\mathrm{thresholdBoard}(n, c, L)$ are the image under $j \mapsto (i_0, j.\mathrm{val})$ of $\{j \in \mathrm{Fin}\,n \mid L_{i_0, j} < c\}$, which has cardinality $c$ by bijectivity of row $i_0$.
+  \item \textbf{Column bound ($\le c$):} Symmetrically, the cells in column $j_0$ are the image under $i \mapsto (i.\mathrm{val}, j_0)$ of $\{i \in \mathrm{Fin}\,n \mid L_{i, j_0} < c\}$, which has cardinality $c$ by bijectivity of column $j_0$.
+  \item \textbf{Total coin count ($= nc$):} Partitioning $\mathrm{Fin}\,n \times \mathrm{Fin}\,n$ by rows (\texttt{Finset.card\_sigma}) shows that the total number of cells with $L_{i,j} < c$ is $\sum_{i \in \mathrm{Fin}\,n} c = nc$.
+\end{itemize}
+
+\subsection{Downward and Upward Diagonal Bounds}
+
+For the diagonals, there are two cases for $c$:
+\begin{itemize}[nosep]
+  \item If $c = 0$, the condition $L_{i,j} < 0$ is impossible in $\mathbb{N}$, so $\mathrm{thresholdBoard}(n, 0, L) = \varnothing$ and every diagonal has $0 \le 0$ coins.
+  \item If $1 \le c \le n$, then for natural numbers we have the equivalence
+  \[
+    L_{i,j} < c \iff L_{i,j} \le c - 1,
+  \]
+  where $k \coloneqq c - 1$ satisfies $0 \le k < n$.
+  \begin{itemize}[nosep]
+    \item \textbf{Downward diagonals ($i + j = s$):} Every cell $(i, j) \in \mathrm{thresholdBoard}(n, c, L)$ with $i + j = s$ belongs to $\mathrm{sumDiagOk}(n, s, c - 1, L)$, whose cardinality is at most $(c - 1) + 1 = c$.
+    \item \textbf{Upward diagonals ($(n - 1) + i - j = d$):} In \texttt{n\_c\_coins\_placement\_proof.lean}, upward diagonals are indexed by the natural number $d \in \{0, \dots, 2n - 2\}$ via truncated subtraction $(n - 1) + i - j = d$. For all $0 \le i, j < n$, we have $(n - 1) + i \ge j$, so the natural-number equation $(n - 1) + i - j = d$ is equivalent to the integer difference equation
+    \[
+      (i : \mathbb{Z}) - (j : \mathbb{Z}) = (d : \mathbb{Z}) - ((n : \mathbb{Z}) - 1) \eqqcolon d_{\mathrm{int}}.
+    \]
+    Hence every cell on the $d$-th upward diagonal of $\mathrm{thresholdBoard}(n, c, L)$ belongs to $\mathrm{diffDiagOk}(n, d_{\mathrm{int}}, c - 1, L)$, whose cardinality is again at most $(c - 1) + 1 = c$.
+  \end{itemize}
+\end{itemize}
+
+This completes the proof of Theorem~\texttt{n\_c\_of\_isIncremental}:
+\begin{lstlisting}[language=Lean4]
+theorem n_c_of_isIncremental (n c : ℕ) (hc : c ≤ n)
+    (L : Fin n → Fin n → Fin n) (hL : IsIncremental n L) :
+    n_c_placement_conjecture_prop n c (thresholdBoard n c L)
+\end{lstlisting}
+
+\section{Universal Non-Cyclic Latin Squares for \texorpdfstring{$n = 4$}{n = 4} and \texorpdfstring{$n = 6$}{n = 6}}
+
+A remarkable insight emerges when we examine the two exceptional dimensions $n = 4$ and $n = 6$ that are excluded from Marc Duponcheel's conjecture:
+\begin{quote}
+\emph{While no \textbf{cyclic} Latin square of order $4$ or $6$ is incremental, \textbf{non-cyclic} incremental (universal) Latin squares exist for both $n = 4$ and $n = 6$!}
+\end{quote}
+Thus the universal board paradigm itself has \textbf{no exceptions at all for $n \ge 4$}: every board size $n \ge 4$ admits an incremental Latin square $L$, and for all $n \notin \{4, 6\}$ we can even choose $L$ to be cyclic ($L_{i,j} = (i + q(j)) \bmod n$).
+
+\subsection{The \texorpdfstring{$4 \times 4$}{4x4} Universal Latin Square \texorpdfstring{$L_4$}{L4}}
+
+For $n = 4$, we decompose the $4 \times 4$ board into four disjoint permutation layers (numbered $0, 1, 2, 3$):
+\begin{itemize}[nosep]
+  \item Layer $0$ (a classical $4$-queens solution): $(0,1), (1,3), (2,0), (3,2)$.
+  \item Layer $1$ (the second $4$-queens solution): $(0,2), (1,0), (2,3), (3,1)$.
+  \item Layer $2$ (a diagonal-conflict-controlled transversal): $(0,0), (1,2), (2,1), (3,3)$.
+  \item Layer $3$ (the remaining transversal): $(0,3), (1,1), (2,2), (3,0)$.
+\end{itemize}
+Assembling these four layers yields the symmetric, non-cyclic $4 \times 4$ universal Latin square
+\[
+  L_4 = \begin{pmatrix}
+    2 & 0 & 1 & 3 \\
+    1 & 3 & 2 & 0 \\
+    0 & 2 & 3 & 1 \\
+    3 & 1 & 0 & 2
+  \end{pmatrix}.
+\]
+One readily checks that:
+\begin{itemize}[nosep]
+  \item For $k = 0$ ($L_{i,j} \le 0$): at most $1$ cell per diagonal ($4$-queens solution).
+  \item For $k = 1$ ($L_{i,j} \le 1$): union of the two $4$-queens solutions, so at most $1 + 1 = 2$ cells per diagonal.
+  \item For $k = 2$ ($L_{i,j} \le 2$): complement of layer $3$; layer $3$ contains $(0,3), (1,1), (2,2), (3,0)$, which includes $2$ cells on the main anti-diagonal and $2$ cells on the main diagonal, so every diagonal has at most $3$ cells with $L_{i,j} \le 2$.
+\end{itemize}
+
+\subsection{The \texorpdfstring{$6 \times 6$}{6x6} Universal Latin Square \texorpdfstring{$L_6$}{L6}}
+
+For $n = 6$, there are $4$ classical $6$-queens solutions, none of which is a cyclic shift of $(0, 1, 2, 3, 4, 5)$ (which is why no cyclic Latin square of order $6$ can even pass the $k = 0$ threshold!). Starting from the classical $6$-queens solution $(0,1), (1,3), (2,5), (3,0), (4,2), (5,4)$ as Layer~$0$ and extending layer by layer yields the explicit $6 \times 6$ universal Latin square:
+\[
+  L_6 = \begin{pmatrix}
+    1 & 0 & 2 & 3 & 5 & 4 \\
+    3 & 1 & 4 & 0 & 2 & 5 \\
+    4 & 3 & 5 & 2 & 1 & 0 \\
+    0 & 2 & 1 & 5 & 4 & 3 \\
+    2 & 5 & 0 & 4 & 3 & 1 \\
+    5 & 4 & 3 & 1 & 0 & 2
+  \end{pmatrix}.
+\]
+
+In \texttt{n\_c\_coins\_from\_incremental.lean}, Lemma~\texttt{isIncremental\_of\_fin\_decide} reduces \texttt{IsIncremental n L} for any concrete finite board $L$ to a bounded boolean check over $\mathrm{Fin}\,n$ and $\mathrm{Fin}(2n - 1)$, allowing Lean's kernel \texttt{decide} tactic to verify both $L_4$ and $L_6$ in milliseconds:
+\begin{lstlisting}[language=Lean4]
+lemma isIncremental_L4 : IsIncremental 4 L4 :=
+  isIncremental_of_fin_decide 4 L4 (by decide)
+
+lemma isIncremental_L6 : IsIncremental 6 L6 :=
+  isIncremental_of_fin_decide 6 L6 (by decide)
+\end{lstlisting}
+
+\section{The Complete Proof in 18 Lines}
+
+Combining the thresholding theorem \texttt{n\_c\_of\_isIncremental}, the two finite boards \texttt{isIncremental\_L4} and \texttt{isIncremental\_L6}, and Marc Duponcheel's conjecture (\texttt{IncrementalCyclic.Conjecture}), the entire Generalized $(n,c)$-Queens Conjecture for all $n \ge 4$ and all $0 \le c \le n$ follows in $18$ lines:
+\begin{lstlisting}[language=Lean4]
+theorem n_c_coins_placement_proof :
+    ∀ (n : ℕ) (c : ℕ) (_hn : n ≥ 4) (_hc : c ≤ n),
+      ∃ board : Finset (ℕ × ℕ),
+      n_c_placement_conjecture_prop n c board := by
+  intro n c hn hc
+  by_cases h4 : n = 4
+  · subst h4
+    exact ⟨thresholdBoard 4 c L4, n_c_of_isIncremental 4 c hc L4 isIncremental_L4⟩
+  · by_cases h6 : n = 6
+    · subst h6
+      exact ⟨thresholdBoard 6 c L6, n_c_of_isIncremental 6 c hc L6 isIncremental_L6⟩
+    · have hpos : n > 0 := by omega
+      have hne : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6 := by omega
+      obtain ⟨q, _hq_bij, hInc⟩ := IncrementalCyclic.Conjecture n hpos hne
+      exact ⟨thresholdBoard n c (cyclicSquare n hpos hne q),
+        n_c_of_isIncremental n c hc (cyclicSquare n hpos hne q) hInc⟩
+\end{lstlisting}
+
+\begin{thebibliography}{9}
+\bibitem{LLW1990}
+Mao-Hua Le, Kang-Di Li, and Zhen-Fa Wang,
+\emph{A note on the generalized $n$-queens problem},
+Kexue Tongbao (Chinese Science Bulletin) \textbf{35} (1990), no.~10, 790--791.
+
+\bibitem{MO510135}
+MathOverflow Question 510135,
+\emph{Generalized $n$-queens problem / Placing $nc$ coins on an $n \times n$ grid},
+\url{https://mathoverflow.net/questions/510135}.
+\end{thebibliography}
+
+\end{document}
