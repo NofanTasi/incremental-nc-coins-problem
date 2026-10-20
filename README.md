@@ -17,3 +17,6 @@ Our work improves upon 1990s 'Mao-Hua Le, Weixuan Li and T. Wang':
 
 - we provide a formal proof
 
+## building and cleaning
+
+see https://github.com/NofanTasi/incremental-nc-coins-problem/blob/main/BUILD_AND_CLEAN.md

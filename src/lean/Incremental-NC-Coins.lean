@@ -1,5 +1,4 @@
-import Mathlib
-
+notation "ℕ" => Nat
 /-!
 # Executable Incremental Latin Square (Incremental Board) Generator
 
