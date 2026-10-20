@@ -6,3 +6,4 @@ mv ../../src/haskell/Incremental-NC-Coins ../../bin/run/haskell
 rm ../../src/haskell/Incremental-NC-Coins.hi
 rm ../../src/haskell/Incremental-NC-Coins.o
 
+echo executable file ../../bin/run/haskell/Incremental-NC-Coins
