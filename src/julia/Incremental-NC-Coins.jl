@@ -1,10 +1,13 @@
 # ============================================================================
 # Incremental (n,c)-Coins Generator, Verifier, and Display Engine
+# Calculate and print optional 2D Discrete Fourier Transform
 #  twin Based
 # on Luc Duponcheel's Lean formalization
 #  and
 # on some Marc Duponcheel's ideas and reports
 # ============================================================================
+
+using FFTW
 
 # ============================================================================
 # 1. Utilities
@@ -112,13 +115,21 @@ function correct(L,n)
 end
 
 # ============================================================================
-# 4. Solver & Display
+# 4. Take and Show 2D Discrete Fourier Transform of M
+# ============================================================================
+function show_dft(M, n)
+    vs = round.(log.(1 .+ abs.(fft(M))[1:n,1:n]), digits=1)
+    foreach(println, [join(lpad.(r, 5)) for r in eachrow(vs)])
+end
+
+# ============================================================================
+# 5. Solver & Display
 # ============================================================================
 """
  * solve(range;print_q,print_L,print_I,verify,benchmark)
 Generates, optionally benchmarks, verifies, displays any range of n and its c's.
 """
-function solve(range;print_q=true,print_L=true,print_I=false,verify=true,benchmark=false)
+function solve(range;print_q=true,print_L=true,print_I=false,print_D=false,verify=true,benchmark=false)
     if benchmark
         (e,t) = (2,time())
     end
@@ -177,6 +188,10 @@ function solve(range;print_q=true,print_L=true,print_I=false,verify=true,benchma
             for r in eachrow(L)
                 println(" ", join(lpad.(r,l)))
             end
+   	    if print_D
+                println("Incremental Latin Square DFT:")
+                show_dft(L,n)
+            end
         end
 
         if print_I
@@ -185,6 +200,14 @@ function solve(range;print_q=true,print_L=true,print_I=false,verify=true,benchma
                 println("Increment c = $c:")
                 for r in eachrow(L)
                     println(" ", join(lpad.(Int.(r.<=c),2),""))
+                end
+            end
+            if print_D
+                for c in 1:n
+                    println("Increment c = $c DFT:")
+                    I::Matrix{Int} = zeros(n,n)
+                    I .= Int.(L .<= c)
+                    show_dft(I,n)
                 end
             end
         end
@@ -223,13 +246,13 @@ end
 # ============================================================================
 
 # r = collect(4:32)
-# solve(r,print_q=true,print_L=true,print_I=true,verify=true)
+# solve(r,print_q=true,print_L=true,print_I=true,print_D=true,verify=true)
 # exit(0)
 
 # or
 
 # r = collect(4:1024)
-# solve(r,print_q=false,print_L=false,print_I=false,verify=false,benchmark=false)
+# solve(r,print_q=false,print_L=false,print_I=false,print_D=false,verify=false,benchmark=false)
 # exit(0)
 
 # ============================================================================
