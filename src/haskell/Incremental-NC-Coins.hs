@@ -10,7 +10,7 @@ import Text.Printf (printf)
 {-!
 # Incremental Cyclic Latin Square & Generalized (n, c)-Coins in Haskell
 
-This Haskell implementation translates the constructive universal Latin square
+This Haskell implementation translates the constructive incremental Latin square
 from Lean 4 (`IncrementalCyclic.lean` & `n_c_coins_from_incremental.lean`).
 
 ## The Power of Laziness
@@ -96,7 +96,7 @@ q n j
 -- 2. Cell Values and Lazy Board Generators
 --------------------------------------------------------------------------------
 
--- | Value of cell (i, j) in the Universal Latin Square
+-- | Value of cell (i, j) in the Incremental Latin Square
 cellValue :: Int -> Int -> Int -> Int
 cellValue n i j = (i + q n j) `mod` n
 
@@ -104,9 +104,9 @@ cellValue n i j = (i + q n j) `mod` n
 isCoin :: Int -> Int -> Int -> Int -> Bool
 isCoin n c i j = cellValue n i j < c
 
--- | Lazy representation of the Universal Board as a list of rows
-universalBoard :: Int -> [[Int]]
-universalBoard n = [ [ cellValue n i j | j <- [0 .. n - 1] ] | i <- [0 .. n - 1] ]
+-- | Lazy representation of the Incremental Board as a list of rows
+incrementalBoard :: Int -> [[Int]]
+incrementalBoard n = [ [ cellValue n i j | j <- [0 .. n - 1] ] | i <- [0 .. n - 1] ]
 
 -- | Lazy representation of the (n, c)-Coins board as a list of rows of Bools
 coinsBoard :: Int -> Int -> [[Bool]]
@@ -154,18 +154,18 @@ verifyCoins n c =
 -- 4. Pretty Printing
 --------------------------------------------------------------------------------
 
-printUniversal :: Int -> IO ()
-printUniversal n = do
-  putStrLn $ "=== Universal Board (" ++ show n ++ " × " ++ show n ++ ") ==="
-  mapM_ (putStrLn . unwords . map show) (universalBoard n)
+printIncremental :: Int -> IO ()
+printIncremental n = do
+  putStrLn $ "=== Incremental Board (" ++ show n ++ " × " ++ show n ++ ") ==="
+  mapM_ (putStrLn . unwords . map show) (incrementalBoard n)
 
--- | Stream the Universal Board cell-by-cell on the fly with an adjustable delay.
+-- | Stream the Incremental Board cell-by-cell on the fly with an adjustable delay.
 -- Each cell is computed and flushed to standard output immediately as it is generated,
 -- demonstrating lazy, demand-driven evaluation without waiting for or allocating the whole board.
-streamUniversal :: Int -> Int -> IO ()
-streamUniversal n delayMs = do
+streamIncremental :: Int -> Int -> IO ()
+streamIncremental n delayMs = do
   hSetBuffering stdout NoBuffering
-  putStrLn $ "=== Streaming Universal Board (" ++ show n ++ " × " ++ show n ++ ") on the fly ==="
+  putStrLn $ "=== Streaming Incremental Board (" ++ show n ++ " × " ++ show n ++ ") on the fly ==="
   let width = length (show (n - 1))
   forM_ [0 .. n - 1] $ \i -> do
     forM_ [0 .. n - 1] $ \j -> do
@@ -213,18 +213,18 @@ main :: IO ()
 main = do
   args <- getArgs
   case args of
-    ["--universal", nStr] -> case readMaybe nStr of
+    ["--incremental", nStr] -> case readMaybe nStr of
       Just n -> do
-        printUniversal n
+        printIncremental n
         -- putStrLn $ "Incremental verification: " ++ show (verifyCoins n 1)
       Nothing -> putStrLn "Invalid n"
 
     ["--stream", nStr] -> case readMaybe nStr of
-      Just n -> streamUniversal n 25
+      Just n -> streamIncremental n 25
       Nothing -> putStrLn "Invalid n"
 
     ["--stream", nStr, delayStr] -> case (readMaybe nStr, readMaybe delayStr) of
-      (Just n, Just delayMs) -> streamUniversal n delayMs
+      (Just n, Just delayMs) -> streamIncremental n delayMs
       _ -> putStrLn "Invalid arguments for --stream"
 
     ["--stream-coins", nStr, cStr] -> case (readMaybe nStr, readMaybe cStr) of
@@ -252,10 +252,10 @@ main = do
 
     _ -> do
       putStrLn "=========================================================="
-      putStrLn "  Haskell Universal Board & (n, c)-Coins (Lazy Evaluation)"
+      putStrLn "  Haskell Incremental Board & (n, c)-Coins (Lazy Evaluation)"
       putStrLn "=========================================================="
       putStrLn "Choose an option:"
-      putStrLn "  1. Generate Universal Board (size n × n)"
+      putStrLn "  1. Generate Incremental Board (size n × n)"
       putStrLn "  2. Generate (n, c)-Coins Solution"
       putStrLn "  3. Demo Laziness: Instant query on massive n (e.g. n = 1,000,000)"
       putStrLn "  4. Stream on the fly (Educational demo with slowing down delay)"
@@ -282,17 +282,17 @@ main = do
           putStrLn "--- Educational Streaming Demo ---"
           putStrLn "Watch values appear cell-by-cell in real time."
           putStrLn "Notice how each row is cyclically shifted by +1 (mod n) from the previous row!"
-          mode <- prompt "What to stream? (1 = Universal Board numbers, 2 = (n, c)-coins board): " (1 :: Int)
+          mode <- prompt "What to stream? (1 = Incremental Board numbers, 2 = (n, c)-coins board): " (1 :: Int)
           n <- prompt "Enter board size n : " (8 :: Int)
           delayMs <- prompt "Enter slowing down delay per cell in ms : " (25 :: Int)
           if mode == 2
             then do
               c <- prompt ("Enter c (1 <= c <= " ++ show n ++ "): ") (3 :: Int)
               streamCoins n c delayMs
-            else streamUniversal n delayMs
+            else streamIncremental n delayMs
 
         _ -> do
           n <- prompt "Enter board size n: " (8 :: Int)
-          printUniversal n
+          printIncremental n
           -- putStrLn "Verifying 1-coins constraints..."
           -- putStrLn $ "Verification result: " ++ show (verifyCoins n 1)
