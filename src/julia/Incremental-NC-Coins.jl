@@ -126,7 +126,7 @@ end
 # 5. Solver & Display
 # ============================================================================
 """
- * solve(range;print_q,print_L,print_I,verify,benchmark)
+ * solve(range;print_q,print_L,print_I,print_D,verify,benchmark)
 Generates, optionally benchmarks, verifies, displays any range of n and its c's.
 """
 function solve(range;print_q=true,print_L=true,print_I=false,print_D=false,verify=true,benchmark=false)
@@ -252,7 +252,7 @@ end
 # or
 
 # r = collect(4:1024)
-# solve(r,print_q=false,print_L=false,print_I=false,print_D=false,verify=false,benchmark=false)
+# solve(r,print_q=false,print_L=false,print_I=false,print_D=false,verify=false,benchmark=true)
 # exit(0)
 
 # ============================================================================
@@ -287,7 +287,7 @@ function main()
             print_coins_solution(n, c)
         else
             r = collect(4:32)
-            solve(r, print_q=true, print_L=true, print_I=true, verify=true)
+            solve(r, print_q=true, print_L=true, print_I=true, verify=false)
         end
     elseif ARGS[1] == "--incremental" && length(ARGS) >= 2
         n = parse(Int, ARGS[2])
