@@ -114,7 +114,6 @@ function correct(L,n)
     return true,"verification success!"
 end
 
-
 # ============================================================================
 # 4. Take and Show 2D Discrete Fourier Transform of M
 # ============================================================================
@@ -124,19 +123,13 @@ function show_dft(M, n)
 end
 
 # ============================================================================
-# 4. Solver & Display
+# 5. Solver & Display
 # ============================================================================
 """
  * solve(range;print_q,print_L,print_I,verify,benchmark)
 Generates, optionally benchmarks, verifies, displays any range of n and its c's.
 """
-function solve(range;
-               print_q=true,
-               print_L=true,
-               print_I=false,
-               print_D=false,
-               verify=true,
-               benchmark=false)
+function solve(range;print_q=true,print_L=true,print_I=false,print_D=false,verify=true,benchmark=false)
     if benchmark
         (e,t) = (2,time())
     end
@@ -195,7 +188,7 @@ function solve(range;
             for r in eachrow(L)
                 println(" ", join(lpad.(r,l)))
             end
-            if print_D
+   	    if print_D
                 println("Incremental Latin Square DFT:")
                 show_dft(L,n)
             end
@@ -231,24 +224,87 @@ function solve(range;
     end
 end
 
+function print_coins_solution(n, c)
+    if n < 4
+        println("KO? Dimension n = $n < 4")
+        return
+    elseif c > n
+        println("Invalid parameter c = $c: must satisfy c ≤ n = $n.")
+        return
+    end
+    L = n == 4 ? [3 1 2 4; 2 4 3 1; 1 3 4 2; 4 2 1 3] :
+        n == 6 ? [2 1 3 4 6 5; 4 2 5 1 3 6; 5 4 6 3 2 1; 1 3 2 6 5 4; 3 6 1 5 4 2; 6 5 4 2 1 3] :
+        cyclic(n, [get_f_q(n)(n,j) for j in 0:(n-1)])
+    println("=== ($n, $c)-Coins Solution ($n × $n board, $(n*c) coins) ===")
+    for r in eachrow(L)
+        println(join([x <= c ? "C " : ". " for x in r]))
+    end
+end
+
 # ============================================================================
-# Example Execution range r
+# uncomment one of the two triples of lines below for interpretation
 # ============================================================================
-r = collect(4:16)
-solve(r,
-      print_q=true,
-      print_L=true,
-      print_I=true,
-      print_D=true,
-      verify=true)
-r = collect(4:1024)
-#=
-solve(r,
-      print_q=false,
-      print_L=false,
-      print_I=false,
-      print_D=false,
-      verify=false,
-      benchmark=false)
-=#
-exit(0)
+
+# r = collect(4:32)
+# solve(r,print_q=true,print_L=true,print_I=true,print_D=true,verify=true)
+# exit(0)
+
+# or
+
+# r = collect(4:1024)
+# solve(r,print_q=false,print_L=false,print_I=false,print_D=false,verify=false,benchmark=false)
+# exit(0)
+
+# ============================================================================
+# uncomment the lines below for compilation
+# ============================================================================
+
+function main()
+    if isempty(ARGS)
+        println("==========================================================")
+        println("  Incremental Board & Generalized (n, c)-Coins Generator   ")
+        println("==========================================================")
+        println("Choose an option:")
+        println("  1. Generate Incremental Board (size n × n)")
+        println("  2. Generate (n, c)-Coins Solution (threshold c < n)")
+        println("  3. Run batch verification range (n = 4 to 32)")
+        print("Enter choice (1, 2, or 3) [default: 3]: ")
+        flush(stdout)
+        line = readline()
+        choice = isempty(strip(line)) ? 3 : tryparse(Int, strip(line))
+        if choice == 1
+            print("Enter board size n: ")
+            flush(stdout)
+            n = parse(Int, strip(readline()))
+            solve(n:n, print_q=true, print_L=true, print_I=false, verify=false)
+        elseif choice == 2
+            print("Enter board size n: ")
+            flush(stdout)
+            n = parse(Int, strip(readline()))
+            print("Enter number of coins per row/col c (1 ≤ c ≤ $n): ")
+            flush(stdout)
+            c = parse(Int, strip(readline()))
+            print_coins_solution(n, c)
+        else
+            r = collect(4:32)
+            solve(r, print_q=true, print_L=true, print_I=true, verify=true)
+        end
+    elseif ARGS[1] == "--incremental" && length(ARGS) >= 2
+        n = parse(Int, ARGS[2])
+        solve(n:n, print_q=true, print_L=true, print_I=false, verify=false)
+    elseif ARGS[1] == "--coins" && length(ARGS) >= 3
+        n = parse(Int, ARGS[2])
+        c = parse(Int, ARGS[3])
+        print_coins_solution(n, c)
+    elseif ARGS[1] == "--batch"
+        r = collect(4:32)
+        solve(r, print_q=true, print_L=true, print_I=true, verify=true)
+    elseif length(ARGS) == 1 && tryparse(Int, ARGS[1]) !== nothing
+        n = parse(Int, ARGS[1])
+        solve(n:n, print_q=true, print_L=true, print_I=false, verify=false)
+    else
+        println("Usage: Incremental-NC-Coins [--incremental <n>] [--coins <n> <c>] [--batch]")
+    end
+end
+
+main()
