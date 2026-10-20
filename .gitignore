@@ -1,0 +1,7 @@
+*.aux
+*.c
+*.hi
+*.log
+*.o
+*.out
+*.pdf
