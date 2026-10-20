@@ -1,8 +1,8 @@
 Intro
 
-1:1 cooperating with (my twin brother) @LucDupAtStackExchange we managed to formally prove the conjecture stated in OP as bonus.
+1:1 cooperating with "FirstName LastName" I managed to formally prove the conjecture stated in OP as bonus.
 
-Since he (Luc) is stronger than me (Marc) in using Lean, he was better placed to implement the ideas that came up during past months.
+Since I am a bit stronger than him in using Lean, I was better placed to implement some of the ideas that came up during past months in Lean.
 
 **caveat**: both me and he have used AI to do some of the heavy lifting work. In fact this post, with exception of this Intro, was written by AI, and, I am affirmative to admit this: it is a well written summary of the solution. We did not keep track of the contributions of one another and AI. In fact, several contributions ware inspired by answers and comments here and in the in OP referenced related other stack exchange posts.
 
@@ -71,7 +71,7 @@ The column permutation functions $q(j)$ (for $j \in 0 \dots n-1$) are partitione
 
 >! 5-Piece Step with Boundary Pins:
 
->! Because composites sharing factors with 2 and 3 create diagonal resonances, a m The columns are split into three structural thirds with step $+3$ and systematic block jumps:ore delicate 5-piece layout with boundary pins is required.
+>! Because composites sharing factors with 2 and 3 create diagonal resonances, a more delicate 5-piece layout with boundary pins is required.
 
 >! Let $d = \lfloor n/2 \rfloor$:
 
@@ -99,5 +99,4 @@ Exceptional Small Cases
 
 ----
 
-For Lean, Haskell and Lean code: see https://github.com/NofanTasi/incremental-nc-coins-problem.git
-
+For Lean, Haskell and Julia code: see https://github.com/NofanTasi/incremental-nc-coins-problem.git
