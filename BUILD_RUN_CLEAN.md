@@ -13,13 +13,13 @@ an executable is generated in `bin/run/haskell`
 
 you can run the executable interactively, or, for example using
 
-./Incremental-NC-Coins --incremental 8
-./Incremental-NC-Coins --coins 8 3
-./Incremental-NC-Coins --stream 8
-./Incremental-NC-Coins --stream 8 25
-./Incremental-NC-Coins --stream-coins 8 3
-./Incremental-NC-Coins --stream-coins 8 3 25
-./Incremental-NC-Coins --demo-laziness 1000000 500 100
+- ./Incremental-NC-Coins --incremental 8
+- ./Incremental-NC-Coins --coins 8 3
+- ./Incremental-NC-Coins --stream 8
+- ./Incremental-NC-Coins --stream 8 25
+- ./Incremental-NC-Coins --stream-coins 8 3
+- ./Incremental-NC-Coins --stream-coins 8 3 25
+- ./Incremental-NC-Coins --demo-laziness 1000000 500 100
 
 ### clean
 
@@ -44,8 +44,8 @@ an executable is generated in `bin/run/julia`
 
 you can run the executable interactively, or, for example using
 
-./Incremental-NC-Coins --incremental 8
-./Incremental-NC-Coins --coins 8 3
+- ./Incremental-NC-Coins --incremental 8
+- ./Incremental-NC-Coins --coins 8 3
 
 ### clean
 
