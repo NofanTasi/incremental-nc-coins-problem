@@ -9,5 +9,5 @@ leanc -O3 Incremental-NC-Coins.c -o ../../bin/run/lean/Incremental-NC-Coins
 
 rm Incremental-NC-Coins.c
 
-echo executable file ../../bin/run/lean/Incremental-NC-Coins
-
+echo "executable file Incremental-NC-Coins is in bin/run/lean"
+echo "see BUILD_RUN_CLEAN.md for more info"

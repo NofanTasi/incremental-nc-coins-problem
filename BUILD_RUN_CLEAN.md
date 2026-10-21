@@ -11,7 +11,11 @@ $ ./build.sh
 
 an executable is generated in `bin/run/haskell`
 
-you can run the executable interactively, or, for example using
+you can run the executable interactively using
+
+- ./Incremental-NC-Coins
+
+or, for example, using
 
 - ./Incremental-NC-Coins --incremental 8
 - ./Incremental-NC-Coins --coins 8 3
@@ -20,6 +24,8 @@ you can run the executable interactively, or, for example using
 - ./Incremental-NC-Coins --stream-coins 8 3
 - ./Incremental-NC-Coins --stream-coins 8 3 25
 - ./Incremental-NC-Coins --demo-laziness 1000000 500 100
+
+optionally using `time` for benchmarking
 
 ### clean
 
@@ -42,10 +48,22 @@ $ cd ..
 ```
 an executable is generated in `bin/run/julia`
 
-you can run the executable interactively, or, for example using
+Please first install the `FFTW` package using
+
+- `julia> import Pkg; Pkg.add("FFTW")`
+
+from within the `julia` interpreter.
+
+you can run the executable interactively using
+
+- ./Incremental-NC-Coins
+
+or, for example, using
 
 - ./Incremental-NC-Coins --incremental 8
 - ./Incremental-NC-Coins --coins 8 3
+
+optionally using `time` for benchmarking
 
 ### clean
 
@@ -68,6 +86,10 @@ $ cd ..
 ```
 
 an executable is generated in `bin/run/lean`
+
+you can run the executable interactively using
+
+- ./Incremental-NC-Coins
 
 ### clean
 
