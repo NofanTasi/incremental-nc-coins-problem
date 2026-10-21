@@ -60,55 +60,50 @@
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
+\setlength{\parindent}{0pt}
+
 \title{\textbf{
-  Existence of Incremental Cyclic Latin Squares \\ 
+  Incremental Cyclic Latin Squares \\ 
   as \\
   Simultaneous Generalized NC-Coins Solutions
 }}
-\author{Marc Duponcheel \small (existence conjecture) \\ 
-  and \\ 
-  \large Luc Duponcheel \small (formal {\tt Lean} proof) 
+\author{Marc Duponcheel and Luc Duponcheel
 }
 
-\date{October 2026}
+\date{\today}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-We present a formal {\tt Lean} proof of the \emph{Incremental Cyclic Latin Square Conjecture}
-together with fast constructions of such squares in {\tt Haskell}, {\tt Julia} en {\tt Lean}, 
+
+\noindent For every natural number $n \notin \{0, 2, 3, 4, 6\}$, there exists a permutation 
+$q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that
+$L_{i,j} = (i + q(j)) \bmod n$ is an \emph{Incremental Cyclic Latin Square}, simultaneously solving
+the $(n,c)$-Coins Problem for all $1 \le c \le n$, a generalization of the $n$-Queens Problem.
 
 \vspace{12pt}
 
-For every natural number $n > 0$ with $n \notin \{2, 3, 4, 6\}$, 
-there exists a $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$, being a permutation of $\mathrm{Fin}$,
-such that the square $L_{i,j} = (i + q(j)) \bmod n$ is an
-\emph{Incremental Cyclic Latin Square}, among others meaning that for every 
-$0 \le k < n$, every sum-diagonal ($i + j = s$) and every
-difference-diagonal ($i - j = d$) contains at most $k + 1$ cells with value
-$L_{i,j} \le k$.
+\noindent We have an existence proof in {\tt Lean} and construction code in {\tt Haskell},
+{\tt Julia} and {\tt Lean}.
 
 \vspace{12pt}
 
-An Incremental Latin Square simultaneously solves the Generalized $(n,c)$-Coins Problem
-for all $1 \le c \le n$ on one board
-(see e.g. 
-\href{https://mathoverflow.net/questions/510135/placing-n-cdot-m-coins-on-an-n-times-n-board-generalizing-the-n-queens-p}{MO \# 510135} 
-and 
-\href{https://puzzling.stackexchange.com/questions/138939/place-as-many-queens-as-you-can}{PSE \# 138939}).
+\noindent See e.g. \href{https://mathoverflow.net/questions/510135/placing-n-cdot-m-coins-on-an-n-times-n-board-generalizing-the-n-queens-p}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}510135}, 
+\href{https://puzzling.stackexchange.com/questions/138939/place-as-many-queens-as-you-can}{PSE\hspace{-0.5pt}\#\hspace{-0.5pt}138939},
+\href{https://mathoverflow.net/questions/516225/universal-board-encoding-placement-of-n-cdot-m-coins-on-an-n-times-n-board}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}516225} an
+\href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub}.
 
 \vspace{12pt}
 
-Our proof introduces a general \emph{Injective-Majorization Principle} that reduces
-checking inequalities on each diagonal to the existence of a single function
-$f(i,j) \le L_{i,j}$ that is injective along every diagonal. 
+\noindent The proof uses the \emph{Injective-Majorization Principle} in combination with the
+\emph{Pigeon Hole Principle} reducing intensively checking inequalities on each diagonal to the
+existence of a single function $f(i,j) \le L_{i,j}$ that is injective on every diagonal. 
 
 \vspace{12pt}
 
-Using this principle, in combination with the \emph{Pigeon Hole Principle}, we construct four
-families of column permutations covering (almost) all dimension residue classes modulo~$6$
+\noindent The proof uses four families covering almost all natural numbers modulo~$6$
 \begin{itemize}
 \item for $n \equiv 1,5 \pmod 6$ (with $n \ge 1$)
 \item for $n \equiv 2,4 \pmod 6$ (with $n \ge 10$)
@@ -118,21 +113,10 @@ families of column permutations covering (almost) all dimension residue classes 
 
 \vspace{12pt}
 
-For all of the covered dimensions an Incremental Cyclic Latin Square can be constructed using
-in $\mathcal{O}(n^2)$ time. Recall that an Incremental Cyclic Latin Square, represents
-$n$ Generalized $(n,c)$-Coins Solutions. By the way, when using Haskell, because of lazyness, a
-Generalized $(n,c)$-Coins Solution can be constructed in $\mathcal{O}(n . c)$ time. In particular,
-a Generalized $(n, 1)$-Coins Solution can be constructed in $\mathcal{O}(n)$ time. 
-
-\vspace{12pt}
-
-Constructing an Incremental Cyclic Latin Square for the four uncovered dimensions,
-$n \in \{8, 9, 15, 21\}$, is handled separately.
-
-\vspace{12pt}
-
-Likewise, constructing an Incremental (non-Cyclic) Latin Square for the two remaining dimensions,
-$n \in \{4, 6\}$, is also handled separately.
+\noindent For all four families an Incremental Cyclic Latin Square can be constructed. Constructing
+an Incremental Cyclic Latin Square for the four uncovered natural numbers, $n \in \{8, 9, 15, 21\}$,
+is handled separately. Likewise, constructing an Incremental (non-Cyclic) Latin Square for the two
+remaining dimensions, $n \in \{4, 6\}$, is also handled separately.
 
 \end{abstract}
 
