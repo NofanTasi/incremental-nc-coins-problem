@@ -13,8 +13,6 @@ show_help() {
     echo ""
     echo "  -incremental -v n,       incremental nxn square with verification"
     echo ""
-    echo "  -coins -v n c,           (n,c)-coins solution with verification"
-    echo ""
     echo "Example:"
     echo "  ./run.sh -h"
     echo "  ./run.sh -incremental 5"
