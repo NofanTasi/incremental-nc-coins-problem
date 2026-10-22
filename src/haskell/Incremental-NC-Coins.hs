@@ -93,7 +93,7 @@ q n j
   where r = n `mod` 6
 
 --------------------------------------------------------------------------------
--- 2. Cell Values and Lazy Board Generators
+-- 2. Cell Values and Lazy Square Generators
 --------------------------------------------------------------------------------
 
 -- | Value of cell (i, j) in the Incremental Latin Square
@@ -104,7 +104,7 @@ cellValue n i j = (i + q n j) `mod` n
 isCoin :: Int -> Int -> Int -> Int -> Bool
 isCoin n c i j = cellValue n i j < c
 
--- | Lazy representation of the Incremental Board as a list of rows
+-- | Lazy representation of the Incremental Square as a list of rows
 incrementalBoard :: Int -> [[Int]]
 incrementalBoard n = [ [ cellValue n i j | j <- [0 .. n - 1] ] | i <- [0 .. n - 1] ]
 
@@ -156,16 +156,16 @@ verifyCoins n c =
 
 printIncremental :: Int -> IO ()
 printIncremental n = do
-  putStrLn $ "=== Incremental Board (" ++ show n ++ " × " ++ show n ++ ") ==="
+  putStrLn $ "=== Incremental Square (" ++ show n ++ " × " ++ show n ++ ") ==="
   mapM_ (putStrLn . unwords . map show) (incrementalBoard n)
 
--- | Stream the Incremental Board cell-by-cell on the fly with an adjustable delay.
+-- | Stream the Incremental Square cell-by-cell on the fly with an adjustable delay.
 -- Each cell is computed and flushed to standard output immediately as it is generated,
 -- demonstrating lazy, demand-driven evaluation without waiting for or allocating the whole board.
 streamIncremental :: Int -> Int -> IO ()
 streamIncremental n delayMs = do
   hSetBuffering stdout NoBuffering
-  putStrLn $ "=== Streaming Incremental Board (" ++ show n ++ " × " ++ show n ++ ") on the fly ==="
+  putStrLn $ "=== Streaming Incremental Square (" ++ show n ++ " × " ++ show n ++ ") on the fly ==="
   let width = length (show (n - 1))
   forM_ [0 .. n - 1] $ \i -> do
     forM_ [0 .. n - 1] $ \j -> do
@@ -175,11 +175,11 @@ streamIncremental n delayMs = do
       when (delayMs > 0) $ threadDelay (delayMs * 1000)
     putStrLn ""
 
--- | Stream the (n, c)-Coins Board cell-by-cell on the fly with adjustable delay.
+-- | Stream the (n, c)-Coins Square cell-by-cell on the fly with adjustable delay.
 streamCoins :: Int -> Int -> Int -> IO ()
 streamCoins n c delayMs = do
   hSetBuffering stdout NoBuffering
-  putStrLn $ "=== Streaming (" ++ show n ++ ", " ++ show c ++ ")-Coins Board on the fly ==="
+  putStrLn $ "=== Streaming (" ++ show n ++ ", " ++ show c ++ ")-Coins Square on the fly ==="
   forM_ [0 .. n - 1] $ \i -> do
     forM_ [0 .. n - 1] $ \j -> do
       let coin = isCoin n c i j
@@ -195,104 +195,115 @@ printCoins n c = do
   mapM_ (putStrLn . unwords . map (\b -> if b then "C" else ".")) (coinsBoard n c)
 
 --------------------------------------------------------------------------------
--- 5. Interactive UI & CLI
+-- 5. CLI
 --------------------------------------------------------------------------------
-
-prompt :: (Read a, Show a) => String -> a -> IO a
-prompt msg defVal = do
-  putStr msg
-  hFlush stdout
-  line <- getLine
-  case readMaybe line of
-    Just val -> return val
-    Nothing  -> do
-      putStrLn $ "Invalid input, using default: " ++ show defVal
-      return defVal
 
 main :: IO ()
 main = do
   args <- getArgs
   case args of
-    ["--incremental", nStr] -> case readMaybe nStr of
+
+    ["-incremental", nStr] -> case readMaybe nStr of
       Just n -> do
         printIncremental n
-        -- putStrLn $ "Incremental verification: " ++ show (verifyCoins n 1)
       Nothing -> putStrLn "Invalid n"
 
-    ["--coins", nStr, cStr] -> case (readMaybe nStr, readMaybe cStr) of
+    ["-coins", nStr, cStr] -> case (readMaybe nStr, readMaybe cStr) of
       (Just n, Just c) -> do
         printCoins n c
-        -- putStrLn $ "Verification result: " ++ show (verifyCoins n c)
       _ -> putStrLn "Invalid arguments"
+
+    ["-coins", "-v", nStr, cStr] -> case (readMaybe nStr, readMaybe cStr) of
+      (Just n, Just c) -> do
+        printCoins n c
+        putStrLn $ "Verification result: " ++ show (verifyCoins n c)
+      _ -> putStrLn "Invalid arguments"
+
+
+-- main :: IO ()
+-- main = do
+--   args <- getArgs
+--   case args of
+--     ["--incremental", nStr] -> case readMaybe nStr of
+--       Just n -> do
+--         printIncremental n
+--         -- putStrLn $ "Incremental verification: " ++ show (verifyCoins n 1)
+--       Nothing -> putStrLn "Invalid n"
+
+--     ["--coins", nStr, cStr] -> case (readMaybe nStr, readMaybe cStr) of
+--       (Just n, Just c) -> do
+--         printCoins n c
+--         -- putStrLn $ "Verification result: " ++ show (verifyCoins n c)
+--       _ -> putStrLn "Invalid arguments"
       
-    ["--stream", nStr] -> case readMaybe nStr of
-      Just n -> streamIncremental n 25
-      Nothing -> putStrLn "Invalid n"
+--     ["--stream", nStr] -> case readMaybe nStr of
+--       Just n -> streamIncremental n 25
+--       Nothing -> putStrLn "Invalid n"
 
-    ["--stream", nStr, delayStr] -> case (readMaybe nStr, readMaybe delayStr) of
-      (Just n, Just delayMs) -> streamIncremental n delayMs
-      _ -> putStrLn "Invalid arguments for --stream"
+--     ["--stream", nStr, delayStr] -> case (readMaybe nStr, readMaybe delayStr) of
+--       (Just n, Just delayMs) -> streamIncremental n delayMs
+--       _ -> putStrLn "Invalid arguments for --stream"
 
-    ["--stream-coins", nStr, cStr] -> case (readMaybe nStr, readMaybe cStr) of
-      (Just n, Just c) -> streamCoins n c 25
-      _ -> putStrLn "Invalid arguments for --stream-coins"
+--     ["--stream-coins", nStr, cStr] -> case (readMaybe nStr, readMaybe cStr) of
+--       (Just n, Just c) -> streamCoins n c 25
+--       _ -> putStrLn "Invalid arguments for --stream-coins"
 
-    ["--stream-coins", nStr, cStr, delayStr] -> case (readMaybe nStr, readMaybe cStr, readMaybe delayStr) of
-      (Just n, Just c, Just delayMs) -> streamCoins n c delayMs
-      _ -> putStrLn "Invalid arguments for --stream-coins"
+--     ["--stream-coins", nStr, cStr, delayStr] -> case (readMaybe nStr, readMaybe cStr, readMaybe delayStr) of
+--       (Just n, Just c, Just delayMs) -> streamCoins n c delayMs
+--       _ -> putStrLn "Invalid arguments for --stream-coins"
 
-    ["--demo-laziness", nStr, cStr, kStr] -> case (readMaybe nStr, readMaybe cStr, readMaybe kStr) of
-      (Just n, Just c, Just k) -> do
-        putStrLn $ "=== Demonstrating Laziness for n = " ++ show n ++ ", c = " ++ show c ++ " ==="
-        putStrLn $ "Extracting first " ++ show k ++ " coins without generating the remaining board..."
-        let coins = take k (coinsPositions n c)
-        mapM_ (\(idx, (r, col)) -> putStrLn $ "  Coin " ++ show idx ++ " at (" ++ show r ++ ", " ++ show col ++ ")") (zip [1..k] coins)
-        putStrLn "Done instantaneously!"
-      _ -> putStrLn "Invalid arguments for --demo-laziness"
+--     ["--demo-laziness", nStr, cStr, kStr] -> case (readMaybe nStr, readMaybe cStr, readMaybe kStr) of
+--       (Just n, Just c, Just k) -> do
+--         putStrLn $ "=== Demonstrating Laziness for n = " ++ show n ++ ", c = " ++ show c ++ " ==="
+--         putStrLn $ "Extracting first " ++ show k ++ " coins without generating the remaining board..."
+--         let coins = take k (coinsPositions n c)
+--         mapM_ (\(idx, (r, col)) -> putStrLn $ "  Coin " ++ show idx ++ " at (" ++ show r ++ ", " ++ show col ++ ")") (zip [1..k] coins)
+--         putStrLn "Done instantaneously!"
+--       _ -> putStrLn "Invalid arguments for --demo-laziness"
 
-    _ -> do
-      putStrLn "=========================================================="
-      putStrLn "  Haskell Incremental Board & (n, c)-Coins (Lazy Evaluation)"
-      putStrLn "=========================================================="
-      putStrLn "Choose an option:"
-      putStrLn "  1. Generate Incremental Board (size n × n)"
-      putStrLn "  2. Generate (n, c)-Coins Solution"
-      putStrLn "  3. Demo Laziness: Instant query on massive n (e.g. n = 1,000,000)"
-      putStrLn "  4. Stream on the fly (Educational demo with slowing down delay)"
-      choice <- prompt "Enter choice (1, 2, 3, or 4): " (1 :: Int)
-      case choice of
-        2 -> do
-          n <- prompt "Enter board size n: " (8 :: Int)
-          c <- prompt ("Enter number of coins per row/col c (1 <= c <= " ++ show n ++ "): ") (3 :: Int)
-          printCoins n c
-          -- putStrLn "Verifying constraints..."
-          -- putStrLn $ "Verification result: " ++ show (verifyCoins n c)
+--     _ -> do
+--       putStrLn "=========================================================="
+--       putStrLn "  Haskell Incremental Square & (n, c)-Coins (Lazy Evaluation)"
+--       putStrLn "=========================================================="
+--       putStrLn "Choose an option:"
+--       putStrLn "  1. Generate Incremental Square (size n × n)"
+--       putStrLn "  2. Generate (n, c)-Coins Solution"
+--       putStrLn "  3. Demo Laziness: Instant query on massive n (e.g. n = 1,000,000)"
+--       putStrLn "  4. Stream on the fly (Educational demo with slowing down delay)"
+--       choice <- prompt "Enter choice (1, 2, 3, or 4): " (1 :: Int)
+--       case choice of
+--         2 -> do
+--           n <- prompt "Enter board size n: " (8 :: Int)
+--           c <- prompt ("Enter number of coins per row/col c (1 <= c <= " ++ show n ++ "): ") (3 :: Int)
+--           printCoins n c
+--           -- putStrLn "Verifying constraints..."
+--           -- putStrLn $ "Verification result: " ++ show (verifyCoins n c)
 
-        3 -> do
-          putStrLn "Imagine a board of size 100,000 × 100,000 (one trillion cells!)."
-          n <- prompt "Enter massive n: " (1000000 :: Int)
-          c <- prompt "Enter c: " (5 :: Int)
-          k <- prompt "How many coin coordinates do you want to inspect? " (1000 :: Int)
-          putStrLn $ "Streaming the first " ++ show k ++ " coin positions on demand..."
-          let coins = take k (coinsPositions n c)
-          mapM_ (\(idx, (r, col)) -> putStrLn $ "  Coin " ++ show idx ++ " -> row " ++ show r ++ ", col " ++ show col) (zip [1..k] coins)
-          putStrLn "Notice how it computed instantaneously without allocating the trillion cells!"
+--         3 -> do
+--           putStrLn "Imagine a board of size 100,000 × 100,000 (one trillion cells!)."
+--           n <- prompt "Enter massive n: " (1000000 :: Int)
+--           c <- prompt "Enter c: " (5 :: Int)
+--           k <- prompt "How many coin coordinates do you want to inspect? " (1000 :: Int)
+--           putStrLn $ "Streaming the first " ++ show k ++ " coin positions on demand..."
+--           let coins = take k (coinsPositions n c)
+--           mapM_ (\(idx, (r, col)) -> putStrLn $ "  Coin " ++ show idx ++ " -> row " ++ show r ++ ", col " ++ show col) (zip [1..k] coins)
+--           putStrLn "Notice how it computed instantaneously without allocating the trillion cells!"
 
-        4 -> do
-          putStrLn "--- Educational Streaming Demo ---"
-          putStrLn "Watch values appear cell-by-cell in real time."
-          putStrLn "Notice how each row is cyclically shifted by +1 (mod n) from the previous row!"
-          mode <- prompt "What to stream? (1 = Incremental Board numbers, 2 = (n, c)-coins board): " (1 :: Int)
-          n <- prompt "Enter board size n : " (8 :: Int)
-          delayMs <- prompt "Enter slowing down delay per cell in ms : " (25 :: Int)
-          if mode == 2
-            then do
-              c <- prompt ("Enter c (1 <= c <= " ++ show n ++ "): ") (3 :: Int)
-              streamCoins n c delayMs
-            else streamIncremental n delayMs
+--         4 -> do
+--           putStrLn "--- Educational Streaming Demo ---"
+--           putStrLn "Watch values appear cell-by-cell in real time."
+--           putStrLn "Notice how each row is cyclically shifted by +1 (mod n) from the previous row!"
+--           mode <- prompt "What to stream? (1 = Incremental Square numbers, 2 = (n, c)-coins board): " (1 :: Int)
+--           n <- prompt "Enter board size n : " (8 :: Int)
+--           delayMs <- prompt "Enter slowing down delay per cell in ms : " (25 :: Int)
+--           if mode == 2
+--             then do
+--               c <- prompt ("Enter c (1 <= c <= " ++ show n ++ "): ") (3 :: Int)
+--               streamCoins n c delayMs
+--             else streamIncremental n delayMs
 
-        _ -> do
-          n <- prompt "Enter board size n: " (8 :: Int)
-          printIncremental n
-          -- putStrLn "Verifying 1-coins constraints..."
-          -- putStrLn $ "Verification result: " ++ show (verifyCoins n 1)
+--         _ -> do
+--           n <- prompt "Enter board size n: " (8 :: Int)
+--           printIncremental n
+--           -- putStrLn "Verifying 1-coins constraints..."
+--           -- putStrLn $ "Verification result: " ++ show (verifyCoins n 1)

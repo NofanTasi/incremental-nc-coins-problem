@@ -2,12 +2,13 @@
 
 cd ../../doc/tex
 
-pdflatex incremental_cyclic_report.tex
+pdflatex paper.tex
 
-mv incremental_cyclic_report.pdf ../../bin/doc/pdf
+mv paper.pdf ../../doc/pdf
 
 echo ""
-echo "file incremental_cyclic_report.pdf is in bin/doc/pdf"
+echo "FYI"
+echo "file paper.pdf is in /doc/pdf"
 
 
 

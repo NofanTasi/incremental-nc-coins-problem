@@ -17,6 +17,11 @@ Our work improves upon 1990s 'Mao-Hua Le, Weixuan Li and T. Wang':
 
 - we provide a formal proof
 
-## building and cleaning
+## building , running and cleaning
 
-see https://github.com/NofanTasi/incremental-nc-coins-problem/blob/main/BUILD_RUN_CLEAN.md
+Scripts in directory `sh/haskell`, `sh/julia` and `sh/lean`.
+
+## generating documentation
+
+Script in directory `sh/tex`.
+

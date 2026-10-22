@@ -1,18 +1,22 @@
 #! /bin/bash
 
-cd ../../bin/doc/pdf
 
-rm incremental_cyclic_report.pdf
 
-echo "removed incremental_cyclic_report.pdf from bin/doc/pdf"
+cd ../../doc/pdf
 
-cd ../../../doc/tex
+rm paper.pdf
 
-rm incremental_cyclic_report.aux
-rm incremental_cyclic_report.log
-rm incremental_cyclic_report.out
+echo ""
+echo "FYI"
+echo "removed paper.pdf from /doc/pdf"
 
-echo "removed .aux .log and .out files"
+cd ../../doc/tex
+
+rm paper.aux
+rm paper.log
+rm paper.out
+
+echo "removed .aux .log and .out files from /doc/tex"
 
 
 
