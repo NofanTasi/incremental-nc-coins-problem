@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass[10pt,a4paper]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -65,7 +65,7 @@
 \title{\textbf{
   Cyclic Incremental Latin $n \times n$ Squares \\ 
   encoding \\
-  Generalized NC-Coins Squares for $0 \le c \le n$
+  Generalized $(n,c)$-Coins Squares for $0 \le c \le n$
 }}
 \author{Marc Duponcheel and Luc Duponcheel
 }
@@ -80,12 +80,12 @@
 
 \noindent For every natural number $n \notin \{0, 2, 3, 4, 6\}$, there exists a permutation 
 $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that
-$L_{i,j} = (i + q(j)) \bmod n$ is an \emph{Cyclic Incremental Latin Square}, encoding NC-Coins
+$L_{i,j} = (i + q(j)) \bmod n$ is an \emph{Cyclic Incremental Latin Square}, encoding $(n,c)$-Coins
 Squares for $0 \le c \le n$.
 
 \vspace{12pt}
 
-An NC-Coins Square for $0 \le 1 \le n$ corresponds to a solution of $n$-Queens Problem.
+An $(n,c)$-Coins Square for $0 \le 1 \le n$ corresponds to a solution of $n$-Queens Problem.
 
 \vspace{12pt}
 
@@ -126,9 +126,9 @@ remaining natural numbers, $n \in \{4, 6\}$, is also handled separately.
 
 \section{Cyclic Incremental Latin Squares}
 
-\subsection{From NC-Coins Squares to Cyclic Incremental Latin Squares}
+\subsection{From $(n,c)$-Coins Squares to Cyclic Incremental Latin Squares}
 
-NC-Coins Squares are subsets $S_c \subseteq \{0, \dots, n-1\}^2$ of $nc$ cells of an $n \times n$
+$(n,c)$-Coins Squares are subsets $S_c \subseteq \{0, \dots, n-1\}^2$ of $nc$ cells of an $n \times n$
 square such that every row, column, sum-diagonal ($i + j = s$), and difference-diagonal
 ($i - j = d$) contains at most $c$ cells of $S_c$.
 
@@ -144,22 +144,28 @@ The construction of Le, Li and Wang~\cite{LLW1990} constructs $S_c$'s separately
 
 \subsection{The Conjecture}
 
-Every permutation $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ defines a \emph{cyclic Latin square} (a column-permuted Cayley table of $\mathbb{Z}/n\mathbb{Z}$):
+Every permutation $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ defines a \emph{Cyclic Latin Square}:
 \[
   L_{i,j} = (i + q(j)) \bmod n \qquad (0 \le i, j < n).
 \]
-Because each column is a cyclic shift of $(0, 1, \dots, n-1)$ by $q(j)$ and $q$ is a bijection, every row and every column of $L$ is automatically a permutation of $\{0, \dots, n-1\}$.
 
 \vspace{12 pt}
 
-The conjecture is that for all $n \ge 1$ except $n \in \{2, 3, 4, 6\}$, there exists a column permutation $q$ such that $L_{i,j} = (i + q(j)) \bmod n$ is an incremental Latin square. (For $n \in \{2, 3\}$, even the $k = 0$ layer---the classical $n$-queens problem---has no solution; for $n \in \{4, 6\}$, exhaustive finite search confirms that no cyclic Latin square satisfies the diagonal bounds.)
+The conjecture is that for all $n > 0$ except $n \in \{2, 3, 4, 6\}$, there exists a column
+permutation $q$ such that $L_{i,j} = (i + q(j)) \bmod n$ is a Cyclic Incremental Latin Square. 
+For $n \in \{2, 3\}$, the $n$-queens problem has no solution, and, for $n \in \{4, 6\}$, exhaustive
+finite search confirms that no Cyclic Incremental Latin Square satisfies the diagonal bounds.
 
 \begin{theorem}[Cyclic Incremental Latin Square Conjecture]\label{thm:main}
-For every integer $n > 0$ with $n \notin \{2, 3, 4, 6\}$, there exists a bijection $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that the cyclic Latin square
+For every integer $n > 0$ and $n \notin \{2, 3, 4, 6\}$, there exists a bijection
+$q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that the Cyclic Incremental Latin Square
 \[
   L_{i,j} = (i + q(j)) \bmod n
 \]
 satisfies:
+
+\vspace{12pt}
+
 \begin{enumerate}[nosep,label=(\roman*)]
   \item For every $i \in \mathrm{Fin}\,n$, the row map $j \mapsto L_{i,j}$ is bijective.
   \item For every $j \in \mathrm{Fin}\,n$, the column map $i \mapsto L_{i,j}$ is bijective.
@@ -174,12 +180,72 @@ satisfies:
 \end{enumerate}
 \end{theorem}
 
+\section{Injective Majorization}
+
+Instead of direct cardinality counting of
+  \[
+    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le k\}| \le k + 1.
+  \]
+and
+  \[
+    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le k\}| \le k + 1.
+  \]
+which would computationally explode for large $n$, we use a simple combinatorial principle that
+completely eliminates cardinality counting and reduces the problem for \emph{all} thresholds
+$0 \le k < n$ simultaneously to constructing a single dominated injection.
+
+\subsection{The Injective-Majorization Principle}
+
+Let $D \subseteq \mathrm{Fin}\,n \times \mathrm{Fin}\,n$ be any diagonal 
+(either a sum-diagonal $i + j = s$ or a difference-diagonal $i - j = d$), and let 
+$v(i,j) = (i + q(j)) \bmod n \in \{0, \dots, n-1\}$ be the square value at cell $(i,j)$.
+
+\begin{lemma}[Injective-Majorization Principle] \label{lem:inj-maj}
+If there exists a function $f : \mathbb{N} \times \mathbb{N} \to \mathbb{N}$ such that:
+
+\vspace{12pt}
+
+\begin{enumerate}[nosep,label=(\arabic*)]
+  \item Majorization: $f(i,j) \le v(i,j)$ for all $0 \le i, j < n$,
+  \item Diagonal Injectivity: $f$ is injective along $D$.
+\end{enumerate}
+
+\vspace{12pt}
+
+Then for every threshold $k \in \mathbb{N}$, the set $D_{\le k} = \{(i,j) \in D \mid v(i,j) \le k\}$
+has cardinality at most $k + 1$.
+\end{lemma}
+
+\begin{proof}
+For every cell $(i,j) \in D_{\le k}$, condition~(1) gives
+\[
+  0 \le f(i,j) \le v(i,j) \le k,
+\]
+so $f(i,j) \in \{0, \dots, k\}$. By condition~(2), the restriction of $f$ to $D_{\le k}$ is an
+injective map into $\{0, \dots, k\}$. By the Pigeonhole Principle,
+\[
+  |D_{\le k}| \le |\{0, \dots, k\}| = k + 1. \qedhere
+\]
+\end{proof}
+
+\vspace{12pt}
+
+\begin{remark}[Geometric Meaning of $f$]
+Along a diagonal $D$, the square values $v(i,j)$ are \emph{almost} distinct, except for a small
+number of pairs $(i_1, j_1), (i_2, j_2) \in D$ caused by jumps between piecewise-linear
+blocks of $q(j)$ or modular wrap-around at $n$. Whenever two cells on $D$ share the same value
+$v(i_1, j_1) = v(i_2, j_2) = v$, one of the two cells is allowed to keep its value, say 
+$f(i_1, j_1) = v$ while the other is changed to an unused value $f(i_2, j_2) < v$ that does not
+appear anywhere else along $D$. Because $f(i_2, j_2) < v(i_2, j_2)$ on the changed cell, the
+changed cell steals a slot in $\{0, \dots, f(i_2, j_2)\} \subseteq \{0, \dots, v(i_2, j_2)\}$ that
+was left vacant on $D$!
+\end{remark}
 
 \begin{thebibliography}{9}
 \bibitem{LLW1990}
 Mao-Hua Le, Wen Li, and Edward T. Wang,
 \emph{A generalization of the $n$-queen problem},
-Journal of Systems Science and Mathematical Sciences \textbf{3} (1990), no.~2, 183--192,
+Journal of Systems Science and Mathematical Sciences \textbf{3} (1990), no.~2, 183--192, \\
 \url{https://sysmath.cjoe.ac.cn/jssc/CN/Y1990/V3/I2/183}.
 \end{thebibliography}
 
