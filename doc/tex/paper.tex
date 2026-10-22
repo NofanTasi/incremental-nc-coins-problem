@@ -101,25 +101,25 @@ An $(n,c)$-Coins Square for $0 \le 1 \le n$ corresponds to a solution of $n$-Que
 
 \vspace{12pt}
 
-\noindent The proof uses the \emph{Injective-Majorization Principle} that, in combination with the
+\noindent The proof uses the \emph{Injective-Majorization Principle} which, in combination with the
 \emph{Pigeon Hole Principle}, replaces intensive checking inequalities on each diagonal to the
-existence of a single function $f(i,j) \le L_{i,j}$ that is injective on every diagonal. 
+existence of a single function $f(i,j) \le L_{i,j}$ which is injective on every diagonal.
 
 \vspace{12pt}
 
 \noindent The proof uses four families covering almost all natural number modulo~$6$ classes
 \begin{itemize}
-\item for $n \equiv 1,5 \pmod 6$ (with $n \ge 1$)
-\item for $n \equiv 2,4 \pmod 6$ (with $n \ge 10$)
-\item for $n \equiv 0 \pmod 6$ (with $n \ge 12$)
-\item for $n \equiv 3 \pmod 6$ (with $n \ge 27$)
+\item for $n \equiv 1,5 \pmod 6$ ($n \ge 1$)
+\item for $n \equiv 2,4 \pmod 6$ ($n \ge 10$)
+\item for $n \equiv 0 \pmod 6$ ($n \ge 12$)
+\item for $n \equiv 3 \pmod 6$ ($n \ge 27$)
 \end{itemize}
 
 \vspace{12pt}
 
-\noindent For all four families a Cyclic Incremental Latin Square can be constructed. Constructing
-a Cyclic Incremental Latin Square for the four uncovered natural numbers, $n \in \{8, 9, 15, 21\}$,
-is handled separately. Likewise, constructing a (non-Cyclic) Incremental Latin Square for the two
+\noindent For all four families a Cyclic Incremental Latin Square solution can be constructed. Constructing
+a Cyclic Incremental Latin Square solution for the four not covered natural numbers, $n \in \{8, 9, 15, 21\}$,
+is handled separately. Likewise, constructing a (non-Cyclic) Incremental Latin Square solution for the two
 remaining natural numbers, $n \in \{4, 6\}$, is also handled separately.
 
 \end{abstract}
@@ -138,7 +138,7 @@ Clearly, for $c = 1$, they correspond to solutions of $n$-Queens Problems.
 
 \vspace{12pt}
 
-The construction of Le, Li and Wang~\cite{LLW1990} constructs $S_c$'s separately for each  $c$.
+The paper of Le, Li and Wang~\cite{LLW1990} constructs $S_c$'s separately for each $c$.
 
 \vspace{12 pt}
 
@@ -152,9 +152,9 @@ Every permutation $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ defines a \emph{Cycl
 \vspace{12 pt}
 
 The conjecture is that for all $n > 0$ except $n \in \{2, 3, 4, 6\}$, there exists a column
-permutation $q$ such that $L_{i,j} = (i + q(j)) \bmod n$ is a Cyclic Incremental Latin Square. 
+permutation $q$ such that $L_{i,j} = (i + q(j)) \bmod n$ is a Cyclic Incremental Latin Square solutions.
 For $n \in \{2, 3\}$, the $n$-queens problem has no solution, and, for $n \in \{4, 6\}$, exhaustive
-finite search confirms that no Cyclic Incremental Latin Square satisfies the diagonal bounds.
+finite search confirms that no Cyclic Incremental Latin Square solutions satisfies the diagonal bounds.
 
 \begin{theorem}[Cyclic Incremental Latin Square Conjecture]\label{thm:main}
 For every integer $n > 0$ and $n \notin \{2, 3, 4, 6\}$, there exists a bijection
@@ -192,7 +192,7 @@ and
   \]
 which would computationally explode for large $n$, we use a simple combinatorial principle that
 completely eliminates cardinality counting and reduces the problem for \emph{all} thresholds
-$0 \le k < n$ simultaneously to constructing a single dominated injection.
+$0 \le k < n$ simultaneously to constructing a single appropriate injection.
 
 \subsection{The Injective-Majorization Principle}
 
