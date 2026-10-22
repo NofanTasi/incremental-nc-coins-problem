@@ -92,13 +92,13 @@ the $(n,c)$-Coins Problem for all $1 \le c \le n$, a generalization of the $n$-Q
 
 \noindent See e.g. \href{https://mathoverflow.net/questions/510135/placing-n-cdot-m-coins-on-an-n-times-n-board-generalizing-the-n-queens-p}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}510135}, 
 \href{https://puzzling.stackexchange.com/questions/138939/place-as-many-queens-as-you-can}{PSE\hspace{-0.5pt}\#\hspace{-0.5pt}138939},
-\href{https://mathoverflow.net/questions/516225/universal-board-encoding-placement-of-n-cdot-m-coins-on-an-n-times-n-board}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}516225} an
+\href{https://mathoverflow.net/questions/516225/universal-board-encoding-placement-of-n-cdot-m-coins-on-an-n-times-n-board}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}516225} and
 \href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub}.
 
 \vspace{12pt}
 
 \noindent The proof uses the \emph{Injective-Majorization Principle} in combination with the
-\emph{Pigeon Hole Principle} reducing intensively checking inequalities on each diagonal to the
+\emph{Pigeon Hole Principle} reducing intensive checking inequalities on each diagonal to the
 existence of a single function $f(i,j) \le L_{i,j}$ that is injective on every diagonal. 
 
 \vspace{12pt}
@@ -116,37 +116,25 @@ existence of a single function $f(i,j) \le L_{i,j}$ that is injective on every d
 \noindent For all four families an Incremental Cyclic Latin Square can be constructed. Constructing
 an Incremental Cyclic Latin Square for the four uncovered natural numbers, $n \in \{8, 9, 15, 21\}$,
 is handled separately. Likewise, constructing an Incremental (non-Cyclic) Latin Square for the two
-remaining dimensions, $n \in \{4, 6\}$, is also handled separately.
+remaining natural numbers, $n \in \{4, 6\}$, is also handled separately.
 
 \end{abstract}
 
-\end{document}
+\section{Incremental Cyclic Latin Squares}
 
-\section{Introduction: Universal Boards and Cyclic Latin Squares}
+\subsection{From \texorpdfstring{$(n,c)$}{(n,c)}-Coins Problems to Incremental Cyclic Latin Squares}
 
-\subsection{From Generalized \texorpdfstring{$(n,c)$}{(n,c)}-Queens to Universal Boards}
+The $(n,c)$-Coins Problem is about the existence of a subset $S_c \subseteq \{0, \dots, n-1\}^2$ of
+$nc$ cells on an $n \times n$ board such that every row, column, sum-diagonal ($i + j = s$), and
+difference-diagonal ($i - j = d$) contains at most $c$ cells of $S_c$. Clearly, for $(n,1)$, this
+problem corresponds to the $n$-Queens Problem.
 
-In the Generalized $(n,c)$-Queens Problem one seeks a subset
-$S_c \subseteq \{0, \dots, n-1\}^2$ of $nc$ cells on an $n \times n$ chessboard such that every row,
-column, sum-diagonal ($i + j = s$), and difference-diagonal ($i - j = d$) contains at most $c$ cells
-of $S_c$.
+\vspace{12pt}
 
-In the classical construction of Le--Li--Wang
-(formalized in \texttt{Incremental-NC-Coins-Proof.{\tt Lean}}), the placement $S_c$ is constructed
-separately for each $c$, and for odd $c$ the sets $S_c$ are not nested
-($S_1 \not\subseteq S_2$, etc.) because an isolated queen shift must be applied when $c$ is odd.
+The construction of Le, Li and Wang~\cite{LLW1990} constructs the subsets $S_c$ separately for each 
+$c$.
 
-A much stronger structural property is to ask for a \emph{nested tower} of solutions
-\[
-  \varnothing = S_0 \subset S_1 \subset S_2 \subset \cdots \subset S_n = \{0, \dots, n-1\}^2
-\]
-where each layer $S_{k+1} \setminus S_k$ is a permutation matrix (one cell per row and per column) and each cumulative set $S_{k+1}$ is a valid $(n, k+1)$-queens configuration. Assigning the symbol $k \in \{0, \dots, n-1\}$ (or $k+1 \in \{1, \dots, n\}$ in $1$-indexed notation) to the cells in $S_{k+1} \setminus S_k$ produces an $n \times n$ Latin square $L_{i,j} \in \{0, \dots, n-1\}$ with the property that for every threshold $0 \le k < n$, the sublevel set
-\[
-  S_{k+1} = \{(i,j) \in \{0,\dots,n-1\}^2 \mid L_{i,j} \le k\}
-\]
-has at most $k + 1$ cells on every sum-diagonal and on every difference-diagonal. We call such a Latin square \emph{incremental}, or a \emph{universal board}: thresholding a single universal board at $\le k$ immediately yields valid $(n, k+1)$-queens solutions for all $k \in \{0, \dots, n-1\}$ simultaneously.
-
-Notice a crucial subtlety: the $k$-th layer $L_{i,j} = k$ (for $k \ge 1$) need \emph{not} be a valid $n$-queens solution by itself; it may have two or more cells on the same diagonal, provided that the cumulative count of cells with values $\le k$ on that diagonal does not exceed $k + 1$.
+\vspace{12 pt}
 
 \subsection{The Conjecture}
 
@@ -180,8 +168,22 @@ satisfies:
 \end{enumerate}
 \end{theorem}
 
+
+\begin{thebibliography}{9}
+\bibitem{LLW1990}
+Mao-Hua Le, Wen Li, and Edward T. Wang,
+\emph{A generalization of the $n$-queen problem},
+Journal of Systems Science and Mathematical Sciences \textbf{3} (1990), no.~2, 183--192,
+\url{https://sysmath.cjoe.ac.cn/jssc/CN/Y1990/V3/I2/183}.
+\end{thebibliography}
+
+\end{document}
+
+
+
+
 In \texttt{IncrementalCyclic.{\tt Lean}}, these definitions and the main theorem are formalized directly as follows:
-\begin{lstlisting}[language={\tt Lean}4]
+\begin{lstlisting}[language=Lean4]
 def cyclicSquare (n : ℕ) (h : n > 0) (_ : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
     (q : Fin n → Fin n) : Fin n → Fin n → Fin n :=
   fun i j => ⟨(i.val + (q j).val) % n, mod_lt _ h⟩
@@ -280,7 +282,7 @@ modulo operation is just a single conditional subtraction:
   \end{cases}
 \]
 In \texttt{Incremental-NC-Coins-Proof.{\tt Lean}}, Lemma \texttt{mod\_eq\_val\_nat} proves that $(i + q(j)) \bmod n$ equals $\mathrm{val\_nat}(n, q, i, j)$, and Lemma \texttt{exists\_incremental\_of\_nat} packages Lemma~\ref{lem:inj-maj} into a pure $\mathbb{N}$-level interface:
-\begin{lstlisting}[language={\tt Lean}4]
+\begin{lstlisting}[language=Lean4]
 lemma exists_incremental_of_nat
     (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
     (q_nat : ℕ → ℕ)
@@ -342,7 +344,7 @@ Consequently, no downward shifts are needed at all: we take
   f_{1,\mathrm{sum}}(i,j) = v(i,j), \qquad f_{1,\mathrm{diff}}(i,j) = v(i,j).
 \]
 In \texttt{IncrementalCyclic.{\tt Lean}}, \texttt{solve\_family1} proves this case in $30$ lines:
-\begin{lstlisting}[language={\tt Lean}4]
+\begin{lstlisting}[language=Lean4]
 def q1_nat (n : ℕ) (j : ℕ) : ℕ :=
   if j = 0 then 0 else if 2 * j < n then n - 2 * j else 2 * n - 2 * j
 
@@ -400,7 +402,7 @@ This happens for only a \textbf{single pair of cells on the entire board}: $(i_1
   \end{cases}
 \]
 In {\tt Lean}~4:
-\begin{lstlisting}[language={\tt Lean}4]
+\begin{lstlisting}[language=Lean4]
 def q2_nat (n : ℕ) (j : ℕ) : ℕ :=
   let m := n / 2
   if j < m then
@@ -535,7 +537,7 @@ When a piecewise function such as $f_{3,\mathrm{diff}}$ has $6$ branches and $q_
 \end{enumerate}
 
 The final theorem \texttt{Conjecture} then dispatches over $n \bmod 6$ in $20$ lines:
-\begin{lstlisting}[language={\tt Lean}4]
+\begin{lstlisting}[language=Lean4]
 theorem Conjecture :
   ∀ (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6),
   ∃ q : Fin n → Fin n, Bijective q ∧ @IsIncremental n (@cyclicSquare n h hn q) := by
@@ -560,9 +562,10 @@ As a result, the entire $1{,}094$-line file \texttt{IncrementalCyclic.{\tt Lean}
 
 \begin{thebibliography}{9}
 \bibitem{LLW1990}
-Mao-Hua Le, Kang-Di Li, and Zhen-Fa Wang,
-\emph{A note on the generalized $n$-queens problem},
-Kexue Tongbao (Chinese Science Bulletin) \textbf{35} (1990), no.~10, 790--791.
+Mao-Hua Le, Wen Li, and Edward T. Wang,
+\emph{A generalization of the $n$-queen problem},
+Journal of Systems Science and Mathematical Sciences \textbf{3} (1990), no.~2, 183--192,
+\url{https://sysmath.cjoe.ac.cn/jssc/CN/Y1990/V3/I2/183}.
 
 \bibitem{MO510135}
 MathOverflow Question 510135,
