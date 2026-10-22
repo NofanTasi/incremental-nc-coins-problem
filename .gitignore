@@ -4,4 +4,5 @@
 *.o
 *.out
 *.pdf
-bin/run/*/
+
+/doc/tbd

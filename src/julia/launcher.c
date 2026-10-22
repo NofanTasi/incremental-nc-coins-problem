@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
     char *dir = dirname(exe_path);
     char script_path[PATH_MAX];
-    snprintf(script_path, sizeof(script_path), "%s/../../../src/julia/Incremental-NC-Coins.jl", dir);
+    snprintf(script_path, sizeof(script_path), "%s/../../src/julia/Incremental-NC-Coins.jl", dir);
 
     char resolved_script[PATH_MAX];
     if (realpath(script_path, resolved_script) != NULL) {

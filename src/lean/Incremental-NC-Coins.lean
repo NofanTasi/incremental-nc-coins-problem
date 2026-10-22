@@ -199,60 +199,27 @@ end IncrementalCyclicProgram
 
 open IncrementalCyclicProgram
 
-/-- Prompts the user for a number on standard input. -/
-def promptNat (prompt : String) : IO ℕ := do
-  let stdout ← IO.getStdout
-  stdout.putStr prompt
-  stdout.flush
-  let stdin ← IO.getStdin
-  let line ← stdin.getLine
-  match line.trimAscii.toString.toNat? with
-  | some val => pure val
-  | none =>
-    IO.println "Invalid input; defaulting to 8."
-    pure 8
-
-/-- Main entry point: interactive prompt if run without arguments, or CLI flags if provided. -/
 def main (args : List String) : IO Unit := do
   match args with
-  | ["--incremental", nStr] =>
+  | ["-incremental", nStr] =>
     let n := nStr.toNat?.getD 8
     printBoard n
-    -- IO.println s!"Verifying incremental property for n = {n}..."
-    -- let ok := verifyIncremental n
-    -- IO.println s!"Result: {ok}"
-  | ["--coins", nStr, cStr] =>
+  | ["-coins", nStr, cStr] =>
     let n := nStr.toNat?.getD 8
     let c := cStr.toNat?.getD 1
     printCoinsBoard n c
-    -- IO.println s!"Verifying ({n}, {c})-coins constraints..."
-    -- let ok := verifyCoinsPlacement n c
-    -- IO.println s!"Result: {ok}"
-  | [nStr] =>
+  | ["-incremental", "-v", nStr] =>
     let n := nStr.toNat?.getD 8
     printBoard n
-    -- IO.println s!"Verifying incremental property for n = {n}..."
-    -- let ok := verifyIncremental n
-    -- IO.println s!"Result: {ok}"
+    IO.println s!"Verifying incremental property for n = {n}..."
+    let ok := verifyIncremental n
+    IO.println s!"Result: {ok}"
+  | ["-coins", "-v", nStr, cStr] =>
+    let n := nStr.toNat?.getD 8
+    let c := cStr.toNat?.getD 1
+    printCoinsBoard n c
+    IO.println s!"Verifying ({n}, {c})-coins constraints..."
+    let ok := verifyCoinsPlacement n c
+    IO.println s!"Result: {ok}"
   | _ =>
-    -- Interactive Mode
-    IO.println "=========================================================="
-    IO.println "  Incremental Board & Generalized (n, c)-Coins Generator   "
-    IO.println "=========================================================="
-    IO.println "Choose an option:"
-    IO.println "  1. Generate Incremental Board (size n × n)"
-    IO.println "  2. Generate (n, c)-Coins Solution (threshold c < n)"
-    let choice ← promptNat "Enter choice (1 or 2): "
-    if choice == 2 then
-      let n ← promptNat "Enter board size n: "
-      let c ← promptNat s!"Enter number of coins per row/col c (1 ≤ c ≤ {n}): "
-      printCoinsBoard n c
-      -- IO.println s!"Verifying ({n}, {c})-coins constraints..."
-      -- let ok := verifyCoinsPlacement n c
-      -- IO.println s!"Result: {ok}"
-    else
-      let n ← promptNat "Enter board size n: "
-      printBoard n
-      -- IO.println s!"Verifying incremental property for n = {n}..."
-      -- let ok := verifyIncremental n
-      -- IO.println s!"Result: {ok}"
+    IO.println ""
