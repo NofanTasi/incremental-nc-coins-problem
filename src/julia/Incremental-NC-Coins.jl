@@ -237,7 +237,6 @@ r = collect(4:32)
 solve(r,print_q=true,print_L=true,print_I=true,print_D=true,verify=true)
 exit(0)
 
-
 # example invocation: show nothing and do not verify but benchmark up to 2^12
 # r = collect(4:2^12)
 # solve(r,print_q=false,print_L=false,print_I=false,print_D=false,verify=false,benchmark=true)

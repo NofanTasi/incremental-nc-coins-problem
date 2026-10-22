@@ -113,7 +113,7 @@ def printBoard (n : ℕ) : IO Unit := do
   if n = 2 ∨ n = 3 then
     IO.println s!"No incremental board exists for n = {n}."
   else
-    IO.println s!"=== Incremental Board ({n} × {n}) ==="
+    -- IO.println s!"=== Incremental Board ({n} × {n}) ==="
     for i in [:n] do
       let mut rowStr := ""
       for j in [:n] do
@@ -128,7 +128,7 @@ def printCoinsBoard (n c : ℕ) : IO Unit := do
   else if c > n then
     IO.println s!"Invalid parameter c = {c}: must satisfy c ≤ n = {n}."
   else
-    IO.println s!"=== ({n}, {c})-Coins Solution ({n} × {n} board, {n * c} coins) ==="
+    IO.println s!"({n}, {c})"
     for i in [:n] do
       let mut rowStr := ""
       for j in [:n] do
@@ -223,3 +223,22 @@ def main (args : List String) : IO Unit := do
     IO.println s!"Result: {ok}"
   | _ =>
     IO.println ""
+
+
+#eval printBoard 8
+#eval IO.println ""
+#eval printCoinsBoard 8 1
+#eval IO.println ""
+#eval printCoinsBoard 8 2
+#eval IO.println ""
+#eval printCoinsBoard 8 3
+#eval IO.println ""
+#eval printCoinsBoard 8 4
+#eval IO.println ""
+#eval printCoinsBoard 8 5
+#eval IO.println ""
+#eval printCoinsBoard 8 6
+#eval IO.println ""
+#eval printCoinsBoard 8 7
+#eval IO.println ""
+#eval printCoinsBoard 8 8
