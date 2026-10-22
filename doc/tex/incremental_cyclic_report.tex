@@ -60,64 +60,67 @@
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
+\setlength{\parindent}{0pt}
+
 \title{\textbf{
   Incremental Cyclic Latin Squares \\ 
   as \\
   Simultaneous Generalized NC-Coins Solutions
 }}
-\author{Marc Duponcheel \small (existence conjecture) \\ 
-  and \\ 
-  \large Luc Duponcheel \small (formal proof) 
+\author{Marc Duponcheel and Luc Duponcheel
 }
 
-\date{October 2026}
+\date{\today}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-We present a formal Lean~4 proof of the \emph{Incremental Cyclic Latin Square Conjecture}:
+
+\noindent For every natural number $n \notin \{0, 2, 3, 4, 6\}$, there exists a permutation 
+$q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that
+$L_{i,j} = (i + q(j)) \bmod n$ is an \emph{Incremental Cyclic Latin Square}, simultaneously solving
+the $(n,c)$-Coins Problem for all $1 \le c \le n$, a generalization of the $n$-Queens Problem.
 
 \vspace{12pt}
 
-For every natural number $n > 0$ with $n \notin \{2, 3, 4, 6\}$, 
-there exists a bijection $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ 
-such that the cyclic Latin square $L_{i,j} = (i + q(j)) \bmod n$ is 
-\emph{incremental} (a.k.a. a \emph{universal board}), meaning that for every 
-$0 \le k < n$, every sum-diagonal ($i + j = s$) and every
-difference-diagonal ($i - j = d$) contains at most $k + 1$ cells with value
-$L_{i,j} \le k$.
+\noindent We have an existence proof in {\tt Lean} and construction code in {\tt Haskell},
+{\tt Julia} and {\tt Lean}.
 
 \vspace{12pt}
 
-An incremental Latin square simultaneously solves the Generalized $(n,c)$-Queens Problem for
-all $1 \le c \le n$ on one universal board
-(see e.g. 
-\href{https://mathoverflow.net/questions/510135/placing-n-cdot-m-coins-on-an-n-times-n-board-generalizing-the-n-queens-p}{MO \# 510135} 
-and 
-\href{https://puzzling.stackexchange.com/questions/138939/place-as-many-queens-as-you-can}{PSE \# 138939}).
+\noindent See e.g. \href{https://mathoverflow.net/questions/510135/placing-n-cdot-m-coins-on-an-n-times-n-board-generalizing-the-n-queens-p}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}510135}, 
+\href{https://puzzling.stackexchange.com/questions/138939/place-as-many-queens-as-you-can}{PSE\hspace{-0.5pt}\#\hspace{-0.5pt}138939},
+\href{https://mathoverflow.net/questions/516225/universal-board-encoding-placement-of-n-cdot-m-coins-on-an-n-times-n-board}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}516225} an
+\href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub}.
 
 \vspace{12pt}
 
-Our proof introduces a general \emph{Injective-Majorization Principle} that reduces
-counting inequalities on each diagonal to the existence of a single function
-F$f(i,j) \le L_{i,j}$ that is injective along every diagonal. 
+\noindent The proof uses the \emph{Injective-Majorization Principle} in combination with the
+\emph{Pigeon Hole Principle} reducing intensively checking inequalities on each diagonal to the
+existence of a single function $f(i,j) \le L_{i,j}$ that is injective on every diagonal. 
 
 \vspace{12pt}
 
-Using this principle, in combination with the \emph{Pigeon Hole Principle}, we construct four
-explicit infinite families of column permutations covering all residue classes modulo~$6$
+\noindent The proof uses four families covering almost all natural numbers modulo~$6$
 \begin{itemize}
-\item for $n \equiv 1,5 \pmod 6$ with $n \ge 1$
-\item for $n \equiv 2,4 \pmod 6$ with $n \ge 10$
-\item for $n \equiv 0 \pmod 6$ with $n \ge 12$
-\item for $n \equiv 3 \pmod 6$ with $n \ge 27$
+\item for $n \equiv 1,5 \pmod 6$ (with $n \ge 1$)
+\item for $n \equiv 2,4 \pmod 6$ (with $n \ge 10$)
+\item for $n \equiv 0 \pmod 6$ (with $n \ge 12$)
+\item for $n \equiv 3 \pmod 6$ (with $n \ge 27$)
 \end{itemize}
-and explicit column permutations for the four remaining small dimensions
-$n \in \{8, 9, 15, 21\}$.
+
+\vspace{12pt}
+
+\noindent For all four families an Incremental Cyclic Latin Square can be constructed. Constructing
+an Incremental Cyclic Latin Square for the four uncovered natural numbers, $n \in \{8, 9, 15, 21\}$,
+is handled separately. Likewise, constructing an Incremental (non-Cyclic) Latin Square for the two
+remaining dimensions, $n \in \{4, 6\}$, is also handled separately.
 
 \end{abstract}
+
+\end{document}
 
 \section{Introduction: Universal Boards and Cyclic Latin Squares}
 
@@ -129,7 +132,7 @@ column, sum-diagonal ($i + j = s$), and difference-diagonal ($i - j = d$) contai
 of $S_c$.
 
 In the classical construction of Le--Li--Wang
-(formalized in \texttt{Incremental-NC-Coins-Proof.lean}), the placement $S_c$ is constructed
+(formalized in \texttt{Incremental-NC-Coins-Proof.{\tt Lean}}), the placement $S_c$ is constructed
 separately for each $c$, and for odd $c$ the sets $S_c$ are not nested
 ($S_1 \not\subseteq S_2$, etc.) because an isolated queen shift must be applied when $c$ is odd.
 
@@ -177,8 +180,8 @@ satisfies:
 \end{enumerate}
 \end{theorem}
 
-In \texttt{IncrementalCyclic.lean}, these definitions and the main theorem are formalized directly as follows:
-\begin{lstlisting}[language=Lean4]
+In \texttt{IncrementalCyclic.{\tt Lean}}, these definitions and the main theorem are formalized directly as follows:
+\begin{lstlisting}[language={\tt Lean}4]
 def cyclicSquare (n : ℕ) (h : n > 0) (_ : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
     (q : Fin n → Fin n) : Fin n → Fin n → Fin n :=
   fun i j => ⟨(i.val + (q j).val) % n, mod_lt _ h⟩
@@ -265,7 +268,7 @@ slot in $\{0, \dots, f(i,j)\} \subseteq \{0, \dots, v(i,j)\}$ that was left vaca
 
 \subsection{Eliminating Modulo \texorpdfstring{$n$}{n} via \texttt{val\_nat}}
 
-In Lean~4, the \texttt{omega} tactic decides Presburger arithmetic
+In {\tt Lean}~4, the \texttt{omega} tactic decides Presburger arithmetic
 (linear integer and natural number inequalities and divisibility by constants), but treats 
 \texttt{\% n} with a variable modulus $n$ as an uninterpreted division/modulo term unless expanded.
 However, since $0 \le i < n$ and $0 \le q(j) < n$, their sum satisfies $0 \le i + q(j) < 2n$, so the
@@ -276,8 +279,8 @@ modulo operation is just a single conditional subtraction:
     i + q(j) - n & \text{if } i + q(j) \ge n.
   \end{cases}
 \]
-In \texttt{Incremental-NC-Coins-Proof.lean}, Lemma \texttt{mod\_eq\_val\_nat} proves that $(i + q(j)) \bmod n$ equals $\mathrm{val\_nat}(n, q, i, j)$, and Lemma \texttt{exists\_incremental\_of\_nat} packages Lemma~\ref{lem:inj-maj} into a pure $\mathbb{N}$-level interface:
-\begin{lstlisting}[language=Lean4]
+In \texttt{Incremental-NC-Coins-Proof.{\tt Lean}}, Lemma \texttt{mod\_eq\_val\_nat} proves that $(i + q(j)) \bmod n$ equals $\mathrm{val\_nat}(n, q, i, j)$, and Lemma \texttt{exists\_incremental\_of\_nat} packages Lemma~\ref{lem:inj-maj} into a pure $\mathbb{N}$-level interface:
+\begin{lstlisting}[language={\tt Lean}4]
 lemma exists_incremental_of_nat
     (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
     (q_nat : ℕ → ℕ)
@@ -304,7 +307,7 @@ We partition all integers $n > 0$ ($n \notin \{2, 3, 4, 6\}$) according to $n \b
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{@{}llll@{}}
 \toprule
-\textbf{Residue class} & \textbf{Range of $n$} & \textbf{Construction type} & \textbf{Lean Lemma} \\
+\textbf{Residue class} & \textbf{Range of $n$} & \textbf{Construction type} & \textbf{{\tt Lean} Lemma} \\
 \midrule
 $n \equiv 1, 5 \pmod 6$ & all $n \ge 1$ & Linear step $-2 \pmod n$ & \texttt{solve\_family1} \\
 $n \equiv 2, 4 \pmod 6$ & $n \ge 10$ & 2-block step $+2$, jump $+3$ at $n/2$ & \texttt{solve\_family2} \\
@@ -338,8 +341,8 @@ Consequently, no downward shifts are needed at all: we take
 \[
   f_{1,\mathrm{sum}}(i,j) = v(i,j), \qquad f_{1,\mathrm{diff}}(i,j) = v(i,j).
 \]
-In \texttt{IncrementalCyclic.lean}, \texttt{solve\_family1} proves this case in $30$ lines:
-\begin{lstlisting}[language=Lean4]
+In \texttt{IncrementalCyclic.{\tt Lean}}, \texttt{solve\_family1} proves this case in $30$ lines:
+\begin{lstlisting}[language={\tt Lean}4]
 def q1_nat (n : ℕ) (j : ℕ) : ℕ :=
   if j = 0 then 0 else if 2 * j < n then n - 2 * j else 2 * n - 2 * j
 
@@ -396,8 +399,8 @@ This happens for only a \textbf{single pair of cells on the entire board}: $(i_1
     v(i, j) & \text{otherwise.}
   \end{cases}
 \]
-In Lean~4:
-\begin{lstlisting}[language=Lean4]
+In {\tt Lean}~4:
+\begin{lstlisting}[language={\tt Lean}4]
 def q2_nat (n : ℕ) (j : ℕ) : ℕ :=
   let m := n / 2
   if j < m then
@@ -518,11 +521,11 @@ For these four concrete dimensions, we exhibit explicit permutations $q_n$ and m
 \end{align*}
 Notably, for $n = 9$, all difference-diagonals already have pairwise distinct values ($f_{9,\mathrm{diff}} = v$), and for $n = 15$, all sum-diagonals already have pairwise distinct values ($f_{15,\mathrm{sum}} = v$).
 
-To make Lean's kernel decision procedure (\texttt{decide}) verify these four cases in milliseconds without \texttt{native\_decide}, Lemma~\texttt{exists\_incremental\_of\_fin\_decide} eliminates the fourth variable $i_2$ from the diagonal injectivity quantifiers using $i_2 = i_1 + j_1 - j_2$ on sum-diagonals and $i_2 = i_1 + j_2 - j_1$ on difference-diagonals. This reduces the verification for a given $n$ from $O(n^4)$ 4-tuples to $O(n^3)$ triples $(i_1, j_1, j_2) \in (\mathrm{Fin}\,n)^3$ (at most $21^3 = 9{,}261$ triples for $n = 21$), which Lean's kernel evaluates almost instantaneously.
+To make {\tt Lean}'s kernel decision procedure (\texttt{decide}) verify these four cases in milliseconds without \texttt{native\_decide}, Lemma~\texttt{exists\_incremental\_of\_fin\_decide} eliminates the fourth variable $i_2$ from the diagonal injectivity quantifiers using $i_2 = i_1 + j_1 - j_2$ on sum-diagonals and $i_2 = i_1 + j_2 - j_1$ on difference-diagonals. This reduces the verification for a given $n$ from $O(n^4)$ 4-tuples to $O(n^3)$ triples $(i_1, j_1, j_2) \in (\mathrm{Fin}\,n)^3$ (at most $21^3 = 9{,}261$ triples for $n = 21$), which {\tt Lean}'s kernel evaluates almost instantaneously.
 
-\section{Architecture of the Lean 4 Formalization}
+\section{Architecture of the {\tt Lean} 4 Formalization}
 
-A major engineering goal of \texttt{IncrementalCyclic.lean} was to achieve fast, deterministic compilation with \textbf{zero \texttt{sorry}s, zero \texttt{native\_decide}s, and zero linter warnings}.
+A major engineering goal of \texttt{IncrementalCyclic.{\tt Lean}} was to achieve fast, deterministic compilation with \textbf{zero \texttt{sorry}s, zero \texttt{native\_decide}s, and zero linter warnings}.
 
 When a piecewise function such as $f_{3,\mathrm{diff}}$ has $6$ branches and $q_3$ has $5$ branches, unfolding both definitions simultaneously inside an injectivity proof for two points $(i_1, j_1)$ and $(i_2, j_2)$ would create $(6 \times 5 \times 2)^2 = 3{,}600$ nested \texttt{if-then-else} branches, causing exponential blowup in \texttt{omega}. We prevented this blowup using a two-tier \textbf{Flat Disjunctive Specification Pattern}:
 \begin{enumerate}[nosep]
@@ -532,7 +535,7 @@ When a piecewise function such as $f_{3,\mathrm{diff}}$ has $6$ branches and $q_
 \end{enumerate}
 
 The final theorem \texttt{Conjecture} then dispatches over $n \bmod 6$ in $20$ lines:
-\begin{lstlisting}[language=Lean4]
+\begin{lstlisting}[language={\tt Lean}4]
 theorem Conjecture :
   ∀ (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6),
   ∃ q : Fin n → Fin n, Bijective q ∧ @IsIncremental n (@cyclicSquare n h hn q) := by
@@ -553,7 +556,7 @@ theorem Conjecture :
   · exact solve_family4 n h hn h4 hge
 \end{lstlisting}
 
-As a result, the entire $1{,}094$-line file \texttt{IncrementalCyclic.lean} compiles cleanly from scratch in under $25$ seconds using \texttt{lake env lean}.
+As a result, the entire $1{,}094$-line file \texttt{IncrementalCyclic.{\tt Lean}} compiles c{\tt Lean}ly from scratch in under $25$ seconds using \texttt{lake env {\tt Lean}}.
 
 \begin{thebibliography}{9}
 \bibitem{LLW1990}
