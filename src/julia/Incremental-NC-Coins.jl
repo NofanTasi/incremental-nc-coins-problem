@@ -259,51 +259,30 @@ end
 # uncomment the lines below for compilation
 # ============================================================================
 
-function main()
-    if isempty(ARGS)
-        println("==========================================================")
-        println("  Incremental Board & Generalized (n, c)-Coins Generator   ")
-        println("==========================================================")
-        println("Choose an option:")
-        println("  1. Generate Incremental Board (size n × n)")
-        println("  2. Generate (n, c)-Coins Solution (threshold c < n)")
-        println("  3. Run batch verification range (n = 4 to 32)")
-        print("Enter choice (1, 2, or 3) [default: 3]: ")
-        flush(stdout)
-        line = readline()
-        choice = isempty(strip(line)) ? 3 : tryparse(Int, strip(line))
-        if choice == 1
-            print("Enter board size n: ")
-            flush(stdout)
-            n = parse(Int, strip(readline()))
-            solve(n:n, print_q=true, print_L=true, print_I=false, verify=false)
-        elseif choice == 2
-            print("Enter board size n: ")
-            flush(stdout)
-            n = parse(Int, strip(readline()))
-            print("Enter number of coins per row/col c (1 ≤ c ≤ $n): ")
-            flush(stdout)
-            c = parse(Int, strip(readline()))
-            print_coins_solution(n, c)
-        else
-            r = collect(4:32)
-            solve(r, print_q=true, print_L=true, print_I=true, verify=false)
-        end
-    elseif ARGS[1] == "--incremental" && length(ARGS) >= 2
+function main() 
+
+    # TODO : why is this extra ARGS[2] != "-v" needed ?
+    if (ARGS[1] == "-incremental") && ARGS[2] != "-v" && (length(ARGS) == 2)
         n = parse(Int, ARGS[2])
         solve(n:n, print_q=true, print_L=true, print_I=false, verify=false)
-    elseif ARGS[1] == "--coins" && length(ARGS) >= 3
+    elseif ARGS[1] == "-coins" && length(ARGS) == 3
         n = parse(Int, ARGS[2])
         c = parse(Int, ARGS[3])
-        print_coins_solution(n, c)
-    elseif ARGS[1] == "--batch"
-        r = collect(4:32)
-        solve(r, print_q=true, print_L=true, print_I=true, verify=true)
-    elseif length(ARGS) == 1 && tryparse(Int, ARGS[1]) !== nothing
-        n = parse(Int, ARGS[1])
-        solve(n:n, print_q=true, print_L=true, print_I=false, verify=false)
+        print_coins_solution(n, c) 
+    elseif ARGS[1] == "-incremental" && ARGS[2] == "-v" && length(ARGS) == 3
+        n = parse(Int, ARGS[3])        
+        solve(n:n, print_q=true, print_L=true, print_I=false, verify=true)  
+
+    # elseif ARGS[1] == "--batch"
+    #     r = collect(4:32)
+    #     solve(r, print_q=true, print_L=true, print_I=true, verify=true)
+    # elseif length(ARGS) == 1 && tryparse(Int, ARGS[1]) !== nothing
+    #     n = parse(Int, ARGS[1])
+    #     solve(n:n, print_q=true, print_L=true, print_I=false, verify=false)
+
     else
-        println("Usage: Incremental-NC-Coins [--incremental <n>] [--coins <n> <c>] [--batch]")
+        # TODO : why is foo printed using ./run.sh -increment -v 5 ?
+        println("foo")
     end
 end
 

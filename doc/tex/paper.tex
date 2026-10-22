@@ -1,0 +1,180 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  urlcolor=blue!60!black,
+  citecolor=blue!60!black
+}
+
+\lstdefinelanguage{Lean4}{
+  keywords={def, theorem, lemma, by, have, let, in, if, then, else, match, with, fun, intro, rcases, rw, exact, refine, apply, omega, decide, simp, dsimp, ext, subst, generalize, constructor, forall, exists, import, namespace, end, open, use, by_cases, split_ifs},
+  keywordstyle=\color{blue!70!black}\bfseries,
+  comment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  commentstyle=\color{green!45!black}\itshape,
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  rulecolor=\color{black!20},
+  backgroundcolor=\color{black!2},
+  literate=
+    {ℕ}{{$\mathbb{N}$}}1
+    {ℤ}{{$\mathbb{Z}$}}1
+    {×}{{$\times$}}1
+    {∀}{{$\forall$}}1
+    {∃}{{$\exists$}}1
+    {∈}{{$\in$}}1
+    {≤}{{$\le$}}1
+    {≥}{{$\ge$}}1
+    {≠}{{$\ne$}}1
+    {∧}{{$\land$}}1
+    {∨}{{$\lor$}}1
+    {→}{{$\to$}}1
+    {⇒}{{$\Rightarrow$}}1
+    {⟨}{{$\langle$}}1
+    {⟩}{{$\rangle$}}1
+    {₁}{{$_1$}}1
+    {₂}{{$_2$}}1
+    {·}{{$\cdot$}}1
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\setlength{\parindent}{0pt}
+
+\title{\textbf{
+  Incremental Cyclic Latin Squares \\ 
+  as \\
+  Simultaneous Generalized NC-Coins Solutions
+}}
+\author{Marc Duponcheel and Luc Duponcheel
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\noindent For every natural number $n \notin \{0, 2, 3, 4, 6\}$, there exists a permutation 
+$q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that
+$L_{i,j} = (i + q(j)) \bmod n$ is an \emph{Incremental Cyclic Latin Square}, simultaneously solving
+the $(n,c)$-Coins Problem for all $1 \le c \le n$, a generalization of the $n$-Queens Problem.
+
+\vspace{12pt}
+
+\noindent We have an existence proof in {\tt Lean} and construction code in {\tt Haskell},
+{\tt Julia} and {\tt Lean}.
+
+\vspace{12pt}
+
+\noindent See e.g. \href{https://mathoverflow.net/questions/510135/placing-n-cdot-m-coins-on-an-n-times-n-board-generalizing-the-n-queens-p}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}510135}, 
+\href{https://puzzling.stackexchange.com/questions/138939/place-as-many-queens-as-you-can}{PSE\hspace{-0.5pt}\#\hspace{-0.5pt}138939},
+\href{https://mathoverflow.net/questions/516225/universal-board-encoding-placement-of-n-cdot-m-coins-on-an-n-times-n-board}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}516225} and
+\href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub}.
+
+\vspace{12pt}
+
+\noindent The proof uses the \emph{Injective-Majorization Principle} in combination with the
+\emph{Pigeon Hole Principle} reducing intensive checking inequalities on each diagonal to the
+existence of a single function $f(i,j) \le L_{i,j}$ that is injective on every diagonal. 
+
+\vspace{12pt}
+
+\noindent The proof uses four families covering almost all natural numbers modulo~$6$
+\begin{itemize}
+\item for $n \equiv 1,5 \pmod 6$ (with $n \ge 1$)
+\item for $n \equiv 2,4 \pmod 6$ (with $n \ge 10$)
+\item for $n \equiv 0 \pmod 6$ (with $n \ge 12$)
+\item for $n \equiv 3 \pmod 6$ (with $n \ge 27$)
+\end{itemize}
+
+\vspace{12pt}
+
+\noindent For all four families an Incremental Cyclic Latin Square can be constructed. Constructing
+an Incremental Cyclic Latin Square for the four uncovered natural numbers, $n \in \{8, 9, 15, 21\}$,
+is handled separately. Likewise, constructing an Incremental (non-Cyclic) Latin Square for the two
+remaining natural numbers, $n \in \{4, 6\}$, is also handled separately.
+
+\end{abstract}
+
+\section{Incremental Cyclic Latin Squares}
+
+\subsection{From \texorpdfstring{$(n,c)$}{(n,c)}-Coins Problems to Incremental Cyclic Latin Squares}
+
+The $(n,c)$-Coins Problem is about the existence of a subset $S_c \subseteq \{0, \dots, n-1\}^2$ of
+$nc$ cells on an $n \times n$ board such that every row, column, sum-diagonal ($i + j = s$), and
+difference-diagonal ($i - j = d$) contains at most $c$ cells of $S_c$. Clearly, for $(n,1)$, this
+problem corresponds to the $n$-Queens Problem.
+
+\vspace{12pt}
+
+The construction of Le, Li and Wang~\cite{LLW1990} constructs the subsets $S_c$ separately for each 
+$c$.
+
+\vspace{12 pt}
+
+\subsection{The Conjecture}
+
+Every permutation $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ defines a \emph{cyclic Latin square} (a column-permuted Cayley table of $\mathbb{Z}/n\mathbb{Z}$):
+\[
+  L_{i,j} = (i + q(j)) \bmod n \qquad (0 \le i, j < n).
+\]
+Because each column is a cyclic shift of $(0, 1, \dots, n-1)$ by $q(j)$ and $q$ is a bijection, every row and every column of $L$ is automatically a permutation of $\{0, \dots, n-1\}$.
+
+\vspace{12 pt}
+
+The conjecture is that for all $n \ge 1$ except $n \in \{2, 3, 4, 6\}$, there exists a column permutation $q$ such that $L_{i,j} = (i + q(j)) \bmod n$ is an incremental Latin square. (For $n \in \{2, 3\}$, even the $k = 0$ layer---the classical $n$-queens problem---has no solution; for $n \in \{4, 6\}$, exhaustive finite search confirms that no cyclic Latin square satisfies the diagonal bounds.)
+
+\begin{theorem}[Incremental Cyclic Latin Square Conjecture]\label{thm:main}
+For every integer $n > 0$ with $n \notin \{2, 3, 4, 6\}$, there exists a bijection $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that the cyclic Latin square
+\[
+  L_{i,j} = (i + q(j)) \bmod n
+\]
+satisfies:
+\begin{enumerate}[nosep,label=(\roman*)]
+  \item For every $i \in \mathrm{Fin}\,n$, the row map $j \mapsto L_{i,j}$ is bijective.
+  \item For every $j \in \mathrm{Fin}\,n$, the column map $i \mapsto L_{i,j}$ is bijective.
+  \item For every $0 \le k < n$ and every $s \in \mathbb{N}$,
+  \[
+    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le k\}| \le k + 1.
+  \]
+  \item For every $0 \le k < n$ and every $d \in \mathbb{Z}$,
+  \[
+    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le k\}| \le k + 1.
+  \]
+\end{enumerate}
+\end{theorem}
+
+
+\begin{thebibliography}{9}
+\bibitem{LLW1990}
+Mao-Hua Le, Wen Li, and Edward T. Wang,
+\emph{A generalization of the $n$-queen problem},
+Journal of Systems Science and Mathematical Sciences \textbf{3} (1990), no.~2, 183--192,
+\url{https://sysmath.cjoe.ac.cn/jssc/CN/Y1990/V3/I2/183}.
+\end{thebibliography}
+
+\end{document}
