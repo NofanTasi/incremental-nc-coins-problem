@@ -63,9 +63,9 @@
 \setlength{\parindent}{0pt}
 
 \title{\textbf{
-  Incremental Cyclic Latin Squares \\ 
-  as \\
-  Simultaneous Generalized NC-Coins Solutions
+  Cyclic Incremental Latin $n \times n$ Squares \\ 
+  encoding \\
+  Generalized NC-Coins Squares for $0 \le c \le n$
 }}
 \author{Marc Duponcheel and Luc Duponcheel
 }
@@ -80,8 +80,12 @@
 
 \noindent For every natural number $n \notin \{0, 2, 3, 4, 6\}$, there exists a permutation 
 $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that
-$L_{i,j} = (i + q(j)) \bmod n$ is an \emph{Incremental Cyclic Latin Square}, simultaneously solving
-the $(n,c)$-Coins Problem for all $1 \le c \le n$, a generalization of the $n$-Queens Problem.
+$L_{i,j} = (i + q(j)) \bmod n$ is an \emph{Cyclic Incremental Latin Square}, encoding NC-Coins
+Squares for $0 \le c \le n$.
+
+\vspace{12pt}
+
+An NC-Coins Square for $0 \le 1 \le n$ corresponds to a solution of $n$-Queens Problem.
 
 \vspace{12pt}
 
@@ -97,13 +101,13 @@ the $(n,c)$-Coins Problem for all $1 \le c \le n$, a generalization of the $n$-Q
 
 \vspace{12pt}
 
-\noindent The proof uses the \emph{Injective-Majorization Principle} in combination with the
-\emph{Pigeon Hole Principle} reducing intensive checking inequalities on each diagonal to the
+\noindent The proof uses the \emph{Injective-Majorization Principle} that, in combination with the
+\emph{Pigeon Hole Principle}, replaces intensive checking inequalities on each diagonal to the
 existence of a single function $f(i,j) \le L_{i,j}$ that is injective on every diagonal. 
 
 \vspace{12pt}
 
-\noindent The proof uses four families covering almost all natural numbers modulo~$6$
+\noindent The proof uses four families covering almost all natural number modulo~$6$ classes
 \begin{itemize}
 \item for $n \equiv 1,5 \pmod 6$ (with $n \ge 1$)
 \item for $n \equiv 2,4 \pmod 6$ (with $n \ge 10$)
@@ -113,26 +117,28 @@ existence of a single function $f(i,j) \le L_{i,j}$ that is injective on every d
 
 \vspace{12pt}
 
-\noindent For all four families an Incremental Cyclic Latin Square can be constructed. Constructing
-an Incremental Cyclic Latin Square for the four uncovered natural numbers, $n \in \{8, 9, 15, 21\}$,
-is handled separately. Likewise, constructing an Incremental (non-Cyclic) Latin Square for the two
+\noindent For all four families a Cyclic Incremental Latin Square can be constructed. Constructing
+a Cyclic Incremental Latin Square for the four uncovered natural numbers, $n \in \{8, 9, 15, 21\}$,
+is handled separately. Likewise, constructing a (non-Cyclic) Incremental Latin Square for the two
 remaining natural numbers, $n \in \{4, 6\}$, is also handled separately.
 
 \end{abstract}
 
-\section{Incremental Cyclic Latin Squares}
+\section{Cyclic Incremental Latin Squares}
 
-\subsection{From \texorpdfstring{$(n,c)$}{(n,c)}-Coins Problems to Incremental Cyclic Latin Squares}
+\subsection{From NC-Coins Squares to Cyclic Incremental Latin Squares}
 
-The $(n,c)$-Coins Problem is about the existence of a subset $S_c \subseteq \{0, \dots, n-1\}^2$ of
-$nc$ cells on an $n \times n$ board such that every row, column, sum-diagonal ($i + j = s$), and
-difference-diagonal ($i - j = d$) contains at most $c$ cells of $S_c$. Clearly, for $(n,1)$, this
-problem corresponds to the $n$-Queens Problem.
+NC-Coins Squares are subsets $S_c \subseteq \{0, \dots, n-1\}^2$ of $nc$ cells of an $n \times n$
+square such that every row, column, sum-diagonal ($i + j = s$), and difference-diagonal
+($i - j = d$) contains at most $c$ cells of $S_c$.
 
 \vspace{12pt}
 
-The construction of Le, Li and Wang~\cite{LLW1990} constructs the subsets $S_c$ separately for each 
-$c$.
+Clearly, for $c = 1$, they correspond to solutions of $n$-Queens Problems.
+
+\vspace{12pt}
+
+The construction of Le, Li and Wang~\cite{LLW1990} constructs $S_c$'s separately for each  $c$.
 
 \vspace{12 pt}
 
@@ -148,7 +154,7 @@ Because each column is a cyclic shift of $(0, 1, \dots, n-1)$ by $q(j)$ and $q$ 
 
 The conjecture is that for all $n \ge 1$ except $n \in \{2, 3, 4, 6\}$, there exists a column permutation $q$ such that $L_{i,j} = (i + q(j)) \bmod n$ is an incremental Latin square. (For $n \in \{2, 3\}$, even the $k = 0$ layer---the classical $n$-queens problem---has no solution; for $n \in \{4, 6\}$, exhaustive finite search confirms that no cyclic Latin square satisfies the diagonal bounds.)
 
-\begin{theorem}[Incremental Cyclic Latin Square Conjecture]\label{thm:main}
+\begin{theorem}[Cyclic Incremental Latin Square Conjecture]\label{thm:main}
 For every integer $n > 0$ with $n \notin \{2, 3, 4, 6\}$, there exists a bijection $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that the cyclic Latin square
 \[
   L_{i,j} = (i + q(j)) \bmod n

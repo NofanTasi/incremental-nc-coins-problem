@@ -1,10 +1,10 @@
 #! /bin/bash
 
-cd ../../doc/tex
+cd ../tex
 
 pdflatex paper.tex
 
-mv paper.pdf ../../doc/pdf
+mv paper.pdf ../pdf
 
 echo ""
 echo "FYI"

@@ -1,8 +1,6 @@
 #! /bin/bash
 
-
-
-cd ../../doc/pdf
+cd ../pdf
 
 rm paper.pdf
 
@@ -10,7 +8,7 @@ echo ""
 echo "FYI"
 echo "removed paper.pdf from /doc/pdf"
 
-cd ../../doc/tex
+cd ../tex
 
 rm paper.aux
 rm paper.log
