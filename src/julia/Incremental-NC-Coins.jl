@@ -127,9 +127,17 @@ end
 # ============================================================================
 """
  * solve(range;print_q,print_L,print_I,print_D,verify,benchmark)
-Generates, optionally benchmarks, verifies, displays any range of n and its c's.
+Generates, optionally benchmarks, verifies, displays any range of n and its nc's.
 """
-function solve(range;print_q=true,print_L=true,print_I=false,print_D=false,verify=true,benchmark=false)
+function solve(range;
+               print_q=true, # print permutation q
+               print_L=true, # print latin square L solution
+               print_I=false, # print incremental boards
+               print_D=false, # print discrete fourier
+               verify=true, # verify solution
+               benchmark=false # benchmark execution
+               )
+
     if benchmark
         (e,t) = (2,time())
     end
@@ -143,7 +151,7 @@ function solve(range;print_q=true,print_L=true,print_I=false,print_D=false,verif
         end
 
         if n < 4
-            println("KO? Dimension n = $n < 4")
+            println("skipping Dimension n = $n < 4")
             continue
         elseif n == 4
             # an Explicit non-cyclic L4
@@ -195,7 +203,7 @@ function solve(range;print_q=true,print_L=true,print_I=false,print_D=false,verif
         end
 
         if print_I
-            println("(n,c) Solutions ((0|1) valued):")
+            println("(n,c) Solutions ([0|1] valued):")
             for c in 1:n
                 println("Increment c = $c:")
                 for r in eachrow(L)
@@ -203,9 +211,9 @@ function solve(range;print_q=true,print_L=true,print_I=false,print_D=false,verif
                 end
             end
             if print_D
+                I::Matrix{Int} = zeros(n,n)
                 for c in 1:n
                     println("Increment c = $c DFT:")
-                    I::Matrix{Int} = zeros(n,n)
                     I .= Int.(L .<= c)
                     show_dft(I,n)
                 end
@@ -224,66 +232,13 @@ function solve(range;print_q=true,print_L=true,print_I=false,print_D=false,verif
     end
 end
 
-function print_coins_solution(n, c)
-    if n < 4
-        println("KO? Dimension n = $n < 4")
-        return
-    elseif c > n
-        println("Invalid parameter c = $c: must satisfy c ≤ n = $n.")
-        return
-    end
-    L = n == 4 ? [3 1 2 4; 2 4 3 1; 1 3 4 2; 4 2 1 3] :
-        n == 6 ? [2 1 3 4 6 5; 4 2 5 1 3 6; 5 4 6 3 2 1; 1 3 2 6 5 4; 3 6 1 5 4 2; 6 5 4 2 1 3] :
-        cyclic(n, [get_f_q(n)(n,j) for j in 0:(n-1)])
-    println("=== ($n, $c)-Coins Solution ($n × $n board, $(n*c) coins) ===")
-    for r in eachrow(L)
-        println(join([x <= c ? "C " : ". " for x in r]))
-    end
-end
+# example invocation: show everything and verify up to 32
+r = collect(4:32)
+solve(r,print_q=true,print_L=true,print_I=true,print_D=true,verify=true)
+exit(0)
 
-# ============================================================================
-# uncomment one of the two triples of lines below for interpretation
-# ============================================================================
 
-# r = collect(4:32)
-# solve(r,print_q=true,print_L=true,print_I=true,print_D=true,verify=true)
-# exit(0)
-
-# or
-
-# r = collect(4:1024)
+# example invocation: show nothing and do not verify but benchmark up to 2^12
+# r = collect(4:2^12)
 # solve(r,print_q=false,print_L=false,print_I=false,print_D=false,verify=false,benchmark=true)
 # exit(0)
-
-# ============================================================================
-# uncomment the lines below for compilation
-# ============================================================================
-
-function main() 
-
-    # TODO : why is this extra ARGS[2] != "-v" needed ?
-    if (ARGS[1] == "-incremental") && ARGS[2] != "-v" && (length(ARGS) == 2)
-        n = parse(Int, ARGS[2])
-        solve(n:n, print_q=true, print_L=true, print_I=false, verify=false)
-    elseif ARGS[1] == "-coins" && length(ARGS) == 3
-        n = parse(Int, ARGS[2])
-        c = parse(Int, ARGS[3])
-        print_coins_solution(n, c) 
-    elseif ARGS[1] == "-incremental" && ARGS[2] == "-v" && length(ARGS) == 3
-        n = parse(Int, ARGS[3])        
-        solve(n:n, print_q=true, print_L=true, print_I=false, verify=true)  
-
-    # elseif ARGS[1] == "--batch"
-    #     r = collect(4:32)
-    #     solve(r, print_q=true, print_L=true, print_I=true, verify=true)
-    # elseif length(ARGS) == 1 && tryparse(Int, ARGS[1]) !== nothing
-    #     n = parse(Int, ARGS[1])
-    #     solve(n:n, print_q=true, print_L=true, print_I=false, verify=false)
-
-    else
-        # TODO : why is foo printed using ./run.sh -increment -v 5 ?
-        println("foo")
-    end
-end
-
-main()
