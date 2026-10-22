@@ -232,9 +232,9 @@ function solve(range;
     end
 end
 
-# example invocation: show everything and verify up to 32
+# example invocation: show (almost) everything and verify up to 32
 r = collect(4:32)
-solve(r,print_q=true,print_L=true,print_I=true,print_D=true,verify=true)
+solve(r,print_q=true,print_L=true,print_I=true,print_D=false,verify=true)
 exit(0)
 
 # example invocation: show nothing and do not verify but benchmark up to 2^12
