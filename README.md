@@ -17,11 +17,7 @@ Our work improves upon 1990s 'Mao-Hua Le, Weixuan Li and T. Wang':
 
 - we provide a formal proof
 
-## building , running and cleaning
-
-Scripts in directory `sh/haskell`, `sh/julia` and `sh/lean`.
-
 ## generating documentation
 
-Script in directory `sh/tex`.
+Scripts in directory `doc/sh`.
 
