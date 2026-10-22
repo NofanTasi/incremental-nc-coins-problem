@@ -232,10 +232,15 @@ function solve(range;
     end
 end
 
-# example invocation: show (almost) everything and verify up to 32
-r = collect(4:32)
-solve(r,print_q=true,print_L=true,print_I=true,print_D=false,verify=true)
+# example invocation: 8x8 board and it's (8,c)-coins solutions
+r = collect(8:8)
+solve(r,print_q=true,print_L=true,print_I=true,print_D=false,verify=false)
 exit(0)
+
+# example invocation: show (almost) everything and verify up to 32
+# r = collect(4:32)
+# solve(r,print_q=true,print_L=true,print_I=true,print_D=false,verify=true)
+# exit(0)
 
 # example invocation: show nothing and do not verify but benchmark up to 2^12
 # r = collect(4:2^12)
