@@ -1,4 +1,0 @@
---  ghci -e "example01" Incremental-NC-Coins.hs
---  ghci -e "example02" Incremental-NC-Coins.hs
---  ghci -e "example03" Incremental-NC-Coins.hs
---  ghci -e "example04" Incremental-NC-Coins.hs
