@@ -149,9 +149,7 @@ Clearly, for $c = 1$, they correspond to solutions of the $n$-Queens Problem.
 The construction of Le, Li and Wang~\cite{LLW1990} constructs $S_c$'s separately for each $c$.
 In contrast, an \emph{Incremental Latin Square} encodes the entire nested sequence of solutions
 $S_1 \subset S_2 \subset \dots \subset S_n$ simultaneously into a single board $L_{i,j}$ by setting
-\[
-  S_c = \{(i,j) \mid L_{i,j} < c\}.
-\]
+$S_c = \{(i,j) \mid L_{i,j} \le c\}$.
 
 \subsection{The Conjecture}
 
