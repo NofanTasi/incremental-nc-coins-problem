@@ -6,19 +6,12 @@
 # on some Marc Duponcheel's ideas and reports
 # ============================================================================
 
-#
-# Julia indexes starting 1 but some of the arithmeric is done mod n
-#  therefore one needs both ranges 1:n and 0:(n-1).
-#  hence 0-indexed and 1-indexed in comments
-# Latin squares amd Permutations are printed using numbers 1:n
-#
-
 # ============================================================================
 # 1. Utilities
 # ============================================================================
 """
  * cyclic(n,q)
-Constructs the 1-indexed cyclic Latin square L[i,j] = 1 + ((i + q[j]) mod n).
+Constructs the 1:n valued cyclic Latin square L[i,j] = 1 + ((i + q[j]) mod n).
 """
 cyclic(n,q) = [mod(i+q[j],n) + 1 for i in 0:(n-1), j in 1:n]
 
@@ -38,7 +31,7 @@ F_3(n,j) = (d = div(n,2); j == 0 ? n - 2 : j < d - 2 ? 2j + 2 : j == d - 2 ? 0 :
 # Family 4: n = 3 (mod 6) (n >= 27)
 F_4(n,j) = (d = div(n,3); r = j < d ? 3j + 2d : j < 2d ? 3(j - d) + 2d + 4 : 3(j - 2d) + 2d + 8; r < n ? r : r - n)
 
-# some finite small Permutations (0-indexed) below minimal values supported per family
+# some finite small Permutations (0:(n-1) valued) below minimal values supported per family
 const Qs = Dict(
     8  => [0,4,1,3,6,2,7,5], # f2: 8 < 10
     9  => [0,6,3,1,8,5,2,4,7], # f3: 9 < 27
@@ -96,7 +89,7 @@ function correct(L,n)
 
     # 2. Check Diagonals for every threshold k
     for k in 1:n
-        # Check all sum-diagonals (0-indexed sum s from 0 to 2n-2)
+        # Check all sum-diagonals (sum s from 0 to 2n-2)
         for s in 0:(2n-2)
             cnt = count(i->L[i+1,s-i+1] <= k, max(0,s-n+1):min(n-1,s))
             if cnt > k
@@ -105,7 +98,7 @@ function correct(L,n)
             end
         end
 
-        # Check all dif-diagonals (0-indexed dif d from -(n-1) to n-1)
+        # Check all dif-diagonals (dif d from -(n-1) to n-1)
         for d in -(n-1):(n-1)
             cnt = count(i->L[i+1,i-d+1] <= k, max(0,d):min(n-1,n-1+d))
             if cnt > k
@@ -181,20 +174,20 @@ function solve(range;
         end
 
         if print_q
-            println("column Permutation (1-indexed):")
+            println("column Permutation (1:n valued):")
             print("q = ")
             println(q)
         end
 
         if print_L
-            println("Incremental Latin Square:")
+            println("Incremental Latin Square (1:n valued):")
             for r in eachrow(L)
                 println(" ", join(lpad.(r,l)))
             end
         end
 
         if print_I
-            println("(n,c) Solutions ([0|1] valued):")
+            println("(n,c) Solutions (0:1 valued):")
             for c in 1:n
                 println("Increment c = $c:")
                 for r in eachrow(L)
