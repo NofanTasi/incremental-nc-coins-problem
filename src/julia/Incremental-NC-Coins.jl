@@ -71,8 +71,8 @@ end
 """
  * correct(L,n)
 Verifies that L is a Latin square (bijective rows and columns) and that 
-for every threshold c (1 <= c <= n), every sum-diagonal and dif-diagonal 
-contains at most c cells with value <= c.
+for every threshold k (1 <= k <= n), every sum-diagonal and dif-diagonal 
+contains at most k cells with value <= k.
 """
 function correct(L,n)
     # 1. Check Row and Col Bijectivity
