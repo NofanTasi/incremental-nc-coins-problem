@@ -23,7 +23,9 @@
 }
 
 \lstdefinelanguage{Lean4}{
-  keywords={def, theorem, lemma, by, have, let, in, if, then, else, match, with, fun, intro, rcases, rw, exact, refine, apply, omega, decide, simp, dsimp, ext, subst, generalize, constructor, forall, exists, import, namespace, end, open, use, by_cases, split_ifs},
+  keywords={def, theorem, lemma, by, have, let, in, if, then, else, match, with, fun, intro,
+rcases, rw, exact, refine, apply, omega, decide, simp, dsimp, ext, subst, generalize,
+constructor, forall, exists, import, namespace, end, open, use, by_cases, split_ifs},
   keywordstyle=\color{blue!70!black}\bfseries,
   comment=[l]{--},
   morecomment=[s]{/-}{-/},
@@ -97,9 +99,11 @@ An $(n,c)$-Coins Square for $c = 1$ corresponds to a solution of the $n$-Queens 
 
 \vspace{12pt}
 
-\noindent See e.g. \href{https://mathoverflow.net/questions/510135/placing-n-cdot-m-coins-on-an-n-times-n-board-generalizing-the-n-queens-p}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}510135}, 
+\noindent See e.g.
+\href{https://mathoverflow.net/questions/510135/placing-n-cdot-m-coins-on-an-n-times-n-board-generalizing-the-n-queens-p}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}510135},
 \href{https://puzzling.stackexchange.com/questions/138939/place-as-many-queens-as-you-can}{PSE\hspace{-0.5pt}\#\hspace{-0.5pt}138939},
-\href{https://mathoverflow.net/questions/516225/universal-board-encoding-placement-of-n-cdot-m-coins-on-an-n-times-n-board}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}516225} and
+\href{https://mathoverflow.net/questions/516225/universal-board-encoding-placement-of-n-cdot-m-coins-on-an-n-times-n-board}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}516225}
+and
 \href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub}.
 
 \vspace{12pt}
@@ -131,7 +135,8 @@ remaining natural numbers, $n \in \{4, 6\}$, is also handled separately.
 
 \subsection{From \texorpdfstring{$(n,c)$}{(n,c)}-Coins Squares to Cyclic Incremental Latin Squares}
 
-$(n,c)$-Coins Squares are subsets $S_c \subseteq \{0, \dots, n-1\}^2$ of $nc$ cells of an $n \times n$
+$(n,c)$-Coins Squares are subsets $S_c \subseteq \{0, \dots, n-1\}^2$ of $nc$ cells of an $n
+\times n$
 square such that every row, column, sum-diagonal ($i + j = s$), and difference-diagonal
 ($i - j = d$) contains at most $c$ cells of $S_c$.
 
@@ -174,23 +179,28 @@ satisfies:
   \item For every $j \in \mathrm{Fin}\,n$, the column map $i \mapsto L_{i,j}$ is bijective.
   \item For every $0 \le k < n$ and every $s \in \mathbb{N}$,
   \[
-    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le k\}| \le k + 1.
+    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le
+k\}| \le k + 1.
   \]
   \item For every $0 \le k < n$ and every $d \in \mathbb{Z}$,
   \[
-    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le k\}| \le k + 1.
+    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le
+k\}| \le k + 1.
   \]
 \end{enumerate}
 \end{theorem}
 
-\subsection{An Example: The \texorpdfstring{$8 \times 8$}{8x8} Incremental Square and its \texorpdfstring{$(8,c)$}{(8,c)}-Coins Squares}
+\subsection{An Example: The \texorpdfstring{$8 \times 8$}{8x8} Incremental Square and its
+\texorpdfstring{$(8,c)$}{(8,c)}-Coins Squares}
 
-As noted in the abstract, $n = 8$ is one of the four individual cases not covered by the four modulo-$6$ families.
+As noted in the abstract, $n = 8$ is one of the four individual cases not covered by the four
+modulo-$6$ families.
 Using the permutation
 \[
   q = (0, 4, 1, 3, 6, 2, 7, 5),
 \]
-the cyclic formula $L_{i,j} = (i + q(j)) \bmod 8$ produces the following $8 \times 8$ Cyclic Incremental Latin Square:
+the cyclic formula $L_{i,j} = (i + q(j)) \bmod 8$ produces the following $8 \times 8$ Cyclic
+Incremental Latin Square:
 \[
   L = \begin{pmatrix}
   0 & 4 & 1 & 3 & 6 & 2 & 7 & 5 \\
@@ -203,7 +213,11 @@ the cyclic formula $L_{i,j} = (i + q(j)) \bmod 8$ produces the following $8 \tim
   7 & 3 & 0 & 2 & 5 & 1 & 6 & 4
   \end{pmatrix}.
 \]
-For every threshold $c \in \{1, \dots, 8\}$, placing a coin (denoted by $\bullet$) in cell $(i,j)$ if and only if $L_{i,j} < c$ yields the $(8,c)$-Coins Square $S_c$. Each square contains exactly $8c$ coins and has at most $c$ coins along every row, column, and diagonal. Figure~\ref{fig:8x8_coins} displays all eight nested solutions $S_1 \subset S_2 \subset \dots \subset S_8$, where $(8,1)$ is a classic 8-Queens solution.
+For every threshold $c \in \{1, \dots, 8\}$, placing a coin (denoted by $\bullet$) in cell
+$(i,j)$ if and only if $L_{i,j} < c$ yields the $(8,c)$-Coins Square $S_c$. Each square
+contains exactly $8c$ coins and has at most $c$ coins along every row, column, and diagonal.
+Figure~\ref{fig:8x8_coins} displays all eight nested solutions $S_1 \subset S_2 \subset \dots
+\subset S_8$, where $(8,1)$ is a classic 8-Queens solution.
 
 \begin{figure}[htbp]
 \centering
@@ -539,7 +553,8 @@ For every threshold $c \in \{1, \dots, 8\}$, placing a coin (denoted by $\bullet
 \end{tikzpicture}
 \end{tabular}
 \end{tabular}
-\caption{The eight nested $(8,c)$-Coins Squares generated by $L_{i,j} < c$ for $c = 1, \dots, 8$. Coins ($\bullet$) are added incrementally without moving previously placed coins.}
+\caption{The eight nested $(8,c)$-Coins Squares generated by $L_{i,j} < c$ for $c = 1, \dots,
+8$. Coins ($\bullet$) are added incrementally without moving previously placed coins.}
 \label{fig:8x8_coins}
 \end{figure}
 
@@ -547,14 +562,17 @@ For every threshold $c \in \{1, \dots, 8\}$, placing a coin (denoted by $\bullet
 
 Instead of direct cardinality counting of
 \[
-  |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le k\}| \le k + 1
+  |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le k\}|
+\le k + 1
 \]
 and
 \[
-  |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le k\}| \le k + 1,
+  |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le k\}|
+\le k + 1,
 \]
 which would computationally explode for large $n$, we use a combinatorial principle that
-reduces the problem for \emph{all} thresholds $0 \le k < n$ simultaneously to constructing a single dominated injection.
+reduces the problem for \emph{all} thresholds $0 \le k < n$ simultaneously to constructing a
+single dominated injection.
 
 \subsection{The Injective-Majorization Principle}
 
@@ -586,48 +604,80 @@ injective map into $\{0, \dots, k\}$. By the Pigeonhole Principle,
 
 \subsection{Geometric Interpretation: Why Vacant Lower Slots Always Exist}
 
-Along a diagonal $D$, the board values $v(i,j)$ are \emph{almost} distinct, except for a small number of collision pairs $(i_1, j_1), (i_2, j_2) \in D$ where $v(i_1, j_1) = v(i_2, j_2) = v$.
-To satisfy Lemma~\ref{lem:inj-maj}, one of the two cells keeps its value $f(i_1, j_1) = v$, while the duplicate cell is reassigned to a strictly smaller value $f(i_2, j_2) < v$ that does not appear anywhere else along $D$. 
+Along a diagonal $D$, the board values $v(i,j)$ are \emph{almost} distinct, except for a small
+number of collision pairs $(i_1, j_1), (i_2, j_2) \in D$ where $v(i_1, j_1) = v(i_2, j_2) = v$.
+To satisfy Lemma~\ref{lem:inj-maj}, one of the two cells keeps its value $f(i_1, j_1) = v$,
+while the duplicate cell is reassigned to a strictly smaller value $f(i_2, j_2) < v$ that does
+not appear anywhere else along $D$.
 The reassigned cell \emph{steals} a slot in $\{0, \dots, v - 1\}$ that was left vacant on $D$.
 
 \vspace{8pt}
 
 A natural and fundamental question arises:
 \begin{quote}
-\emph{Why precisely is there always guaranteed to be an unoccupied value strictly less than $v$ available to be stolen?}
+\emph{Why precisely is there always guaranteed to be an unoccupied value strictly less than $v$
+available to be stolen?}
 \end{quote}
 
-The existence of such vacant lower slots is not accidental; it is guaranteed by the arithmetic and geometric structure of the column permutation $q(j)$:
+The existence of such vacant lower slots is not accidental; it is guaranteed by the arithmetic
+and geometric structure of the column permutation $q(j)$:
 
 \begin{enumerate}[label=(\alph*), leftmargin=*]
-  \item \textbf{Elevated Baselines and Block Jumps (The Vacant Lower Shadow):}\\
-  Stepping along a diagonal changes $j$ by $+1$, and changes $i$ by $-1$ (along $i + j = s$) or $+1$ (along $i - j = d$). Within a linear block $q(j) = a \cdot j + b$, the unreduced value expression advances with constant slope:
+  \item \emph{Elevated Baselines and Block Jumps (The Vacant Lower Shadow):}\\
+  Stepping along a diagonal changes $j$ by $+1$, and changes $i$ by $-1$ (along $i + j = s$) or
+$+1$ (along $i - j = d$). Within a linear block $q(j) = a \cdot j + b$, the unreduced value
+expression advances with constant slope:
   \[
     \Delta_{\mathrm{sum}} = a - 1, \qquad \Delta_{\mathrm{diff}} = a + 1.
   \]
-  In Family 2 ($n \ge 10$ even, $3 \nmid n$), each block has slope $a = 2$, so $\Delta_{\mathrm{sum}} = +1$. Within each half, the sequence is strictly increasing without any internal collisions. 
-  The first block ($j_1 < n/2$) covers cells with high row indices $i_1 = s - j_1$, and starts at an elevated baseline $q(j_1) \ge n/2 + 1$. Its values along the diagonal start high above $0$.
-  The second block ($j_2 \ge n/2$) has a parity jump of $+3$ and lower row indices $i_2$, causing it to wrap around $n$ and hit the same value $v$ as cell $(i_1, j_1)$.
-  Crucially, because the diagonal entered the duplicate value $v$ while skipping the lower numbers $\{0, \dots, \text{corner size}-1\}$, \textbf{none of the cells on the diagonal ever visited those lowest values}. They form a vacant ``shadow'' $\{0, \dots, v-1\}$. Reassigning the duplicate cell $(i_2, j_2)$ to $j_2 - (n - 3) \in \{0, 1, 2\}$ steals one of these untouched slots, with $f(i_2, j_2) < v$.
+  In Family 2 ($n \ge 10$ even, $3 \nmid n$), each block has slope $a = 2$, so
+$\Delta_{\mathrm{sum}} = +1$. Within each half, the sequence is strictly increasing without any
+internal collisions.
+  The first block ($j_1 < n/2$) covers cells with high row indices $i_1 = s - j_1$, and starts
+at an elevated baseline $q(j_1) \ge n/2 + 1$. Its values along the diagonal start high above
+$0$.
+  The second block ($j_2 \ge n/2$) has a parity jump of $+3$ and lower row indices $i_2$,
+causing it to wrap around $n$ and hit the same value $v$ as cell $(i_1, j_1)$.
+  Crucially, because the diagonal entered the duplicate value $v$ while skipping the lower
+numbers $\{0, \dots, \text{corner size}-1\}$, \emph{none of the cells on the diagonal ever
+visited those lowest values}. They form a vacant ``shadow'' $\{0, \dots, v-1\}$. Reassigning
+the duplicate cell $(i_2, j_2)$ to $j_2 - (n - 3) \in \{0, 1, 2\}$ steals one of these
+untouched slots, with $f(i_2, j_2) < v$.
 
-  \item \textbf{Modular Wrap-Around and Empty Modulo-$3$ Residue Classes:}\\
-  In Family 3 ($n \ge 12$, $6 \mid n$), the column permutation has slope $a = 2$. Along a difference-diagonal $i - j = d$, the progression has step $\Delta_{\mathrm{diff}} = 2 + 1 = 3$.
-  Because $3 \mid n$, stepping by $+3$ confines all cells within a linear block to a \textbf{single residue class modulo $3$} ($d + 2 \pmod 3$ for Block 1, and $d \pmod 3$ for Block 2).
-  Consequently, \textbf{the third residue class $d + 1 \pmod 3$ is left completely empty on the entire diagonal} (one-third of all values $\{0, \dots, n-1\}$ are unvisited).
+  \item \emph{Modular Wrap-Around and Empty Modulo-$3$ Residue Classes:}\\
+  In Family 3 ($n \ge 12$, $6 \mid n$), the column permutation has slope $a = 2$. Along a
+difference-diagonal $i - j = d$, the progression has step $\Delta_{\mathrm{diff}} = 2 + 1 = 3$.
+  Because $3 \mid n$, stepping by $+3$ confines all cells within a linear block to a
+\emph{single residue class modulo $3$} ($d + 2 \pmod 3$ for Block 1, and $d \pmod 3$ for Block
+2).
+  Consequently, \emph{the third residue class $d + 1 \pmod 3$ is left completely empty on the
+entire diagonal} (one-third of all values $\{0, \dots, n-1\}$ are unvisited).
   When $j$ advances by $k = n/3$, the linear term advances by $3(n/3) = n$.
-  Modulo $n$, this wraps around, causing a pure \emph{modular wrap-around at $n$} that repeats the exact same value $v$ from $k$ steps earlier.
-  Because the parallel residue class $d + 1 \pmod 3$ is entirely vacant, shifting the wrapped cell downward by $-1$ or $-2$ lands it directly into an empty slot in $\{0, \dots, v-1\}$.
+  Modulo $n$, this wraps around, causing a pure \emph{modular wrap-around at $n$} that repeats
+the exact same value $v$ from $k$ steps earlier.
+  Because the parallel residue class $d + 1 \pmod 3$ is entirely vacant, shifting the wrapped
+cell downward by $-1$ or $-2$ lands it directly into an empty slot in $\{0, \dots, v-1\}$.
 
-  \item \textbf{Pigeonhole Conservation:}\\
-  On any diagonal of length $|D|$, if a value $v$ appears twice, at most $|D| - 1$ distinct values appear among the $|D|$ cells. Whenever the sequence steps into $\{0, \dots, v\}$ with stride $\Delta \ge 1$ from a non-zero offset, the number of cells on $D$ taking values $\le v$ is strictly less than $v + 1$. By the Pigeonhole Principle, the set $\{0, \dots, v-1\}$ cannot be full, guaranteeing the existence of vacant slots below $v$.
+  \item \emph{Pigeonhole Conservation:}\\
+  On any diagonal of length $|D|$, if a value $v$ appears twice, at most $|D| - 1$ distinct
+values appear among the $|D|$ cells. Whenever the sequence steps into $\{0, \dots, v\}$ with
+stride $\Delta \ge 1$ from a non-zero offset, the number of cells on $D$ taking values $\le v$
+is strictly less than $v + 1$. By the Pigeonhole Principle, the set $\{0, \dots, v-1\}$ cannot
+be full, guaranteeing the existence of vacant slots below $v$.
 \end{enumerate}
 
 \subsection{Four Concrete Examples of Diagonal Slot Stealing}
 
-We present four concrete examples from the Lean formalization: two for sum-diagonals and two for difference-diagonals, illustrating piecewise jumps and modular wrap-around. In each grid, off-diagonal values and the grid lines are displayed in gray, diagonal cells are highlighted in blue, the cell that keeps its original value is highlighted in orange ($\mathbf{v}$), and the duplicate cell that steals a lower vacant slot is highlighted in red ($\mathbf{v \downarrow f}$).
+We present four concrete examples from the Lean formalization: two for sum-diagonals and two
+for difference-diagonals, illustrating piecewise jumps and modular wrap-around. In each grid,
+off-diagonal values and the grid lines are displayed in gray, diagonal cells are highlighted in
+blue, the cell that keeps its original value is highlighted in orange ($\mathbf{v}$), and the
+duplicate cell that steals a lower vacant slot is highlighted in red ($\mathbf{v \downarrow
+f}$).
 
 \begin{example}[Sum-Diagonal Piecewise Jump: $n = 10$, $s = 7$]
-For $n = 10$, $q = (6, 8, 0, 2, 4 \mid 9, 1, 3, 5, 7)$ has two linear halves ($j < 5$ and $j \ge 5$). Sum-diagonal $i + j = 7$ has 8 cells.
+For $n = 10$, $q = (6, 8, 0, 2, 4 \mid 9, 1, 3, 5, 7)$ has two linear halves ($j < 5$ and $j
+\ge 5$). Sum-diagonal $i + j = 7$ has 8 cells.
 Cells $(7, 0)$ in Block 1 and $(0, 7)$ in Block 2 both evaluate to $v = 3$:
 \[
   v(7, 0) = (7 + q(0)) \bmod 10 = (7 + 6) \bmod 10 = 3, \qquad
@@ -635,12 +685,13 @@ Cells $(7, 0)$ in Block 1 and $(0, 7)$ in Block 2 both evaluate to $v = 3$:
 \]
 The collision is caused by the jump across the two halves ($j_2 - j_1 = 7 - 0 = n - 3$).
 The values present on the diagonal are $\{1, 2, \mathbf{3}, 4, 5, 6, 7\}$. 
-The value $\mathbf{0}$ is \textbf{vacant} on the entire diagonal, and $0 < 3$.
+The value $\mathbf{0}$ is \emph{vacant} on the entire diagonal, and $0 < 3$.
 The majorant $f_{2,\mathrm{sum}}$ keeps $f(7, 0) = 3$ and reassigns the top-right corner cell:
 \[
   f(0, 7) = j - (n - 3) = 7 - 7 = 0 < 3.
 \]
-The resulting values of $f$ along the diagonal are $\{0, 1, 2, 3, 4, 5, 6, 7\}$, which are all distinct.
+The resulting values of $f$ along the diagonal are $\{0, 1, 2, 3, 4, 5, 6, 7\}$, which are all
+distinct.
 \end{example}
 
 \begin{example}[Sum-Diagonal Multiple Collisions: $n = 10$, $s = 10$]
@@ -650,7 +701,7 @@ On diagonal $i + j = 10$ ($n = 10$), two simultaneous collisions occur:
   \item $(8, 2)$ and $(1, 9)$ both have $v = 8$ (with $j_2 - j_1 = 9 - 2 = n - 3$).
 \end{itemize}
 The values present on the diagonal are $\{0, 4, 5, 6, \mathbf{7}, \mathbf{8}, 9\}$.
-The entire range $\{\mathbf{1}, \mathbf{2}, 3\}$ is \textbf{vacant}! 
+The entire range $\{\mathbf{1}, \mathbf{2}, 3\}$ is \emph{vacant}! 
 Cells $(9, 1)$ and $(8, 2)$ keep their values $7$ and $8$, while the corner cells steal:
 \[
   f(2, 8) = 8 - 7 = 1 < 7, \qquad f(1, 9) = 9 - 7 = 2 < 8.
@@ -982,7 +1033,9 @@ $(1, 9)$ & 8 & \textbf{2} & \textbf{Steals vacant 2 ($< 8$)} \\
 \caption{Sum-diagonal $s = 10$ on $n = 10$.}
 \label{subfig:s10}
 \end{subfigure}
-\caption{Sum-diagonal collisions caused by piecewise block jumps in $q(j)$ for $n = 10$. Off-diagonal values and grid lines are shown in gray. The red cells steal unoccupied slots $0, 1, 2$ in the top-right corner.}
+\caption{Sum-diagonal collisions caused by piecewise block jumps in $q(j)$ for $n = 10$.
+Off-diagonal values and grid lines are shown in gray. The red cells steal unoccupied slots $0,
+1, 2$ in the top-right corner.}
 \label{fig:sum_diag_examples}
 \end{figure}
 
@@ -991,9 +1044,10 @@ Along the main difference-diagonal $i - j = 0$ ($i = j$) for $n = 10$:
 \[
   v(0, 0) = (0 + q(0)) \bmod 10 = 6, \qquad v(9, 9) = (9 + q(9)) \bmod 10 = (9 + 7) \bmod 10 = 6.
 \]
-This single collision across the entire board occurs between the first cell of Block 1 ($j = 0$) and the last cell of Block 2 ($j = n - 1 = 9$).
+This single collision across the entire board occurs between the first cell of Block 1 ($j =
+0$) and the last cell of Block 2 ($j = n - 1 = 9$).
 The values along $d = 0$ are $\{0, 2, 3, 4, 5, \mathbf{6}, 7, 8, 9\}$.
-The value $\mathbf{1}$ is \textbf{vacant} on the main diagonal, and $1 < 6$.
+The value $\mathbf{1}$ is \emph{vacant} on the main diagonal, and $1 < 6$.
 The majorant $f_{2,\mathrm{diff}}$ leaves $(0, 0)$ at $6$ and shifts the bottom-right corner cell:
 \[
   f(9, 9) = 1 < 6.
@@ -1002,8 +1056,10 @@ The resulting values of $f$ form the complete permutation $\{0, 1, 2, 3, 4, 5, 6
 \end{example}
 
 \begin{example}[Difference-Diagonal Pure Modular Wrap-Around: $n = 12$, $d = -4$]
-For $n = 12$ ($m = 6, k = n/3 = 4$), the second main block of $q_3$ has $q(j) = 2(j - 5) + 1$ for $j \in \{5, \dots, 10\}$.
-Along the difference-diagonal $i - j = -4$ ($i = j - 4$), stepping $j \mapsto j + 1$ increases $i + q(j)$ by $1 + 2 = +3$.
+For $n = 12$ ($m = 6, k = n/3 = 4$), the second main block of $q_3$ has $q(j) = 2(j - 5) + 1$
+for $j \in \{5, \dots, 10\}$.
+Along the difference-diagonal $i - j = -4$ ($i = j - 4$), stepping $j \mapsto j + 1$ increases
+$i + q(j)$ by $1 + 2 = +3$.
 As $j$ advances from $5$ to $8$, the values advance by $+3$:
 \[
   v(1, 5) = 2, \quad v(2, 6) = 5, \quad v(3, 7) = 8, \quad v(4, 8) = 11.
@@ -1014,16 +1070,18 @@ Modulo $12$, the value wraps around:
   v(5, 9) = (5 + q(9)) \bmod 12 = (5 + 9) \bmod 12 = 14 \bmod 12 = 2 = v(1, 5)!
 \]
 Similarly, at $j = 10$, $v(6, 10) = (6 + 11) \bmod 12 = 17 \bmod 12 = 5 = v(2, 6)!$
-Both collisions are pure \textbf{modular wrap-around at $n$} within the same linear progression.
+Both collisions are pure \emph{modular wrap-around at $n$} within the same linear progression.
 Because the progression has step $+3$, all cells in this block belong to $2 \pmod 3$.
 The boundary cells $(0, 4)$ and $(7, 11)$ have values $0$ and $9$ ($0 \pmod 3$).
-Thus, \textbf{the entire residue class $1 \pmod 3$ ($\{1, 4, 7, 10\}$) is completely vacant on the diagonal!}
+Thus, \emph{the entire residue class $1 \pmod 3$ ($\{1, 4, 7, 10\}$) is completely vacant on
+the diagonal!}
 The majorant $f_{3,\mathrm{diff}}$ shifts the wrapped cells into this empty residue class:
 \[
   f(5, 9) = v(5, 9) - 1 = 2 - 1 = 1 < 2, \qquad
   f(6, 10) = v(6, 10) - 2 = 5 - 2 = 3 < 5.
 \]
-The resulting values of $f$ are $\{0, 1, 2, 3, 5, 8, 9, 11\}$, which are strictly distinct and satisfy $f \le v$.
+The resulting values of $f$ are $\{0, 1, 2, 3, 5, 8, 9, 11\}$, which are strictly distinct and
+satisfy $f \le v$.
 \end{example}
 
 \begin{figure}[htbp]
@@ -1401,7 +1459,10 @@ $(7, 11)$ & 9 & 9 & Boundary pin \\
 \caption{Difference-diagonal $d = -4$ on $n = 12$.}
 \label{subfig:dm4}
 \end{subfigure}
-\caption{Difference-diagonal collisions and reassignment. Off-diagonal values and grid lines are shown in gray. (a) Parity jump between $(0,0)$ and $(9,9)$ for $n = 10$. (b) Pure modular wrap-around at $n = 12$ inside a linear block with step $+3$, where wrapped cells land in the vacant residue class $1 \pmod 3$.}
+\caption{Difference-diagonal collisions and reassignment. Off-diagonal values and grid lines
+are shown in gray. (a) Parity jump between $(0,0)$ and $(9,9)$ for $n = 10$. (b) Pure modular
+wrap-around at $n = 12$ inside a linear block with step $+3$, where wrapped cells land in the
+vacant residue class $1 \pmod 3$.}
 \label{fig:diff_diag_examples}
 \end{figure}
 
