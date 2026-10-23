@@ -1,13 +1,17 @@
 # ============================================================================
 # Incremental (n,c)-Coins Generator, Verifier, and Display Engine
-# Calculate and print optional 2D Discrete Fourier Transform
 #  twin Based
 # on Luc Duponcheel's Lean formalization
 #  and
 # on some Marc Duponcheel's ideas and reports
 # ============================================================================
 
-using FFTW
+#
+# Julia indexes starting 1 but some of the arithmeric is done mod n
+#  therefore one needs both ranges 1:n and 0:(n-1).
+#  hence 0-indexed and 1-indexed in comments
+# Latin squares amd Permutations are printed using numbers 1:n
+#
 
 # ============================================================================
 # 1. Utilities
@@ -90,23 +94,23 @@ function correct(L,n)
         end
     end
 
-    # 2. Check Diagonal Capacities for every threshold c
-    for c in 1:n
+    # 2. Check Diagonals for every threshold k
+    for k in 1:n
         # Check all sum-diagonals (0-indexed sum s from 0 to 2n-2)
         for s in 0:(2n-2)
-            cnt = count(i->L[i+1,s-i+1] <= c, max(0,s-n+1):min(n-1,s))
-            if cnt > c
+            cnt = count(i->L[i+1,s-i+1] <= k, max(0,s-n+1):min(n-1,s))
+            if cnt > k
                 return false,
-                "Sum-diagonal $s count $cnt > $c"
+                "Sum-diagonal $s count $cnt > $k"
             end
         end
 
         # Check all dif-diagonals (0-indexed dif d from -(n-1) to n-1)
         for d in -(n-1):(n-1)
-            cnt = count(i->L[i+1,i-d+1] <= c, max(0,d):min(n-1,n-1+d))
-            if cnt > c
+            cnt = count(i->L[i+1,i-d+1] <= k, max(0,d):min(n-1,n-1+d))
+            if cnt > k
                 return false,
-                "Dif-diagonal $d count $cnt > $c"
+                "Dif-diagonal $d count $cnt > $k"
             end
         end
     end
@@ -115,25 +119,16 @@ function correct(L,n)
 end
 
 # ============================================================================
-# 4. Take and Show 2D Discrete Fourier Transform of M
-# ============================================================================
-function show_dft(M, n)
-    vs = round.(log.(1 .+ abs.(fft(M))[1:n,1:n]), digits=1)
-    foreach(println, [join(lpad.(r, 5)) for r in eachrow(vs)])
-end
-
-# ============================================================================
-# 5. Solver & Display
+# 4. Solver & Display
 # ============================================================================
 """
- * solve(range;print_q,print_L,print_I,print_D,verify,benchmark)
+ * solve(range;print_q,print_L,print_I,verify,benchmark)
 Generates, optionally benchmarks, verifies, displays any range of n and its nc's.
 """
 function solve(range;
                print_q=true, # print permutation q
                print_L=true, # print latin square L solution
                print_I=false, # print incremental boards
-               print_D=false, # print discrete fourier
                verify=true, # verify solution
                benchmark=false # benchmark execution
                )
@@ -196,10 +191,6 @@ function solve(range;
             for r in eachrow(L)
                 println(" ", join(lpad.(r,l)))
             end
-   	    if print_D
-                println("Incremental Latin Square DFT:")
-                show_dft(L,n)
-            end
         end
 
         if print_I
@@ -208,14 +199,6 @@ function solve(range;
                 println("Increment c = $c:")
                 for r in eachrow(L)
                     println(" ", join(lpad.(Int.(r.<=c),2),""))
-                end
-            end
-            if print_D
-                I::Matrix{Int} = zeros(n,n)
-                for c in 1:n
-                    println("Increment c = $c DFT:")
-                    I .= Int.(L .<= c)
-                    show_dft(I,n)
                 end
             end
         end
@@ -233,16 +216,16 @@ function solve(range;
 end
 
 # example invocation: 8x8 board and it's (8,c)-coins solutions
-r = collect(8:8)
-solve(r,print_q=true,print_L=true,print_I=true,print_D=false,verify=false)
-exit(0)
-
-# example invocation: show (almost) everything and verify up to 32
-# r = collect(4:32)
-# solve(r,print_q=true,print_L=true,print_I=true,print_D=false,verify=true)
+# r = collect(8:8)
+# solve(r,print_q=true,print_L=true,print_I=true,verify=false)
 # exit(0)
+
+# example invocation: show everything and verify up to 32
+r = collect(4:32)
+solve(r,print_q=true,print_L=true,print_I=true,verify=true)
+exit(0)
 
 # example invocation: show nothing and do not verify but benchmark up to 2^12
 # r = collect(4:2^12)
-# solve(r,print_q=false,print_L=false,print_I=false,print_D=false,verify=false,benchmark=true)
+# solve(r,print_q=false,print_L=false,print_I=false,verify=false,benchmark=true)
 # exit(0)
