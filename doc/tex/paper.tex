@@ -133,72 +133,12 @@ remaining natural numbers, $n \in \{4, 6\}$, is also handled separately.
 
 \section{Cyclic Incremental Latin Squares}
 
-\subsection{From \texorpdfstring{$(n,c)$}{(n,c)}-Coins Squares to Cyclic Incremental Latin Squares}
-
-$(n,c)$-Coins Squares are subsets $S_c \subseteq \{0, \dots, n-1\}^2$ of $nc$ cells of an $n
-\times n$
-square such that every row, column, sum-diagonal ($i + j = s$), and difference-diagonal
-($i - j = d$) contains at most $c$ cells of $S_c$.
-
-\vspace{12pt}
-
-Clearly, for $c = 1$, they correspond to solutions of the $n$-Queens Problem.
-
-\vspace{12pt}
-
-The construction of Le, Li and Wang~\cite{LLW1990} constructs $S_c$'s separately for each $c$.
-In contrast, an \emph{Incremental Latin Square} encodes the entire nested sequence of solutions
-$S_1 \subset S_2 \subset \dots \subset S_n$ simultaneously into a single board $L_{i,j}$ by setting
-$S_c = \{(i,j) \mid L_{i,j} \le c\}$.
-
-\subsection{The Conjecture}
-
-Every permutation $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ defines a \emph{Cyclic Latin Square}:
-\[
-  L_{i,j} = (i + q(j)) \bmod n \qquad (0 \le i, j < n).
-\]
-
-\vspace{12pt}
-
-The conjecture is that for all $n > 0$ except $n \in \{2, 3, 4, 6\}$, there exists a column
-permutation $q$ such that $L_{i,j} = (i + q(j)) \bmod n$ is a Cyclic Incremental Latin Square. 
-For $n \in \{2, 3\}$, the $n$-queens problem has no solution, and, for $n \in \{4, 6\}$, exhaustive
-finite search confirms that no Cyclic Incremental Latin Square satisfies the diagonal bounds.
-
-\begin{theorem}[Cyclic Incremental Latin Square Conjecture]\label{thm:main}
-For every integer $n > 0$ and $n \notin \{2, 3, 4, 6\}$, there exists a bijection
-$q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that the Cyclic Incremental Latin Square
-\[
-  L_{i,j} = (i + q(j)) \bmod n
-\]
-satisfies:
-\begin{enumerate}[nosep,label=(\roman*)]
-  \item For every $i \in \mathrm{Fin}\,n$, the row map $j \mapsto L_{i,j}$ is bijective.
-  \item For every $j \in \mathrm{Fin}\,n$, the column map $i \mapsto L_{i,j}$ is bijective.
-  \item For every $0 \le k < n$ and every $s \in \mathbb{N}$,
-  \[
-    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le
-k\}| \le k + 1.
-  \]
-  \item For every $0 \le k < n$ and every $d \in \mathbb{Z}$,
-  \[
-    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le
-k\}| \le k + 1.
-  \]
-\end{enumerate}
-\end{theorem}
-
 \subsection{An Example: The \texorpdfstring{$8 \times 8$}{8x8} Incremental Square and its
 \texorpdfstring{$(8,c)$}{(8,c)}-Coins Squares}
 
 As noted in the abstract, $n = 8$ is one of the four individual cases not covered by the four
-modulo-$6$ families.
-Using the permutation
-\[
-  q = (0, 4, 1, 3, 6, 2, 7, 5),
-\]
-the cyclic formula $L_{i,j} = (i + q(j)) \bmod 8$ produces the following $8 \times 8$ Cyclic
-Incremental Latin Square:
+modulo-$6$ families. Anyway, using the permutation $q = (0, 4, 1, 3, 6, 2, 7, 5)$,
+$L_{i,j} = (i + q(j)) \bmod 8$ produces the following $8 \times 8$ Cyclic Incremental Latin Square:
 \[
   L = \begin{pmatrix}
   0 & 4 & 1 & 3 & 6 & 2 & 7 & 5 \\
@@ -556,6 +496,61 @@ Figure~\ref{fig:8x8_coins} displays all eight nested solutions $S_1 \subset S_2 
 \label{fig:8x8_coins}
 \end{figure}
 
+\subsection{From \texorpdfstring{$(n,c)$}{(n,c)}-Coins Squares to Cyclic Incremental Latin Squares}
+
+$(n,c)$-Coins Squares are subsets $S_c \subseteq \{0, \dots, n-1\}^2$ of $nc$ cells of an $n
+\times n$
+square such that every row, column, sum-diagonal ($i + j = s$), and difference-diagonal
+($i - j = d$) contains at most $c$ cells of $S_c$.
+
+\vspace{12pt}
+
+Clearly, for $c = 1$, they correspond to solutions of the $n$-Queens Problem.
+
+\vspace{12pt}
+
+The construction of Le, Li and Wang~\cite{LLW1990} constructs $S_c$'s separately for each $c$.
+In contrast, an \emph{Incremental Latin Square} encodes the entire nested sequence of solutions
+$S_1 \subset S_2 \subset \dots \subset S_n$ simultaneously into a single board $L_{i,j}$ by setting
+$S_c = \{(i,j) \mid L_{i,j} \le c\}$.
+
+\subsection{The Conjecture}
+
+Every permutation $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ defines a \emph{Cyclic Latin Square}:
+\[
+  L_{i,j} = (i + q(j)) \bmod n \qquad (0 \le i, j < n).
+\]
+
+\vspace{12pt}
+
+The conjecture is that for all $n > 0$ except $n \in \{2, 3, 4, 6\}$, there exists a column
+permutation $q$ such that $L_{i,j} = (i + q(j)) \bmod n$ is a Cyclic Incremental Latin Square. 
+For $n \in \{2, 3\}$, the $n$-queens problem has no solution, and, for $n \in \{4, 6\}$, exhaustive
+finite search confirms that no Cyclic Incremental Latin Square satisfies the diagonal bounds.
+
+\begin{theorem}[Cyclic Incremental Latin Square Conjecture]\label{thm:main}
+For every integer $n > 0$ and $n \notin \{2, 3, 4, 6\}$, there exists a bijection
+$q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that the Cyclic Incremental Latin Square
+\[
+  L_{i,j} = (i + q(j)) \bmod n
+\]
+satisfies:
+\begin{enumerate}[nosep,label=(\roman*)]
+  \item For every $i \in \mathrm{Fin}\,n$, the row map $j \mapsto L_{i,j}$ is bijective.
+  \item For every $j \in \mathrm{Fin}\,n$, the column map $i \mapsto L_{i,j}$ is bijective.
+  \item For every $0 \le k < n$ and every $s \in \mathbb{N}$,
+  \[
+    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le
+k\}| \le k + 1.
+  \]
+  \item For every $0 \le k < n$ and every $d \in \mathbb{Z}$,
+  \[
+    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le
+k\}| \le k + 1.
+  \]
+\end{enumerate}
+\end{theorem}
+
 \section{Injective Majorization}
 
 Instead of direct cardinality counting of
@@ -600,7 +595,7 @@ injective map into $\{0, \dots, k\}$. By the Pigeonhole Principle,
 \]
 \end{proof}
 
-\subsection{Geometric Interpretation: Why Vacant Lower Slots Always Exist}
+\subsection{Why Vacant Lower Slots Always Exist}
 
 Along a diagonal $D$, the board values $v(i,j)$ are \emph{almost} distinct, except for a small
 number of collision pairs $(i_1, j_1), (i_2, j_2) \in D$ where $v(i_1, j_1) = v(i_2, j_2) = v$.
@@ -664,7 +659,7 @@ is strictly less than $v + 1$. By the Pigeonhole Principle, the set $\{0, \dots,
 be full, guaranteeing the existence of vacant slots below $v$.
 \end{enumerate}
 
-\subsection{Four Concrete Examples of Diagonal Slot Stealing}
+\subsection{Visualization of Four Concrete Examples of Diagonal Slot Stealing}
 
 We present four concrete examples from the Lean formalization: two for sum-diagonals and two
 for difference-diagonals, illustrating piecewise jumps and modular wrap-around. In each grid,
