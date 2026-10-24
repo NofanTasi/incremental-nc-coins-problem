@@ -188,7 +188,7 @@ function solve(range;
 
         if print_I
             println("(n,c) Solutions (0:1 valued):")
-            for c in 1:n
+            for c in 0:n
                 println("Increment c = $c:")
                 for r in eachrow(L)
                     println(" ", join(lpad.(Int.(r.<=c),2),""))
