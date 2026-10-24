@@ -215,7 +215,7 @@ end
 
 # example invocation: show everything and verify up to 32
 r = collect(4:32)
-solve(r,print_q=false,print_L=false,print_I=true,verify=false)
+solve(r,print_q=true,print_L=true,print_I=true,verify=true)
 exit(0)
 
 # example invocation: show nothing and do not verify but benchmark up to 2^12
