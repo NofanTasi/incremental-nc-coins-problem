@@ -71,7 +71,7 @@ end
 """
  * correct(L,n)
 Verifies that L is a Latin square (bijective rows and columns) and that 
-for every threshold k (1 <= k <= n), every sum-diagonal and dif-diagonal 
+for every threshold k (0 <= k <= n), every sum-diagonal and dif-diagonal 
 contains at most k cells with value <= k.
 """
 function correct(L,n)
@@ -88,7 +88,7 @@ function correct(L,n)
     end
 
     # 2. Check Diagonals for every threshold k
-    for k in 1:n
+    for k in 0:n
         # Check all sum-diagonals (sum s from 0 to 2n-2)
         for s in 0:(2n-2)
             cnt = count(i->L[i+1,s-i+1] <= k, max(0,s-n+1):min(n-1,s))
@@ -215,7 +215,7 @@ end
 
 # example invocation: show everything and verify up to 32
 r = collect(4:32)
-solve(r,print_q=true,print_L=true,print_I=true,verify=true)
+solve(r,print_q=false,print_L=false,print_I=true,verify=false)
 exit(0)
 
 # example invocation: show nothing and do not verify but benchmark up to 2^12
