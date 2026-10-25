@@ -18,7 +18,10 @@ cyclic(n,q) = [mod(i+q[j],n) + 1 for i in 0:(n-1), j in 1:n]
 # ============================================================================
 # 2. Families (compressed somewhat compact formulas extracted from Lean)
 # ============================================================================
-
+"""
+ * F_f(n,j)
+Formula for permutation q to be used by Family f
+"""
 # Family 1: n = 1 or 5 (mod 6) (n >= 1)
 F_1(n,j) = j == 0 ? 0 : 2j < n ? n - 2j : 2n - 2j
 
@@ -40,7 +43,7 @@ const Qs = Dict(
 )
 
 # get F_f where 1 <= f <= 4 providing q for Family f
-function get_f_q(n)
+function get_f_for_q(n)
     if haskey(Qs,n)
         return (n,j) -> Qs[n][j+1]
     end
@@ -162,7 +165,7 @@ function solve(range;
             ]
             q = missing
         else
-            q = [get_f_q(n)(n,j) for j in 0:(n-1)]
+            q = [get_f_for_q(n)(n,j) for j in 0:(n-1)]
             L = cyclic(n,q)
             q = q .+ 1
         end
