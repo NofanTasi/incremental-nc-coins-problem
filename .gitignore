@@ -2,5 +2,7 @@
 *.hi
 *.log
 *.o
+*.orig
 *.out
+*.rej
 /doc/tbd
