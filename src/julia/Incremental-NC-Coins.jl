@@ -76,14 +76,6 @@ end
 Verifies that L is a 0:(n-1)-valued Latin square (bijective rows and columns)
 and that, for every threshold c (0 <= c <= n), every sum-diagonal and
 dif-diagonal contains at most c cells with value < c.
-
-This is Lean's `IsIncremental` form relabelled: Lean states
-  ∀ k < n,  #(sumDiagOk k L) ≤ k + 1  ∧  #(diffDiagOk k L) ≤ k + 1
-where `sumDiagOk k L` = { cells with value ≤ k }.  Setting c = k + 1 gives
-  ∀ c ∈ 0:n,  #{ cells with value < c on a diagonal } ≤ c,
-which is what we check below.  With 1:n-valued L (old convention) the same
-statement reads `count(L ≤ c) ≤ c`; both forms describe the same (n,c) coins
-constraint, only the label on the value axis changes.
 """
 function correct(L,n)
     # 1. Check Row and Col Bijectivity
