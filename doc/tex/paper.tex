@@ -10,7 +10,6 @@
 \usepackage{enumitem}
 \usepackage{xcolor}
 \usepackage{tikz}
-\usepackage{subcaption}
 \usepackage{placeins}
 \usepackage{listings}
 \usepackage{hyperref}
@@ -69,9 +68,9 @@ constructor, forall, exists, import, namespace, end, open, use, by_cases, split_
 \setlength{\parindent}{0pt}
 
 \title{\textbf{
-  Cyclic Incremental Latin $n \times n$ Squares \\ 
-  encoding \\
-  Generalized $(n,c)$-Coins Squares for $0 \le c \le n$
+  $n \times n$ Cyclic Latin Squares \\ 
+  representing solutions of the \\
+  $(n,c)$-Coins Problem for $0 \le c \le n$
 }}
 \author{Marc Duponcheel and Luc Duponcheel}
 
@@ -83,652 +82,614 @@ constructor, forall, exists, import, namespace, end, open, use, by_cases, split_
 
 \begin{abstract}
 
-\noindent For every natural number $n \notin \{0, 2, 3, 4, 6\}$, there exists a permutation 
-$q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that
-$L_{i,j} = (i + q(j)) \bmod n$ is a \emph{Cyclic Incremental Latin Square}, encoding $(n,c)$-Coins
-Squares for $0 \le c \le n$.
+\vspace{8pt}
+ 
+\noindent $\forall n \in \mathbb{N}, \; n > 0, \; n \notin \{2, 3, 4, 6\}$, 
+$\exists p: \{ 0, \ldots n-1 \} \to \{ 0, \ldots n-1 \}$, a permutation of $\{ 0, \ldots n-1 \}$, 
+such that $\forall i, j \in \{ 0, \ldots n-1 \}$, the square with cells
+$S_{i,j} = (i + p(j)) \bmod n$ is an $n \times n$ \emph{Cyclic Latin Square}, representing solutions
+of $(n,c)$\emph{-Coins Problems} $\forall c \;\; 0 \le c \le n$. An $(n,c)$-Coins Problem for
+$c = 1$ corresponds to an $n$-\emph{Queens Problem}.
 
-\vspace{12pt}
+\vspace{8pt}
 
-\noindent An $(n,c)$-Coins Square for $c = 1$ corresponds to a solution of the $n$-Queens Problem.
+\noindent We have an \emph{existence proof} in {\tt Lean} and corresponding \emph{construction code}
+in {\tt Haskell}, {\tt Julia} and {\tt Lean}.
 
-\vspace{12pt}
-
-\noindent We have an existence proof in {\tt Lean} and construction code in {\tt Haskell},
-{\tt Julia} and {\tt Lean}.
-
-\vspace{12pt}
+\vspace{8pt}
 
 \noindent
-\href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub}
+See \href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub}
 and also
 \noindent
-\href{https://mathoverflow.net/questions/510135/placing-n-cdot-m-coins-on-an-n-times-n-board-generalizing-the-n-queens-p}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}510135},
-\href{https://puzzling.stackexchange.com/questions/138939/place-as-many-queens-as-you-can}{PSE\hspace{-0.5pt}\#\hspace{-0.5pt}138939},
-\href{https://mathoverflow.net/questions/516225/universal-board-encoding-placement-of-n-cdot-m-coins-on-an-n-times-n-board}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}516225}.
+\href{https://mathoverflow.net/questions/510135}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}510135},
+\href{https://puzzling.stackexchange.com/questions/138939}%
+{PSE\hspace{-0.5pt}\#\hspace{-0.5pt}138939},
+\href{https://mathoverflow.net/questions/516225}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}516225}.
 
-\vspace{12pt}
+\vspace{8pt}
 
-\noindent The proof uses the \emph{Injective-Majorization Principle} that, in combination with the
-\emph{Pigeonhole Principle}, replaces intensive checking inequalities on each diagonal with the
-existence of a single function $f(i,j) \le L_{i,j}$ that is injective on every diagonal. 
+\noindent The proof uses the \emph{Injective-Majorization Principle} that, instead of intensive
+checking inequalities on each diagonal, uses the existence of a single function
+$f(i,j) \le S_{i,j}$ that is injective on each diagonal. 
 
-\vspace{12pt}
+\vspace{8pt}
 
-\noindent The proof uses four families covering almost all natural number modulo~$6$ classes:
+\noindent The proof uses four subsets of $\mathbb{N}$ covering almost all 
+$\mathbb{N}\,mod\,6$ classes~:
+
+\vspace{8pt}
+
 \begin{itemize}
-\item for $n \equiv 1,5 \pmod 6$ (with $n \ge 1$)
-\item for $n \equiv 2,4 \pmod 6$ (with $n \ge 10$)
-\item for $n \equiv 0 \pmod 6$ (with $n \ge 12$)
-\item for $n \equiv 3 \pmod 6$ (with $n \ge 27$)
+\item $n \equiv 1,5 \pmod 6$ (with $n \ge 1$),
+\item $n \equiv 2,4 \pmod 6$ (with $n \ge 10$),
+\item $n \equiv 3 \pmod 6$ (with $n \ge 27$),
+\item $n \equiv 0 \pmod 6$ (with $n \ge 12$).
 \end{itemize}
 
-\vspace{12pt}
+\vspace{8pt}
 
-\noindent For all four families a Cyclic Incremental Latin Square can be constructed. Constructing
-a Cyclic Incremental Latin Square for the four uncovered natural numbers, $n \in \{8, 9, 15, 21\}$,
-is handled separately. Likewise, constructing a (non-Cyclic) Incremental Latin Square for the two
-remaining natural numbers, $n \in \{4, 6\}$, is also handled separately.
+\noindent For all four subsets a Cyclic Latin Square can be constructed collectively for all their
+elements.
+
+\vspace{8pt}
+
+\noindent Constructing a Cyclic Latin Square for the four uncovered natural numbers,
+$n \in \{8, 9, 15, 21\}$, is handled individually. 
+
+\vspace{8pt}
+
+\noindent Likewise, constructing a (non-Cyclic) Latin Square for the two remaining natural numbers, 
+$n \in \{4, 6\}$, is also handled individually.
 
 \end{abstract}
 
-\section{Cyclic Incremental Latin Squares}
+\section{Cyclic Latin Squares}
 
-\subsection{An Example: The \texorpdfstring{$8 \times 8$}{8x8} Incremental Square and its
-\texorpdfstring{$(8,c)$}{(8,c)}-Coins Squares}
+\subsection{From \texorpdfstring{$(n,c)$}{(n,c)}-Coins Problems to Latin Squares}
 
-\noindent As noted in the abstract, $n = 8$ is one of the four individual cases not covered by the four
-modulo-$6$ families. Anyway, the permutation $q = (0, 4, 1, 3, 6, 2, 7, 5)$, produces the following
-git br$8 \times 8$ Cyclic Incremental Latin Square:
-\[
-  L = \begin{pmatrix}
-  0 & 4 & 1 & 3 & 6 & 2 & 7 & 5 \\
-  1 & 5 & 2 & 4 & 7 & 3 & 0 & 6 \\
-  2 & 6 & 3 & 5 & 0 & 4 & 1 & 7 \\
-  3 & 7 & 4 & 6 & 1 & 5 & 2 & 0 \\
-  4 & 0 & 5 & 7 & 2 & 6 & 3 & 1 \\
-  5 & 1 & 6 & 0 & 3 & 7 & 4 & 2 \\
-  6 & 2 & 7 & 1 & 4 & 0 & 5 & 3 \\
-  7 & 3 & 0 & 2 & 5 & 1 & 6 & 4
-  \end{pmatrix}.
-\]
+Given $n > 0$, and $c \in \{0, \dots, n\}$ solutions of $(n,c)$-Coins Problems are subsets $S_c$ of
+$n.c$ cells of an $n \times n$ square $S_{i,j}$ such that every row, column,
+$s$-diagonal ($i + j = s$), and $d$-diagonal ($i - j = d$), contains at most $c$ cells of $S_c$.
 
-\vspace{12pt}
+\vspace{8pt}
 
-For every threshold $c \in \{1, \dots, 8\}$, placing a coin (denoted by a blue bullet) in cell
-$(i,j)$ if and only if $L_{i,j} < c$ yields the $(8,c)$-Coins Square $S_c$. Each square
-contains exactly $8c$ coins and has at most $c$ coins along every row, column, and diagonal.
-Figure~\ref{fig:8x8_coins} displays all eight nested solutions $S_1 \subset S_2 \subset \dots
-\subset S_8$, where $(8,1)$ is a classic 8-Queens solution.
+The construction of Le, Li and Wang~\cite{LLW1990} constructs \emph{one} $S_c$ for each $c$. 
 
-\begin{figure}[htbp]
-\centering
-\begin{tabular}{cccc}
-\begin{tabular}{@{}c@{}}
-\small\textbf{(8, 1)}\\[2pt]
-\begin{tikzpicture}[scale=0.22]
-\draw[step=1, gray!35, thin] (0,0) grid (8,8);
-\fill[blue!75!black] (0.5, 7.5) circle (0.35);
-\fill[blue!75!black] (6.5, 6.5) circle (0.35);
-\fill[blue!75!black] (4.5, 5.5) circle (0.35);
-\fill[blue!75!black] (7.5, 4.5) circle (0.35);
-\fill[blue!75!black] (1.5, 3.5) circle (0.35);
-\fill[blue!75!black] (3.5, 2.5) circle (0.35);
-\fill[blue!75!black] (5.5, 1.5) circle (0.35);
-\fill[blue!75!black] (2.5, 0.5) circle (0.35);
-\end{tikzpicture}
-\end{tabular} & \begin{tabular}{@{}c@{}}
-\small\textbf{(8, 2)}\\[2pt]
-\begin{tikzpicture}[scale=0.22]
-\draw[step=1, gray!35, thin] (0,0) grid (8,8);
-\fill[blue!75!black] (0.5, 7.5) circle (0.35);
-\fill[blue!75!black] (2.5, 7.5) circle (0.35);
-\fill[blue!75!black] (0.5, 6.5) circle (0.35);
-\fill[blue!75!black] (6.5, 6.5) circle (0.35);
-\fill[blue!75!black] (4.5, 5.5) circle (0.35);
-\fill[blue!75!black] (6.5, 5.5) circle (0.35);
-\fill[blue!75!black] (4.5, 4.5) circle (0.35);
-\fill[blue!75!black] (7.5, 4.5) circle (0.35);
-\fill[blue!75!black] (1.5, 3.5) circle (0.35);
-\fill[blue!75!black] (7.5, 3.5) circle (0.35);
-\fill[blue!75!black] (1.5, 2.5) circle (0.35);
-\fill[blue!75!black] (3.5, 2.5) circle (0.35);
-\fill[blue!75!black] (3.5, 1.5) circle (0.35);
-\fill[blue!75!black] (5.5, 1.5) circle (0.35);
-\fill[blue!75!black] (2.5, 0.5) circle (0.35);
-\fill[blue!75!black] (5.5, 0.5) circle (0.35);
-\end{tikzpicture}
-\end{tabular} & \begin{tabular}{@{}c@{}}
-\small\textbf{(8, 3)}\\[2pt]
-\begin{tikzpicture}[scale=0.22]
-\draw[step=1, gray!35, thin] (0,0) grid (8,8);
-\fill[blue!75!black] (0.5, 7.5) circle (0.35);
-\fill[blue!75!black] (2.5, 7.5) circle (0.35);
-\fill[blue!75!black] (5.5, 7.5) circle (0.35);
-\fill[blue!75!black] (0.5, 6.5) circle (0.35);
-\fill[blue!75!black] (2.5, 6.5) circle (0.35);
-\fill[blue!75!black] (6.5, 6.5) circle (0.35);
-\fill[blue!75!black] (0.5, 5.5) circle (0.35);
-\fill[blue!75!black] (4.5, 5.5) circle (0.35);
-\fill[blue!75!black] (6.5, 5.5) circle (0.35);
-\fill[blue!75!black] (4.5, 4.5) circle (0.35);
-\fill[blue!75!black] (6.5, 4.5) circle (0.35);
-\fill[blue!75!black] (7.5, 4.5) circle (0.35);
-\fill[blue!75!black] (1.5, 3.5) circle (0.35);
-\fill[blue!75!black] (4.5, 3.5) circle (0.35);
-\fill[blue!75!black] (7.5, 3.5) circle (0.35);
-\fill[blue!75!black] (1.5, 2.5) circle (0.35);
-\fill[blue!75!black] (3.5, 2.5) circle (0.35);
-\fill[blue!75!black] (7.5, 2.5) circle (0.35);
-\fill[blue!75!black] (1.5, 1.5) circle (0.35);
-\fill[blue!75!black] (3.5, 1.5) circle (0.35);
-\fill[blue!75!black] (5.5, 1.5) circle (0.35);
-\fill[blue!75!black] (2.5, 0.5) circle (0.35);
-\fill[blue!75!black] (3.5, 0.5) circle (0.35);
-\fill[blue!75!black] (5.5, 0.5) circle (0.35);
-\end{tikzpicture}
-\end{tabular} & \begin{tabular}{@{}c@{}}
-\small\textbf{(8, 4)}\\[2pt]
-\begin{tikzpicture}[scale=0.22]
-\draw[step=1, gray!35, thin] (0,0) grid (8,8);
-\fill[blue!75!black] (0.5, 7.5) circle (0.35);
-\fill[blue!75!black] (2.5, 7.5) circle (0.35);
-\fill[blue!75!black] (3.5, 7.5) circle (0.35);
-\fill[blue!75!black] (5.5, 7.5) circle (0.35);
-\fill[blue!75!black] (0.5, 6.5) circle (0.35);
-\fill[blue!75!black] (2.5, 6.5) circle (0.35);
-\fill[blue!75!black] (5.5, 6.5) circle (0.35);
-\fill[blue!75!black] (6.5, 6.5) circle (0.35);
-\fill[blue!75!black] (0.5, 5.5) circle (0.35);
-\fill[blue!75!black] (2.5, 5.5) circle (0.35);
-\fill[blue!75!black] (4.5, 5.5) circle (0.35);
-\fill[blue!75!black] (6.5, 5.5) circle (0.35);
-\fill[blue!75!black] (0.5, 4.5) circle (0.35);
-\fill[blue!75!black] (4.5, 4.5) circle (0.35);
-\fill[blue!75!black] (6.5, 4.5) circle (0.35);
-\fill[blue!75!black] (7.5, 4.5) circle (0.35);
-\fill[blue!75!black] (1.5, 3.5) circle (0.35);
-\fill[blue!75!black] (4.5, 3.5) circle (0.35);
-\fill[blue!75!black] (6.5, 3.5) circle (0.35);
-\fill[blue!75!black] (7.5, 3.5) circle (0.35);
-\fill[blue!75!black] (1.5, 2.5) circle (0.35);
-\fill[blue!75!black] (3.5, 2.5) circle (0.35);
-\fill[blue!75!black] (4.5, 2.5) circle (0.35);
-\fill[blue!75!black] (7.5, 2.5) circle (0.35);
-\fill[blue!75!black] (1.5, 1.5) circle (0.35);
-\fill[blue!75!black] (3.5, 1.5) circle (0.35);
-\fill[blue!75!black] (5.5, 1.5) circle (0.35);
-\fill[blue!75!black] (7.5, 1.5) circle (0.35);
-\fill[blue!75!black] (1.5, 0.5) circle (0.35);
-\fill[blue!75!black] (2.5, 0.5) circle (0.35);
-\fill[blue!75!black] (3.5, 0.5) circle (0.35);
-\fill[blue!75!black] (5.5, 0.5) circle (0.35);
-\end{tikzpicture}
-\end{tabular} \\[8pt]
-\begin{tabular}{@{}c@{}}
-\small\textbf{(8, 5)}\\[2pt]
-\begin{tikzpicture}[scale=0.22]
-\draw[step=1, gray!35, thin] (0,0) grid (8,8);
-\fill[blue!75!black] (0.5, 7.5) circle (0.35);
-\fill[blue!75!black] (1.5, 7.5) circle (0.35);
-\fill[blue!75!black] (2.5, 7.5) circle (0.35);
-\fill[blue!75!black] (3.5, 7.5) circle (0.35);
-\fill[blue!75!black] (5.5, 7.5) circle (0.35);
-\fill[blue!75!black] (0.5, 6.5) circle (0.35);
-\fill[blue!75!black] (2.5, 6.5) circle (0.35);
-\fill[blue!75!black] (3.5, 6.5) circle (0.35);
-\fill[blue!75!black] (5.5, 6.5) circle (0.35);
-\fill[blue!75!black] (6.5, 6.5) circle (0.35);
-\fill[blue!75!black] (0.5, 5.5) circle (0.35);
-\fill[blue!75!black] (2.5, 5.5) circle (0.35);
-\fill[blue!75!black] (4.5, 5.5) circle (0.35);
-\fill[blue!75!black] (5.5, 5.5) circle (0.35);
-\fill[blue!75!black] (6.5, 5.5) circle (0.35);
-\fill[blue!75!black] (0.5, 4.5) circle (0.35);
-\fill[blue!75!black] (2.5, 4.5) circle (0.35);
-\fill[blue!75!black] (4.5, 4.5) circle (0.35);
-\fill[blue!75!black] (6.5, 4.5) circle (0.35);
-\fill[blue!75!black] (7.5, 4.5) circle (0.35);
-\fill[blue!75!black] (0.5, 3.5) circle (0.35);
-\fill[blue!75!black] (1.5, 3.5) circle (0.35);
-\fill[blue!75!black] (4.5, 3.5) circle (0.35);
-\fill[blue!75!black] (6.5, 3.5) circle (0.35);
-\fill[blue!75!black] (7.5, 3.5) circle (0.35);
-\fill[blue!75!black] (1.5, 2.5) circle (0.35);
-\fill[blue!75!black] (3.5, 2.5) circle (0.35);
-\fill[blue!75!black] (4.5, 2.5) circle (0.35);
-\fill[blue!75!black] (6.5, 2.5) circle (0.35);
-\fill[blue!75!black] (7.5, 2.5) circle (0.35);
-\fill[blue!75!black] (1.5, 1.5) circle (0.35);
-\fill[blue!75!black] (3.5, 1.5) circle (0.35);
-\fill[blue!75!black] (4.5, 1.5) circle (0.35);
-\fill[blue!75!black] (5.5, 1.5) circle (0.35);
-\fill[blue!75!black] (7.5, 1.5) circle (0.35);
-\fill[blue!75!black] (1.5, 0.5) circle (0.35);
-\fill[blue!75!black] (2.5, 0.5) circle (0.35);
-\fill[blue!75!black] (3.5, 0.5) circle (0.35);
-\fill[blue!75!black] (5.5, 0.5) circle (0.35);
-\fill[blue!75!black] (7.5, 0.5) circle (0.35);
-\end{tikzpicture}
-\end{tabular} & \begin{tabular}{@{}c@{}}
-\small\textbf{(8, 6)}\\[2pt]
-\begin{tikzpicture}[scale=0.22]
-\draw[step=1, gray!35, thin] (0,0) grid (8,8);
-\fill[blue!75!black] (0.5, 7.5) circle (0.35);
-\fill[blue!75!black] (1.5, 7.5) circle (0.35);
-\fill[blue!75!black] (2.5, 7.5) circle (0.35);
-\fill[blue!75!black] (3.5, 7.5) circle (0.35);
-\fill[blue!75!black] (5.5, 7.5) circle (0.35);
-\fill[blue!75!black] (7.5, 7.5) circle (0.35);
-\fill[blue!75!black] (0.5, 6.5) circle (0.35);
-\fill[blue!75!black] (1.5, 6.5) circle (0.35);
-\fill[blue!75!black] (2.5, 6.5) circle (0.35);
-\fill[blue!75!black] (3.5, 6.5) circle (0.35);
-\fill[blue!75!black] (5.5, 6.5) circle (0.35);
-\fill[blue!75!black] (6.5, 6.5) circle (0.35);
-\fill[blue!75!black] (0.5, 5.5) circle (0.35);
-\fill[blue!75!black] (2.5, 5.5) circle (0.35);
-\fill[blue!75!black] (3.5, 5.5) circle (0.35);
-\fill[blue!75!black] (4.5, 5.5) circle (0.35);
-\fill[blue!75!black] (5.5, 5.5) circle (0.35);
-\fill[blue!75!black] (6.5, 5.5) circle (0.35);
-\fill[blue!75!black] (0.5, 4.5) circle (0.35);
-\fill[blue!75!black] (2.5, 4.5) circle (0.35);
-\fill[blue!75!black] (4.5, 4.5) circle (0.35);
-\fill[blue!75!black] (5.5, 4.5) circle (0.35);
-\fill[blue!75!black] (6.5, 4.5) circle (0.35);
-\fill[blue!75!black] (7.5, 4.5) circle (0.35);
-\fill[blue!75!black] (0.5, 3.5) circle (0.35);
-\fill[blue!75!black] (1.5, 3.5) circle (0.35);
-\fill[blue!75!black] (2.5, 3.5) circle (0.35);
-\fill[blue!75!black] (4.5, 3.5) circle (0.35);
-\fill[blue!75!black] (6.5, 3.5) circle (0.35);
-\fill[blue!75!black] (7.5, 3.5) circle (0.35);
-\fill[blue!75!black] (0.5, 2.5) circle (0.35);
-\fill[blue!75!black] (1.5, 2.5) circle (0.35);
-\fill[blue!75!black] (3.5, 2.5) circle (0.35);
-\fill[blue!75!black] (4.5, 2.5) circle (0.35);
-\fill[blue!75!black] (6.5, 2.5) circle (0.35);
-\fill[blue!75!black] (7.5, 2.5) circle (0.35);
-\fill[blue!75!black] (1.5, 1.5) circle (0.35);
-\fill[blue!75!black] (3.5, 1.5) circle (0.35);
-\fill[blue!75!black] (4.5, 1.5) circle (0.35);
-\fill[blue!75!black] (5.5, 1.5) circle (0.35);
-\fill[blue!75!black] (6.5, 1.5) circle (0.35);
-\fill[blue!75!black] (7.5, 1.5) circle (0.35);
-\fill[blue!75!black] (1.5, 0.5) circle (0.35);
-\fill[blue!75!black] (2.5, 0.5) circle (0.35);
-\fill[blue!75!black] (3.5, 0.5) circle (0.35);
-\fill[blue!75!black] (4.5, 0.5) circle (0.35);
-\fill[blue!75!black] (5.5, 0.5) circle (0.35);
-\fill[blue!75!black] (7.5, 0.5) circle (0.35);
-\end{tikzpicture}
-\end{tabular} & \begin{tabular}{@{}c@{}}
-\small\textbf{(8, 7)}\\[2pt]
-\begin{tikzpicture}[scale=0.22]
-\draw[step=1, gray!35, thin] (0,0) grid (8,8);
-\fill[blue!75!black] (0.5, 7.5) circle (0.35);
-\fill[blue!75!black] (1.5, 7.5) circle (0.35);
-\fill[blue!75!black] (2.5, 7.5) circle (0.35);
-\fill[blue!75!black] (3.5, 7.5) circle (0.35);
-\fill[blue!75!black] (4.5, 7.5) circle (0.35);
-\fill[blue!75!black] (5.5, 7.5) circle (0.35);
-\fill[blue!75!black] (7.5, 7.5) circle (0.35);
-\fill[blue!75!black] (0.5, 6.5) circle (0.35);
-\fill[blue!75!black] (1.5, 6.5) circle (0.35);
-\fill[blue!75!black] (2.5, 6.5) circle (0.35);
-\fill[blue!75!black] (3.5, 6.5) circle (0.35);
-\fill[blue!75!black] (5.5, 6.5) circle (0.35);
-\fill[blue!75!black] (6.5, 6.5) circle (0.35);
-\fill[blue!75!black] (7.5, 6.5) circle (0.35);
-\fill[blue!75!black] (0.5, 5.5) circle (0.35);
-\fill[blue!75!black] (1.5, 5.5) circle (0.35);
-\fill[blue!75!black] (2.5, 5.5) circle (0.35);
-\fill[blue!75!black] (3.5, 5.5) circle (0.35);
-\fill[blue!75!black] (4.5, 5.5) circle (0.35);
-\fill[blue!75!black] (5.5, 5.5) circle (0.35);
-\fill[blue!75!black] (6.5, 5.5) circle (0.35);
-\fill[blue!75!black] (0.5, 4.5) circle (0.35);
-\fill[blue!75!black] (2.5, 4.5) circle (0.35);
-\fill[blue!75!black] (3.5, 4.5) circle (0.35);
-\fill[blue!75!black] (4.5, 4.5) circle (0.35);
-\fill[blue!75!black] (5.5, 4.5) circle (0.35);
-\fill[blue!75!black] (6.5, 4.5) circle (0.35);
-\fill[blue!75!black] (7.5, 4.5) circle (0.35);
-\fill[blue!75!black] (0.5, 3.5) circle (0.35);
-\fill[blue!75!black] (1.5, 3.5) circle (0.35);
-\fill[blue!75!black] (2.5, 3.5) circle (0.35);
-\fill[blue!75!black] (4.5, 3.5) circle (0.35);
-\fill[blue!75!black] (5.5, 3.5) circle (0.35);
-\fill[blue!75!black] (6.5, 3.5) circle (0.35);
-\fill[blue!75!black] (7.5, 3.5) circle (0.35);
-\fill[blue!75!black] (0.5, 2.5) circle (0.35);
-\fill[blue!75!black] (1.5, 2.5) circle (0.35);
-\fill[blue!75!black] (2.5, 2.5) circle (0.35);
-\fill[blue!75!black] (3.5, 2.5) circle (0.35);
-\fill[blue!75!black] (4.5, 2.5) circle (0.35);
-\fill[blue!75!black] (6.5, 2.5) circle (0.35);
-\fill[blue!75!black] (7.5, 2.5) circle (0.35);
-\fill[blue!75!black] (0.5, 1.5) circle (0.35);
-\fill[blue!75!black] (1.5, 1.5) circle (0.35);
-\fill[blue!75!black] (3.5, 1.5) circle (0.35);
-\fill[blue!75!black] (4.5, 1.5) circle (0.35);
-\fill[blue!75!black] (5.5, 1.5) circle (0.35);
-\fill[blue!75!black] (6.5, 1.5) circle (0.35);
-\fill[blue!75!black] (7.5, 1.5) circle (0.35);
-\fill[blue!75!black] (1.5, 0.5) circle (0.35);
-\fill[blue!75!black] (2.5, 0.5) circle (0.35);
-\fill[blue!75!black] (3.5, 0.5) circle (0.35);
-\fill[blue!75!black] (4.5, 0.5) circle (0.35);
-\fill[blue!75!black] (5.5, 0.5) circle (0.35);
-\fill[blue!75!black] (6.5, 0.5) circle (0.35);
-\fill[blue!75!black] (7.5, 0.5) circle (0.35);
-\end{tikzpicture}
-\end{tabular} & \begin{tabular}{@{}c@{}}
-\small\textbf{(8, 8)}\\[2pt]
-\begin{tikzpicture}[scale=0.22]
-\draw[step=1, gray!35, thin] (0,0) grid (8,8);
-\fill[blue!75!black] (0.5, 7.5) circle (0.35);
-\fill[blue!75!black] (1.5, 7.5) circle (0.35);
-\fill[blue!75!black] (2.5, 7.5) circle (0.35);
-\fill[blue!75!black] (3.5, 7.5) circle (0.35);
-\fill[blue!75!black] (4.5, 7.5) circle (0.35);
-\fill[blue!75!black] (5.5, 7.5) circle (0.35);
-\fill[blue!75!black] (6.5, 7.5) circle (0.35);
-\fill[blue!75!black] (7.5, 7.5) circle (0.35);
-\fill[blue!75!black] (0.5, 6.5) circle (0.35);
-\fill[blue!75!black] (1.5, 6.5) circle (0.35);
-\fill[blue!75!black] (2.5, 6.5) circle (0.35);
-\fill[blue!75!black] (3.5, 6.5) circle (0.35);
-\fill[blue!75!black] (4.5, 6.5) circle (0.35);
-\fill[blue!75!black] (5.5, 6.5) circle (0.35);
-\fill[blue!75!black] (6.5, 6.5) circle (0.35);
-\fill[blue!75!black] (7.5, 6.5) circle (0.35);
-\fill[blue!75!black] (0.5, 5.5) circle (0.35);
-\fill[blue!75!black] (1.5, 5.5) circle (0.35);
-\fill[blue!75!black] (2.5, 5.5) circle (0.35);
-\fill[blue!75!black] (3.5, 5.5) circle (0.35);
-\fill[blue!75!black] (4.5, 5.5) circle (0.35);
-\fill[blue!75!black] (5.5, 5.5) circle (0.35);
-\fill[blue!75!black] (6.5, 5.5) circle (0.35);
-\fill[blue!75!black] (7.5, 5.5) circle (0.35);
-\fill[blue!75!black] (0.5, 4.5) circle (0.35);
-\fill[blue!75!black] (1.5, 4.5) circle (0.35);
-\fill[blue!75!black] (2.5, 4.5) circle (0.35);
-\fill[blue!75!black] (3.5, 4.5) circle (0.35);
-\fill[blue!75!black] (4.5, 4.5) circle (0.35);
-\fill[blue!75!black] (5.5, 4.5) circle (0.35);
-\fill[blue!75!black] (6.5, 4.5) circle (0.35);
-\fill[blue!75!black] (7.5, 4.5) circle (0.35);
-\fill[blue!75!black] (0.5, 3.5) circle (0.35);
-\fill[blue!75!black] (1.5, 3.5) circle (0.35);
-\fill[blue!75!black] (2.5, 3.5) circle (0.35);
-\fill[blue!75!black] (3.5, 3.5) circle (0.35);
-\fill[blue!75!black] (4.5, 3.5) circle (0.35);
-\fill[blue!75!black] (5.5, 3.5) circle (0.35);
-\fill[blue!75!black] (6.5, 3.5) circle (0.35);
-\fill[blue!75!black] (7.5, 3.5) circle (0.35);
-\fill[blue!75!black] (0.5, 2.5) circle (0.35);
-\fill[blue!75!black] (1.5, 2.5) circle (0.35);
-\fill[blue!75!black] (2.5, 2.5) circle (0.35);
-\fill[blue!75!black] (3.5, 2.5) circle (0.35);
-\fill[blue!75!black] (4.5, 2.5) circle (0.35);
-\fill[blue!75!black] (5.5, 2.5) circle (0.35);
-\fill[blue!75!black] (6.5, 2.5) circle (0.35);
-\fill[blue!75!black] (7.5, 2.5) circle (0.35);
-\fill[blue!75!black] (0.5, 1.5) circle (0.35);
-\fill[blue!75!black] (1.5, 1.5) circle (0.35);
-\fill[blue!75!black] (2.5, 1.5) circle (0.35);
-\fill[blue!75!black] (3.5, 1.5) circle (0.35);
-\fill[blue!75!black] (4.5, 1.5) circle (0.35);
-\fill[blue!75!black] (5.5, 1.5) circle (0.35);
-\fill[blue!75!black] (6.5, 1.5) circle (0.35);
-\fill[blue!75!black] (7.5, 1.5) circle (0.35);
-\fill[blue!75!black] (0.5, 0.5) circle (0.35);
-\fill[blue!75!black] (1.5, 0.5) circle (0.35);
-\fill[blue!75!black] (2.5, 0.5) circle (0.35);
-\fill[blue!75!black] (3.5, 0.5) circle (0.35);
-\fill[blue!75!black] (4.5, 0.5) circle (0.35);
-\fill[blue!75!black] (5.5, 0.5) circle (0.35);
-\fill[blue!75!black] (6.5, 0.5) circle (0.35);
-\fill[blue!75!black] (7.5, 0.5) circle (0.35);
-\end{tikzpicture}
-\end{tabular}
-\end{tabular}
-\caption{The eight nested $(8,c)$-Coins Squares generated by $L_{i,j} < c$ for $c = 1, \dots,
-8$. Coins are added incrementally without moving previously placed coins.}
-\label{fig:8x8_coins}
-\end{figure}
+\vspace{8pt}
 
-\subsection{From \texorpdfstring{$(n,c)$}{(n,c)}-Coins Squares to Cyclic Incremental Latin Squares}
+Our construction constructs an $n \times n$ Cyclic Latin Square $S_{i,j}$ representing \emph{many}
+$S_c$'s at once using \\ 
+$S_c = \{(i,j) \mid S_{i,j} \le c\} \;\; \forall c \;\; 0 \le c \le n$.
 
-$(n,c)$-Coins Squares are subsets $S_c \subseteq \{0, \dots, n-1\}^2$ of $nc$ cells of an $n
-\times n$
-square such that every row, column, sum-diagonal ($i + j = s$), and difference-diagonal
-($i - j = d$) contains at most $c$ cells of $S_c$.
+\section{Theorem Statement}
 
-\vspace{12pt}
+\begin{theorem}\label{thm:main}
+$\forall n \in \mathbb{N}, \; n > 0, \; n \notin \{2, 3, 4, 6\}$,
+$\exists p: \{ 0, \ldots n-1 \} \to \{ 0, \ldots n-1 \}$, a permutation, such that 
+$S_{i,j} = (i + p(j)) \bmod n$ is a Cyclic Latin
+Square satisfying~:
 
-Clearly, for $c = 1$, they correspond to solutions of the $n$-Queens Problem.
-
-\vspace{12pt}
-
-The construction of Le, Li and Wang~\cite{LLW1990} constructs $S_c$'s separately for each $c$.
-In contrast, an \emph{Incremental Latin Square} encodes the entire nested sequence of solutions
-$S_1 \subset S_2 \subset \dots \subset S_n$ simultaneously into a single square $L_{i,j}$ by setting
-$S_c = \{(i,j) \mid L_{i,j} \le c\}$.
-
-\subsection{The Conjecture}
-
-Every permutation $q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ defines a \emph{Cyclic Latin Square}:
-\[
-  L_{i,j} = (i + q(j)) \bmod n \qquad (0 \le i, j < n).
-\]
-
-\vspace{12pt}
-
-The conjecture is that for all $n > 0$ except $n \in \{2, 3, 4, 6\}$, there exists a column
-permutation $q$ such that $L_{i,j} = (i + q(j)) \bmod n$ is a Cyclic Incremental Latin Square. 
-For $n \in \{2, 3\}$, the $n$-queens problem has no solution, and, for $n \in \{4, 6\}$, exhaustive
-finite search confirms that no Cyclic Incremental Latin Square satisfies the diagonal bounds.
-
-\begin{theorem}[Cyclic Incremental Latin Square Conjecture]\label{thm:main}
-For every integer $n > 0$ and $n \notin \{2, 3, 4, 6\}$, there exists a bijection
-$q : \mathrm{Fin}\,n \to \mathrm{Fin}\,n$ such that the Cyclic Incremental Latin Square
-\[
-  L_{i,j} = (i + q(j)) \bmod n
-\]
-satisfies:
-
-\vspace{12pt}
+\vspace{8pt}
 
 \begin{enumerate}[nosep,label=(\roman*)]
-  \item For every $i \in \mathrm{Fin}\,n$, the row map $j \mapsto L_{i,j}$ is bijective.
-  \item For every $j \in \mathrm{Fin}\,n$, the column map $i \mapsto L_{i,j}$ is bijective.
-  \item For every $0 \le k < n$ and every $s \in \mathbb{N}$,
-  \[
-    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le
-k\}| \le k + 1.
-  \]
-  \item For every $0 \le k < n$ and every $d \in \mathbb{Z}$,
-  \[
-    |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le
-k\}| \le k + 1.
-  \]
+  \item $\forall i \in \{ 0, \ldots n-1 \}$, the row map $j \mapsto S_{i,j}$ is bijective.
+  \item $\forall j \in \{ 0, \ldots n-1 \}$, the column map $i \mapsto S_{i,j}$ is bijective.
+  \item $\forall k : 0 \le k < n, \forall s \in \mathbb{N}$,
+        $|\{(i,j) \in$ $s$-diagonal with $S_{i,j} \le k\}| \le k + 1$.
+  \item $\forall k : 0 \le k < n, \forall d \in \mathbb{Z}$,
+        $|\{(i,j) \in$ $d$-diagonal with $S_{i,j} \le k\}| \le k + 1$.
 \end{enumerate}
 \end{theorem}
 
 \section{Injective Majorization}
 
-Instead of direct cardinality counting of
-\[
-  |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i + j = s \;\land\; L_{i,j} \le k\}|
-\le k + 1
-\]
-and
-\[
-  |\{(i,j) \in \mathrm{Fin}\,n \times \mathrm{Fin}\,n \mid i - j = d \;\land\; L_{i,j} \le k\}|
-\le k + 1,
-\]
-which would computationally explode for large $n$, we use a combinatorial principle that
-reduces the problem for \emph{all} thresholds $0 \le k < n$ simultaneously to constructing a
-single dominated injection.
+Instead of using direct cardinality counting for $(iii)$ and $(iv)$ above,  which would
+computationally explode for large $n$, we use a principle that reduces the problem for \emph{all}
+thresholds $0 \le k < n$ simultaneously to constructing a single dominated injection.
+
+\vspace{8pt}
+
+In what follows, unless explicitely stated, diagonal refers to either $s$-diagonal or $d$-diagonal.
 
 \subsection{The Injective-Majorization Principle}
 
-Let $D \subseteq \mathrm{Fin}\,n \times \mathrm{Fin}\,n$ be any diagonal 
-(either a sum-diagonal $i + j = s$ or a difference-diagonal $i - j = d$), and let 
-$v(i,j) = (i + q(j)) \bmod n \in \{0, \dots, n-1\}$ be the square value at cell $(i,j)$.
+Let $S_{i,j}$ with $0 \le i, j < n$ be a square and let $D$ be any diagonal.
 
-\begin{lemma}[Injective-Majorization Principle] \label{lem:inj-maj}
+\begin{lemma}\label{lem:inj-maj}
 If there exists a function $f : \mathbb{N} \times \mathbb{N} \to \mathbb{N}$ such that:
+
+\vspace{8pt}
+
 \begin{enumerate}[nosep,label=(\arabic*)]
-  \item Majorization: $f(i,j) \le v(i,j)$ for all $0 \le i, j < n$,
-  \item Diagonal Injectivity: $f$ is injective along $D$.
+  \item Majorization~: $\forall i, j : 0 \le i, j < n, f(i,j) \le S_{i,j}$.
+  \item Diagonal Injectivity~: $f$ is injective on $D$.
 \end{enumerate}
-Then for every threshold $k \in \mathbb{N}$, the set $D_{\le k} = \{(i,j) \in D \mid v(i,j) \le k\}$
-has cardinality at most $k + 1$.
+
+\vspace{8pt}
+
+Then for every threshold $k \in \mathbb{N}$, the set
+$D_{\le k} = \{(i,j) \in D \mid S_{i,j} \le k\}$ has cardinality at most $k + 1$.
 \end{lemma}
 
 \begin{proof}
 
-\vspace{12pt}
+\vspace{8pt}
 
-For every cell $(i,j) \in D_{\le k}$, condition~(1) gives $0 \le f(i,j) \le v(i,j) \le k$ so 
-$f(i,j) \in \{0, \dots, k\}$. By condition~(2), the restriction of $f$ to $D_{\le k}$ is an
-injective map into $\{0, \dots, k\}$. By the Pigeonhole Principle,
-$|D_{\le k}| \le |\{0, \dots, k\}| = k + 1$.
+By condition~(1), $0 \le f(i,j) \le S_{i,j} \le k$ so  $f(i,j) \in \{0, \dots, k\}$.
+By condition~(2), the restriction of $f$ to $D_{\le k}$ is an injective map into $\{0, \dots, k\}$.
+Therefore $|D_{\le k}| \le |\{0, \dots, k\}| = k + 1$.
+
 \end{proof}
 
-\subsection{Why Vacant Lower Slots Always Exist}
+\section{Theorem Proof}
 
-Along a diagonal $D$, the square values $v(i,j)$ are \emph{almost} distinct, except for a small
-number of collision pairs $(i_1, j_1), (i_2, j_2) \in D$ where $v(i_1, j_1) = v(i_2, j_2) = v$.
-To satisfy Lemma~\ref{lem:inj-maj}, one of the two cells keeps its value $f(i_1, j_1) = v$,
-while the duplicate cell is reassigned to a strictly smaller value $f(i_2, j_2) < v$ that does
-not appear anywhere else along $D$.
-The reassigned cell \emph{steals} a slot in $\{0, \dots, v - 1\}$ that was left vacant on $D$.
+Recall that $i = s - j$ on every $s$-diagonal and $i = d + j$ on every $d$-diagonal. 
 
-\vspace{12pt}
+\vspace{8pt}
 
-\noindent \emph{Why is there always guaranteed to be an unoccupied value strictly less than $v$
-available to be stolen?}
+The explanations below will use those equalities without explicitly mentioning them.
 
-\vspace{12pt}
+\vspace{8pt}
 
-\noindent The existence of such vacant lower slots is not accidental:
+Recall that the four families are
 
-\begin{enumerate}[label=(\alph*), leftmargin=*]
-\item \emph{Elevated Baselines and Block Jumps (The Vacant Lower Shadow):}
+\begin{itemize}
+\item Family 1~: $n \equiv 1,5 \pmod 6$ with $n \ge 1$,
+\item Family 2~: $n \equiv 2,4 \pmod 6$ with $n \ge 10$, 
+\item Family 3~: $n \equiv 3 \pmod 6$ with $n \ge 27$,
+\item Family 4~: $n \equiv 0 \pmod 6$ with $n \ge 12$.
+\end{itemize}
 
-\vspace{4pt}
+and notice that
 
-Stepping along a diagonal changes $j$ by $+1$, and changes $i$ by $-1$ (along $i + j = s$) or
-$+1$ (along $i - j = d$). Within a linear block $q(j) = a \cdot j + b$, the unreduced value
-expression advances with constant slopes: 
-$\Delta_{\mathrm{sum}} = a - 1$ and $\Delta_{\mathrm{diff}} = a + 1.$
+\begin{itemize}
+\item Family 2 does not include $n = 8$.
+\item Family 3 does not include $n = 9$, $n = 15$ and $n = 21$.
+\end{itemize}
 
-\vspace{6pt}
+Those cases are handled separately.
 
-In Family 2 ($n \ge 10$ even, $3 \nmid n$), each block has slope $a = 2$, so
-$\Delta_{\mathrm{sum}} = +1$. Within each half, the sequence is strictly increasing without any
-internal collisions.
-The first block ($j_1 < n/2$) covers cells with high row indices $i_1 = s - j_1$, and starts
-at an elevated baseline $q(j_1) \ge n/2 + 1$. Its values along the diagonal start high above
-$0$.
-The second block ($j_2 \ge n/2$) has a parity jump of $+3$ and lower row indices $i_2$,
-causing it to wrap around $n$ and hit the same value $v$ as cell $(i_1, j_1)$.
-Crucially, because the diagonal entered the duplicate value $v$ while skipping the lower
-numbers $\{0, \dots, \text{corner size}-1\}$, \emph{none of the cells on the diagonal ever
-visited those lowest values}. They form a vacant ``shadow'' $\{0, \dots, v-1\}$. Reassigning
-the duplicate cell $(i_2, j_2)$ to $j_2 - (n - 3) \in \{0, 1, 2\}$ steals one of these
-untouched slots, with $f(i_2, j_2) < v$.
+\vspace{8pt}
 
-\item \emph{Modular Wrap-Around and Empty Modulo-$3$ Residue Classes:}
+We will define $p$ and $f$ and prove that
 
-\vspace{4pt}
+\begin{itemize}
+\item $p$ is a bijection on $\{0, \dots, n-1\}$,
+\item $f$ is an injection on the diagonals involved,
+\item $f(i, j) \le S_ij$ on the diagonals involved.
+\end{itemize}
 
-In Family 3 ($n \ge 12$, $6 \mid n$), the column permutation has slope $a = 2$. Along a
-difference-diagonal $i - j = d$, the progression has step $\Delta_{\mathrm{diff}} = 2 + 1 = 3$.
-Because $3 \mid n$, stepping by $+3$ confines all cells within a linear block to a
-\emph{single residue class modulo $3$} ($d + 2 \pmod 3$ for Block 1, and $d \pmod 3$ for Block
-2). Consequently, \emph{the third residue class $d + 1 \pmod 3$ is left completely empty on the
-entire diagonal} (one-third of all values $\{0, \dots, n-1\}$ are unvisited).
-When $j$ advances by $k = n/3$, the linear term advances by $3(n/3) = n$.
-Modulo $n$, this wraps around, causing a pure \emph{modular wrap-around at $n$} that repeats
-the exact same value $v$ from $k$ steps earlier.
-Because the parallel residue class $d + 1 \pmod 3$ is entirely vacant, shifting the wrapped
-cell downward by $-1$ or $-2$ lands it directly into an empty slot in $\{0, \dots, v-1\}$.
+\subsection{Family 1}
 
-\item \emph{Pigeonhole Conservation:}
+Let $p(j) = (-2j) \bmod n$.
 
-\vspace{4pt}
+\vspace{8pt}
 
-On any diagonal of length $|D|$, if a value $v$ appears twice, at most $|D| - 1$ distinct
-values appear among the $|D|$ cells. Whenever the sequence steps into $\{0, \dots, v\}$ with
-stride $\Delta \ge 1$ from a non-zero offset, the number of cells on $D$ taking values $\le v$
-is strictly less than $v + 1$. By the Pigeonhole Principle, the set $\{0, \dots, v-1\}$ cannot
-be full, guaranteeing the existence of vacant slots below $v$.
-\end{enumerate}
+$p$ is bijective since $\gcd(n, 2) = 1$.
+
+\vspace{8pt}
+
+On an $s$-diagonal, $S_{i,j} = (s - 3j) \bmod n$ is injective since $\gcd(3, n) = 1$
+(see Example~\ref{ex:fam1_sum} and Figure~\ref{fig:fam1_sum}).
+
+\vspace{8pt}
+
+On a $d$-diagonal, $S_{i,j} = (d - j) \bmod n$ is trivially injective
+(see Example~\ref{ex:fam1_diff} and Figure~\ref{fig:fam1_diff}).
+
+\vspace{8pt}
+
+Let $f(i,j) = S_{i,j}$.
+
+\subsection{Family 2}
+
+\vspace{8pt}
+
+Let $m = n/2$.
+
+\vspace{8pt}
+
+Let $p(j) = (2j + m + 1) \bmod n$ for $0 \le j < m$. \\
+Let $p(j) = (2(j - m) + m + 4) \bmod n$ for $m \le j < n$.
+
+\vspace{8pt}
+
+$p$ is bijective since the former covers all $(m + 1) \bmod 2$ values one-to-one , and the latter
+covers all $m \bmod 2$ values one-to-one.
+
+\vspace{8pt}
+
+On an $s$-diagonal, inside each half, $S_{i,j} = (s + j + m + 1) \bmod n$ has step $+1$. Because the
+second half is shifted by $3 \bmod n$, a collision between $j_1 < m \le j_2$ happens when 
+$j_2 - j_1 = n - 3$. This happens only when $j_1 \in \{0, 1, 2\}$ 
+(and $i_1 \in \{n - 3, n - 2, n - 1\}$), the $3 \times 3$ bottom-left corner,
+and $j_2 \in \{n - 3, n - 2, n - 1\}$ (and $i_2 \in \{0, 1, 2\}$), the $3 \times 3$ top-right
+corner.
+
+\vspace{8pt}
+
+Let $f(i,j) = j - (n - 3) \in \{0, 1, 2\}$ on the $3 \times 3$ top-right corner. One of the values,
+skipped by the $+3$ shift, are vacant on each $s$-diagonal passing through it
+(see Example~\ref{ex:fam2_sum} and Figure~\ref{fig:fam2_sum}). Trivially $f(i, j) \le S_{i,j}$.
+
+\vspace{8pt}
+
+In the $3 \times 3$ top-right corner ($j = n - 3 + \delta$ with $\delta \in \{0, 1, 2\}$),
+$p(j) = m - 2 + 2\delta$, so the largest sum $i + p(j)$ occurs at $(i, j) = (2, n - 1)$, where
+$2 + p(n - 1) = m + 4$. The threshold $n \ge 10$ ($m \ge 5$) ensures $m + 4 < 2m = n$, so $S_{i,j}$
+never wraps around $\bmod\, n$.
+
+\vspace{8pt}
+
+On a $d$-diagonal, inside each half, $S_{i,j} = s + 3j - m + 4$ has step $+3$.
+Because the second half is shifted by $3 \bmod n$, a collision between $j_1 < m \le j_2$
+happens when $j_2 - j_1 = n - 1$, equivalent with $(j_2 - j_1) + 1 \equiv 0 \pmod n$, equivalent
+with $3(j_2 - j_1) + 3 \equiv 0 \pmod n$ since $\gcd(3, n) = 1$. This happens only at a single pair
+of cells on the entire board: $(0, 0)$ and $(n - 1, n - 1)$ on the main diagonal.
+
+\vspace{8pt}
+
+Let $f(n - 1,n - 1) = 1$, one of the values, skipped by the $+3$ shift, which is vacant on the main
+diagonal (see Example~\ref{ex:fam2_diff} and Figure~\ref{fig:fam2_diff}).
+
+\subsection{Family 3}
+
+\vspace{8pt}
+
+Let $k = n / 3$.
+
+\vspace{8pt}
+
+Let $p(j) = (3j + 2k + 4u) \bmod n$ with $u = \lfloor j / k \rfloor \in \{0, 1, 2\}$.
+$\{0, \dots, n - 1\}$ is partitioned into three blocks of length $k$ with $+4$ jumps between
+consecutive blocks.
+
+\vspace{8pt}
+
+$p$ is bijective since block $u$ covers residue class $(2k + u) \bmod 3$, and thus all three
+residue classes $\bmod\, 3$ are, one-to-one, covered.
+
+\vspace{8pt}
+
+On an $s$-diagonal, $S_{i,j} = (s + 2j + 2k + 4u) \bmod n$ has step $+2$ inside each block. At each
+of the two block transitions ($u = 0 \to 1$ and $u = 1 \to 2$), the extra $+4$ jump skips two steps
+of $+2$: $(s + k) \bmod n$ and $(s + k + 2) \bmod n$ at $j = k$, and $(s + 4) \bmod n$ and 
+$(s + 6) \bmod n$ at $j = 2k$. Collisions between blocks $u_1 < u_2$ happen
+when $2(j_2 - j_1) + 4(u_2 - u_1) \equiv 0 \pmod n$, which is equivalent with
+$(j_2 - j_1) + 2(u_2 - u_1) = n$ since $\gcd(2, n) = 1$, forcing $u_1 = 0$, $u_2 = 2$ and
+$j_2 - j_1 = n - 4$. This happens only in the $4 \times 4$ top-right corner.
+
+\vspace{8pt}
+
+Let $f(i,j) = S_{i,j} - k \in \{s + k, s + k + 2\} \bmod n$ for $j \in \{n - 4, n - 3\}$, which
+fills the two vacant slots skipped at the $u = 0 \to 1$ transition ($j = k$)
+(see Example~\ref{ex:fam3_sum} and Figure~\ref{fig:fam3_sum}). \\
+Let $f(i,j) = S_{i,j} - 2k \in \{s + 4, s + 6\} \bmod n$ for $j \in \{n - 2, n - 1\}$, which
+fills the two vacant slots skipped at the $u = 1 \to 2$ transition ($j = 2k$)
+(see Example~\ref{ex:fam3_sum} and Figure~\ref{fig:fam3_sum}).
+
+\vspace{8pt}
+
+In the $4 \times 4$ top-right corner, the largest unreduced sum $i + p(j)$ occurs at
+$(i, j) = (3, n - 1)$, where $p(n - 1) = 2k + 5$ and $3 + p(n - 1) = 2k + 8$. The threshold
+$n \ge 27$ ($k \ge 9$) ensures $2k + 8 < 3k = n$, so $S_{3, n-1} = 2k + 8$ does not wrap around
+$\bmod\, n$ to a value $< 2k$ before subtracting $2k$ in $f(3, n - 1) = S_{3, n-1} - 2k$.
+
+\vspace{8pt}
+
+On a $d$-diagonal, $S_{i,j} = (d + 4j + 2k + 4u) \bmod n$ has step $+4$ inside each
+block. At each of the two block transitions ($u = 0 \to 1$ and $u = 1 \to 2$), the extra $+4$ jump
+skips one step of $+4$: $d \bmod n$ at $j = k$, and $(d + k + 4) \bmod n$ at $j = 2k$. Collisions
+between blocks $u_1 < u_2$ happen when $4(j_2 - j_1) + 4(u_2 - u_1) \equiv 0 \pmod n$, which is
+equivalent with $(j_2 - j_1) + (u_2 - u_1) = n$ since $\gcd(4, n) = 1$, forcing $u_1 = 0$,
+$u_2 = 2$ and $j_2 - j_1 = n - 2$. This happens only in the $2 \times 2$ bottom-right corner.
+
+\vspace{8pt}
+
+Let $f(i,j) = S_{i,j} - 2k = i + 2 \equiv d \pmod n$ for $j = n - 2$, which fills the vacant
+slot skipped at the $u = 0 \to 1$ transition ($j = k$)
+(see Example~\ref{ex:fam3_diff} and Figure~\ref{fig:fam3_diff}). \\
+Let $f(i,j) = S_{i,j} - k = i + k + 5 \equiv d + k + 4 \pmod n$ for $j = n - 1$, which fills the
+vacant slot skipped at the $u = 1 \to 2$ transition ($j = 2k$)
+(see Example~\ref{ex:fam3_diff} and Figure~\ref{fig:fam3_diff}).
+
+\subsection{Family 4}
+
+\vspace{8pt}
+
+Let $m = n / 2$ and $k = n / 3$.
+
+\vspace{8pt}
+
+Let $p(0) = n - 2$, $p(m - 2) = 0$ and $p(n - 1) = 2$. \\
+Let $p(j) = 2j + 2$ for $1 \le j \le m - 3$. \\
+Let $p(j) = 2(j - (m - 1)) + 1$ for $m - 1 \le j \le n - 2$.
+
+\vspace{8pt}
+
+$p$ is bijective since the first ones cover $\{0, 2, n - 2\}$, and the next ones cover
+$\{4, 6, \dots, n - 4\}$, and the last ones cover all odd numbers $\{1, 3, \dots, n - 1\}$
+
+\vspace{8pt} 
+
+The threshold $n \ge 12$ ($m \ge 6$ and $k \ge 4$) covers all valid multiples of $6$ since $n = 6$
+is excluded, and ensures that the first main block $1 \le j \le m - 3$ is non-empty and that the
+column $j = n - 5$ lies inside the second main block $m - 1 \le j \le n - 2$.
+
+\vspace{8pt}
+
+On an $s$-diagonal, inside the first main block $S_{i,j} = (s + j + 2) \bmod n$ has
+step $+1$, and inside the second main block $S_{i,j} = (s + j + 3) \bmod n$ also has step $+1$,
+leaving the two values $(s + m) \bmod n$ and $(s + m + 1) \bmod n$ vacant between the two blocks.
+Collisions only occur with the three boundary pins $j \in \{0, m - 2, n - 1\}$.
+
+\vspace{8pt}
+
+At $j = m - 1$ (for $i < n - 1$): $S_{i, m-1} = i + 1$ collides with pin $j = m - 2$
+($S_{i+1, m-2} = i + 1$), so let $f(i, m - 1) = S_{i, m-1} - 1 = i \equiv s + m + 1 \pmod n$
+(see Example~\ref{ex:fam4_sum} and Figure~\ref{fig:fam4_sum}). \\
+At $j = n - 5$ (for $i + j < n$, so $i < 5$): $S_{i, n-5} = s - 2$ collides with pin $j = 0$
+($S_{s, 0} = s - 2$), so let $f(i, n - 5) = S_{i, n-5} - (m - 2) = i + m - 5 \equiv s + m \pmod n$
+(see Example~\ref{ex:fam4_sum} and Figure~\ref{fig:fam4_sum}). \\
+At $j = n - 1$ (for $i < 2$): $S_{i, n-1} = i + 2$ collides with $j = 1$
+($S_{s-1, 1} = i + 2$), while pin $j = 0$ is off the diagonal ($s \ge n - 1$), leaving $i + 1$
+vacant; so let $f(i, n - 1) = S_{i, n-1} - 1 = i + 1$
+(see Example~\ref{ex:fam4_sum} and Figure~\ref{fig:fam4_sum}).
+
+\vspace{8pt}
+
+On a $d$-diagonal, inside both main blocks $i + p(j)$, $S_{i,j} = (d + 3j + 2) \bmod n$ has step
+$+3$: $S_{i,j} = (d + 3j + 2) \bmod n$ in the first main block and $S_{i,j} = (d + 3j + 3) \bmod n$ in
+the second main block. Since $3 \mid n$ ($\gcd(3, n) = 3$), the first main block stays entirely in
+residue class $(d + 2) \bmod 3$ and the second main block stays entirely in residue class
+$d \bmod 3$, leaving the third residue class $(d + 1) \bmod 3$ completely vacant (except for the
+single pin $j = 0$). Within each block, a wrap-around collision $3(j_2 - j_1) = n$ occurs when
+$j_2 - j_1 = n / 3 = k$ (for $i_2 \ge k$). To resolve these collisions
+(see Example~\ref{ex:fam4_diff} and Figure~\ref{fig:fam4_diff}):
+\begin{itemize}[nosep]
+\item In the first main block ($1 + k \le j \le m - 3$ and $i \ge k$), let
+$f(i, j) = S_{i,j} - 1 \equiv d + 1 \pmod 3$.
+\item In the second main block ($m + k \le j \le n - 2$ and $i \ge k$), let
+$f(i, j) = S_{i,j} - 2 \equiv d + 1 \pmod 3$.
+\item At the boundary column $j = m - 1 + k$, let $f(i, j) = S_{i,j} - 1$ for $k \le i < 2k$, and
+$f(i, j) = S_{i,j} - 5$ (or $S_{i,j} - 4$ when $n = 12$) for $i \ge 2k$ to avoid colliding with the
+pins $j = m - 2$ and $j = 0$.
+\end{itemize}
 
 \subsection{Concrete Examples of Diagonal Slot Stealing}
 
-We present four concrete examples from the Lean formalization: two for sum-diagonals and two
-for difference-diagonals, illustrating piecewise jumps and modular wrap-around. In each grid,
-off-diagonal values and the grid lines are displayed in gray, diagonal cells are highlighted in
-blue, the cell that keeps its original value is highlighted in orange ($\mathbf{v}$), and the
-duplicate cell that steals a lower vacant slot is highlighted in red ($\mathbf{v \downarrow
-f}$).
+We present eight concrete examples---one $s$-diagonal and one $d$-diagonal for each of the four
+families---illustrated in Figures~\ref{fig:fam1_sum}--\ref{fig:fam4_diff}. In each grid,
+off-diagonal entries and grid lines are shown in gray, uncollided diagonal entries are highlighted
+in blue, the cell that keeps its original value in a collision pair is highlighted in orange
+($\mathbf{v}$), and the duplicate cell that steals a lower vacant slot is highlighted in red
+($\mathbf{v \downarrow f}$).
 
-\vspace{12pt}
+\vspace{8pt}
 
-\begin{example}[Sum-Diagonal Piecewise Jump: $n = 10$, $s = 7$]
-For $n = 10$, $q = (6, 8, 0, 2, 4 \mid 9, 1, 3, 5, 7)$ has two linear halves ($j < 5$ and $j
-\ge 5$). Sum-diagonal $i + j = 7$ has 8 cells.
-Cells $(7, 0)$ in Block 1 and $(0, 7)$ in Block 2 both evaluate to $v = 3$:
-\[
-  v(7, 0) = (7 + q(0)) \bmod 10 = (7 + 6) \bmod 10 = 3, \qquad
-  v(0, 7) = (0 + q(7)) \bmod 10 = (0 + 3) \bmod 10 = 3.
-\]
-The collision is caused by the jump across the two halves ($j_2 - j_1 = 7 - 0 = n - 3$).
-The values present on the diagonal are $\{1, 2, \mathbf{3}, 4, 5, 6, 7\}$. 
-The value $\mathbf{0}$ is \emph{vacant} on the entire diagonal, and $0 < 3$.
-The majorant $f_{2,\mathrm{sum}}$ keeps $f(7, 0) = 3$ and reassigns the top-right corner cell:
-\[
-  f(0, 7) = j - (n - 3) = 7 - 7 = 0 < 3.
-\]
-The resulting values of $f$ along the diagonal are $\{0, 1, 2, 3, 4, 5, 6, 7\}$, which are all
-distinct.
+\begin{example}[Family 1 $s$-Diagonal: $n = 7$, $s = 5$]\label{ex:fam1_sum}
+For $n = 7 \equiv 1 \pmod 6$, $p(j) = (-2j) \bmod 7$ gives $p = (0, 5, 3, 1, 6, 4, 2)$. Along the
+$s$-diagonal $i + j = 5$, $S_{i,j} = (5 - 3j) \bmod 7$ steps by $-3 \equiv +4 \pmod 7$, visiting
+$\{5, 2, 6, 3, 0, 4\}$, which are already distinct because $\gcd(3, 7) = 1$. Thus $f(i,j) = S_{i,j}$
+requires no shifts (Figure~\ref{fig:fam1_sum}).
 \end{example}
 
-\begin{example}[Sum-Diagonal Multiple Collisions: $n = 10$, $s = 10$]
-On diagonal $i + j = 10$ ($n = 10$), two simultaneous collisions occur:
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[scale=0.55, every node/.style={font=\fontsize{7}{8}\selectfont}]
+\draw[step=1cm, gray!45, thin] (0,0) grid (7,7);
+\node[above, gray!85, inner sep=1pt] at (0.5,7) {0};
+\node[above, gray!85, inner sep=1pt] at (1.5,7) {1};
+\node[above, gray!85, inner sep=1pt] at (2.5,7) {2};
+\node[above, gray!85, inner sep=1pt] at (3.5,7) {3};
+\node[above, gray!85, inner sep=1pt] at (4.5,7) {4};
+\node[above, gray!85, inner sep=1pt] at (5.5,7) {5};
+\node[above, gray!85, inner sep=1pt] at (6.5,7) {6};
+\node[left, gray!85, inner sep=1pt] at (0,6.5) {0};
+\node[left, gray!85, inner sep=1pt] at (0,5.5) {1};
+\node[left, gray!85, inner sep=1pt] at (0,4.5) {2};
+\node[left, gray!85, inner sep=1pt] at (0,3.5) {3};
+\node[left, gray!85, inner sep=1pt] at (0,2.5) {4};
+\node[left, gray!85, inner sep=1pt] at (0,1.5) {5};
+\node[left, gray!85, inner sep=1pt] at (0,0.5) {6};
+\node[gray!75] at (0.5,6.5) {0};
+\node[gray!75] at (1.5,6.5) {5};
+\node[gray!75] at (2.5,6.5) {3};
+\node[gray!75] at (3.5,6.5) {1};
+\node[gray!75] at (4.5,6.5) {6};
+\fill[blue!12] (5,6) rectangle ++(1,1);
+\draw[blue!45, thick] (5,6) rectangle ++(1,1);
+\node[blue!85!black] at (5.5,6.5) {\textbf{4}};
+\node[gray!75] at (6.5,6.5) {2};
+\node[gray!75] at (0.5,5.5) {1};
+\node[gray!75] at (1.5,5.5) {6};
+\node[gray!75] at (2.5,5.5) {4};
+\node[gray!75] at (3.5,5.5) {2};
+\fill[blue!12] (4,5) rectangle ++(1,1);
+\draw[blue!45, thick] (4,5) rectangle ++(1,1);
+\node[blue!85!black] at (4.5,5.5) {\textbf{0}};
+\node[gray!75] at (5.5,5.5) {5};
+\node[gray!75] at (6.5,5.5) {3};
+\node[gray!75] at (0.5,4.5) {2};
+\node[gray!75] at (1.5,4.5) {0};
+\node[gray!75] at (2.5,4.5) {5};
+\fill[blue!12] (3,4) rectangle ++(1,1);
+\draw[blue!45, thick] (3,4) rectangle ++(1,1);
+\node[blue!85!black] at (3.5,4.5) {\textbf{3}};
+\node[gray!75] at (4.5,4.5) {1};
+\node[gray!75] at (5.5,4.5) {6};
+\node[gray!75] at (6.5,4.5) {4};
+\node[gray!75] at (0.5,3.5) {3};
+\node[gray!75] at (1.5,3.5) {1};
+\fill[blue!12] (2,3) rectangle ++(1,1);
+\draw[blue!45, thick] (2,3) rectangle ++(1,1);
+\node[blue!85!black] at (2.5,3.5) {\textbf{6}};
+\node[gray!75] at (3.5,3.5) {4};
+\node[gray!75] at (4.5,3.5) {2};
+\node[gray!75] at (5.5,3.5) {0};
+\node[gray!75] at (6.5,3.5) {5};
+\node[gray!75] at (0.5,2.5) {4};
+\fill[blue!12] (1,2) rectangle ++(1,1);
+\draw[blue!45, thick] (1,2) rectangle ++(1,1);
+\node[blue!85!black] at (1.5,2.5) {\textbf{2}};
+\node[gray!75] at (2.5,2.5) {0};
+\node[gray!75] at (3.5,2.5) {5};
+\node[gray!75] at (4.5,2.5) {3};
+\node[gray!75] at (5.5,2.5) {1};
+\node[gray!75] at (6.5,2.5) {6};
+\fill[blue!12] (0,1) rectangle ++(1,1);
+\draw[blue!45, thick] (0,1) rectangle ++(1,1);
+\node[blue!85!black] at (0.5,1.5) {\textbf{5}};
+\node[gray!75] at (1.5,1.5) {3};
+\node[gray!75] at (2.5,1.5) {1};
+\node[gray!75] at (3.5,1.5) {6};
+\node[gray!75] at (4.5,1.5) {4};
+\node[gray!75] at (5.5,1.5) {2};
+\node[gray!75] at (6.5,1.5) {0};
+\node[gray!75] at (0.5,0.5) {6};
+\node[gray!75] at (1.5,0.5) {4};
+\node[gray!75] at (2.5,0.5) {2};
+\node[gray!75] at (3.5,0.5) {0};
+\node[gray!75] at (4.5,0.5) {5};
+\node[gray!75] at (5.5,0.5) {3};
+\node[gray!75] at (6.5,0.5) {1};
+\end{tikzpicture}\\[4pt]
+\footnotesize
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Cell $(i,j)$ & $S_{i,j}$ & $f(i,j)$ & Status \\
+\midrule
+$(5, 0)$ & 5 & 5 & Distinct \\
+$(4, 1)$ & 2 & 2 & Distinct \\
+$(3, 2)$ & 6 & 6 & Distinct \\
+$(2, 3)$ & 3 & 3 & Distinct \\
+$(1, 4)$ & 0 & 0 & Distinct \\
+$(0, 5)$ & 4 & 4 & Distinct \\
+\bottomrule
+\end{tabular}
+\caption{Family 1 ($n = 7$): $s$-diagonal $s = 5$ (step $-3 \bmod 7$), already collision-free with
+$f(i,j) = S_{i,j}$.}
+\label{fig:fam1_sum}
+\end{figure}
+\FloatBarrier
 
-\vspace{6pt}
-
-\begin{itemize}[nosep]
-  \item $(9, 1)$ and $(2, 8)$ both have $v = 7$ (with $j_2 - j_1 = 8 - 1 = n - 3$).
-  \item $(8, 2)$ and $(1, 9)$ both have $v = 8$ (with $j_2 - j_1 = 9 - 2 = n - 3$).
-\end{itemize}
-
-\vspace{6pt}
-
-The values present on the diagonal are $\{0, 4, 5, 6, \mathbf{7}, \mathbf{8}, 9\}$.
-The entire range $\{\mathbf{1}, \mathbf{2}, 3\}$ is \emph{vacant}! 
-Cells $(9, 1)$ and $(8, 2)$ keep their values $7$ and $8$, while the corner cells steal:
-\[
-  f(2, 8) = 8 - 7 = 1 < 7, \qquad f(1, 9) = 9 - 7 = 2 < 8.
-\]
-All nine values of $f$ are now distinct: $\{0, 1, 2, 4, 5, 6, 7, 8, 9\}$.
+\begin{example}[Family 1 $d$-Diagonal: $n = 7$, $d = -1$]\label{ex:fam1_diff}
+Along the $d$-diagonal $i - j = -1$ ($i = j - 1$) for $n = 7$, $S_{i,j} = (-1 - j) \bmod 7$ steps
+by $-1 \pmod 7$, visiting $\{5, 4, 3, 2, 1, 0\}$, which are trivially distinct. Thus
+$f(i,j) = S_{i,j}$ requires no shifts (Figure~\ref{fig:fam1_diff}).
 \end{example}
 
-\vspace{12pt}
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[scale=0.55, every node/.style={font=\fontsize{7}{8}\selectfont}]
+\draw[step=1cm, gray!45, thin] (0,0) grid (7,7);
+\node[above, gray!85, inner sep=1pt] at (0.5,7) {0};
+\node[above, gray!85, inner sep=1pt] at (1.5,7) {1};
+\node[above, gray!85, inner sep=1pt] at (2.5,7) {2};
+\node[above, gray!85, inner sep=1pt] at (3.5,7) {3};
+\node[above, gray!85, inner sep=1pt] at (4.5,7) {4};
+\node[above, gray!85, inner sep=1pt] at (5.5,7) {5};
+\node[above, gray!85, inner sep=1pt] at (6.5,7) {6};
+\node[left, gray!85, inner sep=1pt] at (0,6.5) {0};
+\node[left, gray!85, inner sep=1pt] at (0,5.5) {1};
+\node[left, gray!85, inner sep=1pt] at (0,4.5) {2};
+\node[left, gray!85, inner sep=1pt] at (0,3.5) {3};
+\node[left, gray!85, inner sep=1pt] at (0,2.5) {4};
+\node[left, gray!85, inner sep=1pt] at (0,1.5) {5};
+\node[left, gray!85, inner sep=1pt] at (0,0.5) {6};
+\node[gray!75] at (0.5,6.5) {0};
+\fill[blue!12] (1,6) rectangle ++(1,1);
+\draw[blue!45, thick] (1,6) rectangle ++(1,1);
+\node[blue!85!black] at (1.5,6.5) {\textbf{5}};
+\node[gray!75] at (2.5,6.5) {3};
+\node[gray!75] at (3.5,6.5) {1};
+\node[gray!75] at (4.5,6.5) {6};
+\node[gray!75] at (5.5,6.5) {4};
+\node[gray!75] at (6.5,6.5) {2};
+\node[gray!75] at (0.5,5.5) {1};
+\node[gray!75] at (1.5,5.5) {6};
+\fill[blue!12] (2,5) rectangle ++(1,1);
+\draw[blue!45, thick] (2,5) rectangle ++(1,1);
+\node[blue!85!black] at (2.5,5.5) {\textbf{4}};
+\node[gray!75] at (3.5,5.5) {2};
+\node[gray!75] at (4.5,5.5) {0};
+\node[gray!75] at (5.5,5.5) {5};
+\node[gray!75] at (6.5,5.5) {3};
+\node[gray!75] at (0.5,4.5) {2};
+\node[gray!75] at (1.5,4.5) {0};
+\node[gray!75] at (2.5,4.5) {5};
+\fill[blue!12] (3,4) rectangle ++(1,1);
+\draw[blue!45, thick] (3,4) rectangle ++(1,1);
+\node[blue!85!black] at (3.5,4.5) {\textbf{3}};
+\node[gray!75] at (4.5,4.5) {1};
+\node[gray!75] at (5.5,4.5) {6};
+\node[gray!75] at (6.5,4.5) {4};
+\node[gray!75] at (0.5,3.5) {3};
+\node[gray!75] at (1.5,3.5) {1};
+\node[gray!75] at (2.5,3.5) {6};
+\node[gray!75] at (3.5,3.5) {4};
+\fill[blue!12] (4,3) rectangle ++(1,1);
+\draw[blue!45, thick] (4,3) rectangle ++(1,1);
+\node[blue!85!black] at (4.5,3.5) {\textbf{2}};
+\node[gray!75] at (5.5,3.5) {0};
+\node[gray!75] at (6.5,3.5) {5};
+\node[gray!75] at (0.5,2.5) {4};
+\node[gray!75] at (1.5,2.5) {2};
+\node[gray!75] at (2.5,2.5) {0};
+\node[gray!75] at (3.5,2.5) {5};
+\node[gray!75] at (4.5,2.5) {3};
+\fill[blue!12] (5,2) rectangle ++(1,1);
+\draw[blue!45, thick] (5,2) rectangle ++(1,1);
+\node[blue!85!black] at (5.5,2.5) {\textbf{1}};
+\node[gray!75] at (6.5,2.5) {6};
+\node[gray!75] at (0.5,1.5) {5};
+\node[gray!75] at (1.5,1.5) {3};
+\node[gray!75] at (2.5,1.5) {1};
+\node[gray!75] at (3.5,1.5) {6};
+\node[gray!75] at (4.5,1.5) {4};
+\node[gray!75] at (5.5,1.5) {2};
+\fill[blue!12] (6,1) rectangle ++(1,1);
+\draw[blue!45, thick] (6,1) rectangle ++(1,1);
+\node[blue!85!black] at (6.5,1.5) {\textbf{0}};
+\node[gray!75] at (0.5,0.5) {6};
+\node[gray!75] at (1.5,0.5) {4};
+\node[gray!75] at (2.5,0.5) {2};
+\node[gray!75] at (3.5,0.5) {0};
+\node[gray!75] at (4.5,0.5) {5};
+\node[gray!75] at (5.5,0.5) {3};
+\node[gray!75] at (6.5,0.5) {1};
+\end{tikzpicture}\\[4pt]
+\footnotesize
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Cell $(i,j)$ & $S_{i,j}$ & $f(i,j)$ & Status \\
+\midrule
+$(0, 1)$ & 5 & 5 & Distinct \\
+$(1, 2)$ & 4 & 4 & Distinct \\
+$(2, 3)$ & 3 & 3 & Distinct \\
+$(3, 4)$ & 2 & 2 & Distinct \\
+$(4, 5)$ & 1 & 1 & Distinct \\
+$(5, 6)$ & 0 & 0 & Distinct \\
+\bottomrule
+\end{tabular}
+\caption{Family 1 ($n = 7$): $d$-diagonal $d = -1$ (step $-1 \bmod 7$), already collision-free with
+$f(i,j) = S_{i,j}$.}
+\label{fig:fam1_diff}
+\end{figure}
+\clearpage
 
-\begin{figure}[htbp]
+\begin{example}[Family 2 $s$-Diagonal Piecewise Jump: $n = 10$, $s = 7$]\label{ex:fam2_sum}
+For $n = 10$ ($m = 5$), $p = (6, 8, 0, 2, 4 \mid 9, 1, 3, 5, 7)$ has two linear halves ($j < 5$ and
+$j \ge 5$). Along $i + j = 7$, cells $(7, 0)$ in the first half and $(0, 7)$ in the $3 \times 3$
+top-right corner ($j_2 - j_1 = 7 = n - 3$) both evaluate to $S_{7,0} = S_{0,7} = 3$. The values on
+the diagonal are $\{1, 2, \mathbf{3}, 4, 5, 6, 7\}$, leaving $\mathbf{0}$ vacant. Setting
+$f(0, 7) = j_2 - (n - 3) = 7 - 7 = 0 < 3$ resolves the collision (Figure~\ref{fig:fam2_sum}).
+\end{example}
+
+\begin{figure}[!htbp]
 \centering
-\begin{subfigure}[t]{0.48\textwidth}
-\centering
-\begin{tikzpicture}[scale=0.38, every node/.style={font=\fontsize{5.5}{6.5}\selectfont}]
+\begin{tikzpicture}[scale=0.42, every node/.style={font=\fontsize{6.5}{7.5}\selectfont}]
 \draw[step=1cm, gray!45, thin] (0,0) grid (10,10);
 \node[above, gray!85, inner sep=1pt] at (0.5,10) {0};
 \node[above, gray!85, inner sep=1pt] at (1.5,10) {1};
@@ -759,7 +720,8 @@ All nine values of $f$ are now distinct: $\{0, 1, 2, 4, 5, 6, 7, 8, 9\}$.
 \node[gray!75] at (6.5,9.5) {1};
 \fill[red!25] (7,9) rectangle ++(1,1);
 \draw[red!85!black, thick] (7,9) rectangle ++(1,1);
-\node at (7.5,9.5) {\color{red!85!black}\shortstack[c]{\textbf{3}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{0}}}};
+\node at (7.5,9.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{3}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{0}}}};
 \node[gray!75] at (8.5,9.5) {5};
 \node[gray!75] at (9.5,9.5) {7};
 \node[gray!75] at (0.5,8.5) {7};
@@ -870,7 +832,7 @@ All nine values of $f$ are now distinct: $\{0, 1, 2, 4, 5, 6, 7, 8, 9\}$.
 \footnotesize
 \begin{tabular}{@{}cccc@{}}
 \toprule
-Cell $(i,j)$ & $v(i,j)$ & $f(i,j)$ & Status \\
+Cell $(i,j)$ & $S_{i,j}$ & $f(i,j)$ & Status \\
 \midrule
 $(7, 0)$ & 3 & 3 & Keeps value \\
 $(6, 1)$ & 4 & 4 & Distinct \\
@@ -882,233 +844,23 @@ $(1, 6)$ & 2 & 2 & Distinct \\
 $(0, 7)$ & 3 & \textbf{0} & \textbf{Steals vacant 0 ($< 3$)} \\
 \bottomrule
 \end{tabular}
-\caption{Sum-diagonal $s = 7$ on $n = 10$.}
-\label{subfig:s7}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\textwidth}
-\centering
-\begin{tikzpicture}[scale=0.38, every node/.style={font=\fontsize{5.5}{6.5}\selectfont}]
-\draw[step=1cm, gray!45, thin] (0,0) grid (10,10);
-\node[above, gray!85, inner sep=1pt] at (0.5,10) {0};
-\node[above, gray!85, inner sep=1pt] at (1.5,10) {1};
-\node[above, gray!85, inner sep=1pt] at (2.5,10) {2};
-\node[above, gray!85, inner sep=1pt] at (3.5,10) {3};
-\node[above, gray!85, inner sep=1pt] at (4.5,10) {4};
-\node[above, gray!85, inner sep=1pt] at (5.5,10) {5};
-\node[above, gray!85, inner sep=1pt] at (6.5,10) {6};
-\node[above, gray!85, inner sep=1pt] at (7.5,10) {7};
-\node[above, gray!85, inner sep=1pt] at (8.5,10) {8};
-\node[above, gray!85, inner sep=1pt] at (9.5,10) {9};
-\node[left, gray!85, inner sep=1pt] at (0,9.5) {0};
-\node[left, gray!85, inner sep=1pt] at (0,8.5) {1};
-\node[left, gray!85, inner sep=1pt] at (0,7.5) {2};
-\node[left, gray!85, inner sep=1pt] at (0,6.5) {3};
-\node[left, gray!85, inner sep=1pt] at (0,5.5) {4};
-\node[left, gray!85, inner sep=1pt] at (0,4.5) {5};
-\node[left, gray!85, inner sep=1pt] at (0,3.5) {6};
-\node[left, gray!85, inner sep=1pt] at (0,2.5) {7};
-\node[left, gray!85, inner sep=1pt] at (0,1.5) {8};
-\node[left, gray!85, inner sep=1pt] at (0,0.5) {9};
-\node[gray!75] at (0.5,9.5) {6};
-\node[gray!75] at (1.5,9.5) {8};
-\node[gray!75] at (2.5,9.5) {0};
-\node[gray!75] at (3.5,9.5) {2};
-\node[gray!75] at (4.5,9.5) {4};
-\node[gray!75] at (5.5,9.5) {9};
-\node[gray!75] at (6.5,9.5) {1};
-\node[gray!75] at (7.5,9.5) {3};
-\node[gray!75] at (8.5,9.5) {5};
-\node[gray!75] at (9.5,9.5) {7};
-\node[gray!75] at (0.5,8.5) {7};
-\node[gray!75] at (1.5,8.5) {9};
-\node[gray!75] at (2.5,8.5) {1};
-\node[gray!75] at (3.5,8.5) {3};
-\node[gray!75] at (4.5,8.5) {5};
-\node[gray!75] at (5.5,8.5) {0};
-\node[gray!75] at (6.5,8.5) {2};
-\node[gray!75] at (7.5,8.5) {4};
-\node[gray!75] at (8.5,8.5) {6};
-\fill[red!25] (9,8) rectangle ++(1,1);
-\draw[red!85!black, thick] (9,8) rectangle ++(1,1);
-\node at (9.5,8.5) {\color{red!85!black}\shortstack[c]{\textbf{8}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{2}}}};
-\node[gray!75] at (0.5,7.5) {8};
-\node[gray!75] at (1.5,7.5) {0};
-\node[gray!75] at (2.5,7.5) {2};
-\node[gray!75] at (3.5,7.5) {4};
-\node[gray!75] at (4.5,7.5) {6};
-\node[gray!75] at (5.5,7.5) {1};
-\node[gray!75] at (6.5,7.5) {3};
-\node[gray!75] at (7.5,7.5) {5};
-\fill[red!25] (8,7) rectangle ++(1,1);
-\draw[red!85!black, thick] (8,7) rectangle ++(1,1);
-\node at (8.5,7.5) {\color{red!85!black}\shortstack[c]{\textbf{7}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{1}}}};
-\node[gray!75] at (9.5,7.5) {9};
-\node[gray!75] at (0.5,6.5) {9};
-\node[gray!75] at (1.5,6.5) {1};
-\node[gray!75] at (2.5,6.5) {3};
-\node[gray!75] at (3.5,6.5) {5};
-\node[gray!75] at (4.5,6.5) {7};
-\node[gray!75] at (5.5,6.5) {2};
-\node[gray!75] at (6.5,6.5) {4};
-\fill[blue!12] (7,6) rectangle ++(1,1);
-\draw[blue!45, thick] (7,6) rectangle ++(1,1);
-\node[blue!85!black] at (7.5,6.5) {\textbf{6}};
-\node[gray!75] at (8.5,6.5) {8};
-\node[gray!75] at (9.5,6.5) {0};
-\node[gray!75] at (0.5,5.5) {0};
-\node[gray!75] at (1.5,5.5) {2};
-\node[gray!75] at (2.5,5.5) {4};
-\node[gray!75] at (3.5,5.5) {6};
-\node[gray!75] at (4.5,5.5) {8};
-\node[gray!75] at (5.5,5.5) {3};
-\fill[blue!12] (6,5) rectangle ++(1,1);
-\draw[blue!45, thick] (6,5) rectangle ++(1,1);
-\node[blue!85!black] at (6.5,5.5) {\textbf{5}};
-\node[gray!75] at (7.5,5.5) {7};
-\node[gray!75] at (8.5,5.5) {9};
-\node[gray!75] at (9.5,5.5) {1};
-\node[gray!75] at (0.5,4.5) {1};
-\node[gray!75] at (1.5,4.5) {3};
-\node[gray!75] at (2.5,4.5) {5};
-\node[gray!75] at (3.5,4.5) {7};
-\node[gray!75] at (4.5,4.5) {9};
-\fill[blue!12] (5,4) rectangle ++(1,1);
-\draw[blue!45, thick] (5,4) rectangle ++(1,1);
-\node[blue!85!black] at (5.5,4.5) {\textbf{4}};
-\node[gray!75] at (6.5,4.5) {6};
-\node[gray!75] at (7.5,4.5) {8};
-\node[gray!75] at (8.5,4.5) {0};
-\node[gray!75] at (9.5,4.5) {2};
-\node[gray!75] at (0.5,3.5) {2};
-\node[gray!75] at (1.5,3.5) {4};
-\node[gray!75] at (2.5,3.5) {6};
-\node[gray!75] at (3.5,3.5) {8};
-\fill[blue!12] (4,3) rectangle ++(1,1);
-\draw[blue!45, thick] (4,3) rectangle ++(1,1);
-\node[blue!85!black] at (4.5,3.5) {\textbf{0}};
-\node[gray!75] at (5.5,3.5) {5};
-\node[gray!75] at (6.5,3.5) {7};
-\node[gray!75] at (7.5,3.5) {9};
-\node[gray!75] at (8.5,3.5) {1};
-\node[gray!75] at (9.5,3.5) {3};
-\node[gray!75] at (0.5,2.5) {3};
-\node[gray!75] at (1.5,2.5) {5};
-\node[gray!75] at (2.5,2.5) {7};
-\fill[blue!12] (3,2) rectangle ++(1,1);
-\draw[blue!45, thick] (3,2) rectangle ++(1,1);
-\node[blue!85!black] at (3.5,2.5) {\textbf{9}};
-\node[gray!75] at (4.5,2.5) {1};
-\node[gray!75] at (5.5,2.5) {6};
-\node[gray!75] at (6.5,2.5) {8};
-\node[gray!75] at (7.5,2.5) {0};
-\node[gray!75] at (8.5,2.5) {2};
-\node[gray!75] at (9.5,2.5) {4};
-\node[gray!75] at (0.5,1.5) {4};
-\node[gray!75] at (1.5,1.5) {6};
-\fill[orange!25] (2,1) rectangle ++(1,1);
-\draw[orange!90!black, thick] (2,1) rectangle ++(1,1);
-\node at (2.5,1.5) {\color{orange!90!black}\textbf{8}};
-\node[gray!75] at (3.5,1.5) {0};
-\node[gray!75] at (4.5,1.5) {2};
-\node[gray!75] at (5.5,1.5) {7};
-\node[gray!75] at (6.5,1.5) {9};
-\node[gray!75] at (7.5,1.5) {1};
-\node[gray!75] at (8.5,1.5) {3};
-\node[gray!75] at (9.5,1.5) {5};
-\node[gray!75] at (0.5,0.5) {5};
-\fill[orange!25] (1,0) rectangle ++(1,1);
-\draw[orange!90!black, thick] (1,0) rectangle ++(1,1);
-\node at (1.5,0.5) {\color{orange!90!black}\textbf{7}};
-\node[gray!75] at (2.5,0.5) {9};
-\node[gray!75] at (3.5,0.5) {1};
-\node[gray!75] at (4.5,0.5) {3};
-\node[gray!75] at (5.5,0.5) {8};
-\node[gray!75] at (6.5,0.5) {0};
-\node[gray!75] at (7.5,0.5) {2};
-\node[gray!75] at (8.5,0.5) {4};
-\node[gray!75] at (9.5,0.5) {6};
-\end{tikzpicture}\\[4pt]
-\footnotesize
-\begin{tabular}{@{}cccc@{}}
-\toprule
-Cell $(i,j)$ & $v(i,j)$ & $f(i,j)$ & Status \\
-\midrule
-$(9, 1)$ & 7 & 7 & Keeps value \\
-$(8, 2)$ & 8 & 8 & Keeps value \\
-$(7, 3)$ & 9 & 9 & Distinct \\
-$(6, 4)$ & 0 & 0 & Distinct \\
-$(5, 5)$ & 4 & 4 & Distinct \\
-$(4, 6)$ & 5 & 5 & Distinct \\
-$(3, 7)$ & 6 & 6 & Distinct \\
-$(2, 8)$ & 7 & \textbf{1} & \textbf{Steals vacant 1 ($< 7$)} \\
-$(1, 9)$ & 8 & \textbf{2} & \textbf{Steals vacant 2 ($< 8$)} \\
-\bottomrule
-\end{tabular}
-\caption{Sum-diagonal $s = 10$ on $n = 10$.}
-\label{subfig:s10}
-\end{subfigure}
-\caption{Sum-diagonal collisions caused by piecewise block jumps in $q(j)$ for $n = 10$.
-Off-diagonal values and grid lines are shown in gray. The red cells steal unoccupied slots $0,
-1, 2$ in the top-right corner.}
-\label{fig:sum_diag_examples}
+\caption{Family 2 ($n = 10$): $s$-diagonal $s = 7$ collision at $j_2 - j_1 = n - 3 = 7$ resolved in
+the $3 \times 3$ top-right corner at $(0, 7)$.}
+\label{fig:fam2_sum}
 \end{figure}
+\FloatBarrier
 
-
-\begin{example}[Difference-Diagonal Parity Jump: $n = 10$, $d = 0$]
-Along the main difference-diagonal $i - j = 0$ ($i = j$) for $n = 10$:
-\[
-  v(0, 0) = (0 + q(0)) \bmod 10 = 6, \qquad v(9, 9) = (9 + q(9)) \bmod 10 = (9 + 7) \bmod 10 = 6.
-\]
-This single collision across the entire square occurs between the first cell of Block 1 ($j =
-0$) and the last cell of Block 2 ($j = n - 1 = 9$).
-The values along $d = 0$ are $\{0, 2, 3, 4, 5, \mathbf{6}, 7, 8, 9\}$.
-The value $\mathbf{1}$ is \emph{vacant} on the main diagonal, and $1 < 6$.
-The majorant $f_{2,\mathrm{diff}}$ leaves $(0, 0)$ at $6$ and shifts the bottom-right corner cell:
-\[
-  f(9, 9) = 1 < 6.
-\]
-The resulting values of $f$ form the complete permutation $\{0, 1, 2, 3, 4, 5, 6, 7, 8, 9\}$.
+\begin{example}[Family 2 $d$-Diagonal Parity Jump: $n = 10$, $d = 0$]\label{ex:fam2_diff}
+Along the main $d$-diagonal $i - j = 0$ for $n = 10$, the single collision on the entire board
+occurs between $(0, 0)$ and $(9, 9)$ ($j_2 - j_1 = 9 = n - 1$), which both have
+$S_{0,0} = S_{9,9} = 6$. The values on $d = 0$ are $\{0, 2, 3, 4, 5, \mathbf{6}, 7, 8, 9\}$,
+leaving $\mathbf{1}$ vacant. Setting $f(9, 9) = 1 < 6$ produces the full permutation
+$\{0, \dots, 9\}$ (Figure~\ref{fig:fam2_diff}).
 \end{example}
 
-\vspace{12pt}
-
-\begin{example}[Difference-Diagonal Pure Modular Wrap-Around: $n = 12$, $d = -4$]
-For $n = 12$ ($m = 6, k = n/3 = 4$), the second main block of $q_3$ has $q(j) = 2(j - 5) + 1$
-for $j \in \{5, \dots, 10\}$.
-Along the difference-diagonal $i - j = -4$ ($i = j - 4$), stepping $j \mapsto j + 1$ increases
-$i + q(j)$ by $1 + 2 = +3$.
-As $j$ advances from $5$ to $8$, the values advance by $+3$:
-\[
-  v(1, 5) = 2, \quad v(2, 6) = 5, \quad v(3, 7) = 8, \quad v(4, 8) = 11.
-\]
-At $j = 9 = 5 + k$, advancing by $k = n/3$ adds $+3 \times 4 = +12 = n$.
-Modulo $12$, the value wraps around:
-\[
-  v(5, 9) = (5 + q(9)) \bmod 12 = (5 + 9) \bmod 12 = 14 \bmod 12 = 2 = v(1, 5)!
-\]
-Similarly, at $j = 10$, $v(6, 10) = (6 + 11) \bmod 12 = 17 \bmod 12 = 5 = v(2, 6)!$
-Both collisions are pure \emph{modular wrap-around at $n$} within the same linear progression.
-Because the progression has step $+3$, all cells in this block belong to $2 \pmod 3$.
-The boundary cells $(0, 4)$ and $(7, 11)$ have values $0$ and $9$ ($0 \pmod 3$).
-Thus, \emph{the entire residue class $1 \pmod 3$ ($\{1, 4, 7, 10\}$) is completely vacant on
-the diagonal!}
-The majorant $f_{3,\mathrm{diff}}$ shifts the wrapped cells into this empty residue class:
-\[
-  f(5, 9) = v(5, 9) - 1 = 2 - 1 = 1 < 2, \qquad
-  f(6, 10) = v(6, 10) - 2 = 5 - 2 = 3 < 5.
-\]
-The resulting values of $f$ are $\{0, 1, 2, 3, 5, 8, 9, 11\}$, which are strictly distinct and
-satisfy $f \le v$.
-\end{example}
-
-\vspace{12pt}
-
-\begin{figure}[htbp]
+\begin{figure}[!htbp]
 \centering
-\begin{subfigure}[t]{0.48\textwidth}
-\centering
-\begin{tikzpicture}[scale=0.38, every node/.style={font=\fontsize{5.5}{6.5}\selectfont}]
+\begin{tikzpicture}[scale=0.42, every node/.style={font=\fontsize{6.5}{7.5}\selectfont}]
 \draw[step=1cm, gray!45, thin] (0,0) grid (10,10);
 \node[above, gray!85, inner sep=1pt] at (0.5,10) {0};
 \node[above, gray!85, inner sep=1pt] at (1.5,10) {1};
@@ -1249,12 +1001,13 @@ satisfy $f \le v$.
 \node[gray!75] at (8.5,0.5) {4};
 \fill[red!25] (9,0) rectangle ++(1,1);
 \draw[red!85!black, thick] (9,0) rectangle ++(1,1);
-\node at (9.5,0.5) {\color{red!85!black}\shortstack[c]{\textbf{6}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{1}}}};
+\node at (9.5,0.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{6}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{1}}}};
 \end{tikzpicture}\\[4pt]
 \footnotesize
 \begin{tabular}{@{}cccc@{}}
 \toprule
-Cell $(i,j)$ & $v(i,j)$ & $f(i,j)$ & Status \\
+Cell $(i,j)$ & $S_{i,j}$ & $f(i,j)$ & Status \\
 \midrule
 $(0, 0)$ & 6 & 6 & Keeps value \\
 $(1, 1)$ & 9 & 9 & Distinct \\
@@ -1268,13 +1021,2006 @@ $(8, 8)$ & 3 & 3 & Distinct \\
 $(9, 9)$ & 6 & \textbf{1} & \textbf{Steals vacant 1 ($< 6$)} \\
 \bottomrule
 \end{tabular}
-\caption{Difference-diagonal $d = 0$ on $n = 10$.}
-\label{subfig:d0}
-\end{subfigure}
-\hfill
-\begin{subfigure}[t]{0.48\textwidth}
+\caption{Family 2 ($n = 10$): $d$-diagonal $d = 0$ collision at $j_2 - j_1 = n - 1 = 9$ resolved at
+$(9, 9)$.}
+\label{fig:fam2_diff}
+\end{figure}
+\clearpage
+
+\begin{example}[Family 3 $s$-Diagonal Block Jumps: $n = 27$, $s = 25$]\label{ex:fam3_sum}
+For $n = 27$ ($k = 9$), along $i + j = 25$ the step inside each block is $+2$. At the block jump
+$j = 8 \to 9$ ($u = 0 \to 1$), $S_{i,j}$ jumps from $S_{17,8} = 5$ to $S_{16,9} = 11$, skipping
+$\mathbf{7}$ and $\mathbf{9}$ ($\equiv s + k, s + k + 2 \pmod{27}$). At $j = 17 \to 18$
+($u = 1 \to 2$), $S_{i,j}$ jumps from $S_{8,17} = 0$ to $S_{7,18} = 6$, skipping $\mathbf{2}$
+and $\mathbf{4}$ ($\equiv s + 4, s + 6 \pmod{27}$). In the $4 \times 4$ top-right corner
+($j_2 - j_1 = n - 4 = 23$), cells $(2, 23)$, $(1, 24)$, $(0, 25)$ collide with $(25, 0)$,
+$(24, 1)$, $(23, 2)$ at values $16, 18, 20$. Subtracting $k = 9$ at $j \in \{23, 24\}$ gives
+$f(2, 23) = 7$ and $f(1, 24) = 9$, and subtracting $2k = 18$ at $j = 25$ gives $f(0, 25) = 2$,
+filling the exact skipped slots (Figure~\ref{fig:fam3_sum}).
+\end{example}
+
+\begin{figure}[!htbp]
 \centering
-\begin{tikzpicture}[scale=0.32, every node/.style={font=\fontsize{5.5}{6.5}\selectfont}]
+\begin{tikzpicture}[scale=0.42, every node/.style={font=\fontsize{6}{7}\selectfont}]
+\draw[step=1cm, gray!45, thin] (0,0) grid (27,27);
+\node[above, gray!85, inner sep=1pt] at (0.5,27) {0};
+\node[above, gray!85, inner sep=1pt] at (1.5,27) {1};
+\node[above, gray!85, inner sep=1pt] at (2.5,27) {2};
+\node[above, gray!85, inner sep=1pt] at (3.5,27) {3};
+\node[above, gray!85, inner sep=1pt] at (4.5,27) {4};
+\node[above, gray!85, inner sep=1pt] at (5.5,27) {5};
+\node[above, gray!85, inner sep=1pt] at (6.5,27) {6};
+\node[above, gray!85, inner sep=1pt] at (7.5,27) {7};
+\node[above, gray!85, inner sep=1pt] at (8.5,27) {8};
+\node[above, gray!85, inner sep=1pt] at (9.5,27) {9};
+\node[above, gray!85, inner sep=1pt] at (10.5,27) {10};
+\node[above, gray!85, inner sep=1pt] at (11.5,27) {11};
+\node[above, gray!85, inner sep=1pt] at (12.5,27) {12};
+\node[above, gray!85, inner sep=1pt] at (13.5,27) {13};
+\node[above, gray!85, inner sep=1pt] at (14.5,27) {14};
+\node[above, gray!85, inner sep=1pt] at (15.5,27) {15};
+\node[above, gray!85, inner sep=1pt] at (16.5,27) {16};
+\node[above, gray!85, inner sep=1pt] at (17.5,27) {17};
+\node[above, gray!85, inner sep=1pt] at (18.5,27) {18};
+\node[above, gray!85, inner sep=1pt] at (19.5,27) {19};
+\node[above, gray!85, inner sep=1pt] at (20.5,27) {20};
+\node[above, gray!85, inner sep=1pt] at (21.5,27) {21};
+\node[above, gray!85, inner sep=1pt] at (22.5,27) {22};
+\node[above, gray!85, inner sep=1pt] at (23.5,27) {23};
+\node[above, gray!85, inner sep=1pt] at (24.5,27) {24};
+\node[above, gray!85, inner sep=1pt] at (25.5,27) {25};
+\node[above, gray!85, inner sep=1pt] at (26.5,27) {26};
+\node[left, gray!85, inner sep=1pt] at (0,26.5) {0};
+\node[left, gray!85, inner sep=1pt] at (0,25.5) {1};
+\node[left, gray!85, inner sep=1pt] at (0,24.5) {2};
+\node[left, gray!85, inner sep=1pt] at (0,23.5) {3};
+\node[left, gray!85, inner sep=1pt] at (0,22.5) {4};
+\node[left, gray!85, inner sep=1pt] at (0,21.5) {5};
+\node[left, gray!85, inner sep=1pt] at (0,20.5) {6};
+\node[left, gray!85, inner sep=1pt] at (0,19.5) {7};
+\node[left, gray!85, inner sep=1pt] at (0,18.5) {8};
+\node[left, gray!85, inner sep=1pt] at (0,17.5) {9};
+\node[left, gray!85, inner sep=1pt] at (0,16.5) {10};
+\node[left, gray!85, inner sep=1pt] at (0,15.5) {11};
+\node[left, gray!85, inner sep=1pt] at (0,14.5) {12};
+\node[left, gray!85, inner sep=1pt] at (0,13.5) {13};
+\node[left, gray!85, inner sep=1pt] at (0,12.5) {14};
+\node[left, gray!85, inner sep=1pt] at (0,11.5) {15};
+\node[left, gray!85, inner sep=1pt] at (0,10.5) {16};
+\node[left, gray!85, inner sep=1pt] at (0,9.5) {17};
+\node[left, gray!85, inner sep=1pt] at (0,8.5) {18};
+\node[left, gray!85, inner sep=1pt] at (0,7.5) {19};
+\node[left, gray!85, inner sep=1pt] at (0,6.5) {20};
+\node[left, gray!85, inner sep=1pt] at (0,5.5) {21};
+\node[left, gray!85, inner sep=1pt] at (0,4.5) {22};
+\node[left, gray!85, inner sep=1pt] at (0,3.5) {23};
+\node[left, gray!85, inner sep=1pt] at (0,2.5) {24};
+\node[left, gray!85, inner sep=1pt] at (0,1.5) {25};
+\node[left, gray!85, inner sep=1pt] at (0,0.5) {26};
+\node[gray!75] at (0.5,26.5) {18};
+\node[gray!75] at (1.5,26.5) {21};
+\node[gray!75] at (2.5,26.5) {24};
+\node[gray!75] at (3.5,26.5) {0};
+\node[gray!75] at (4.5,26.5) {3};
+\node[gray!75] at (5.5,26.5) {6};
+\node[gray!75] at (6.5,26.5) {9};
+\node[gray!75] at (7.5,26.5) {12};
+\node[gray!75] at (8.5,26.5) {15};
+\node[gray!75] at (9.5,26.5) {22};
+\node[gray!75] at (10.5,26.5) {25};
+\node[gray!75] at (11.5,26.5) {1};
+\node[gray!75] at (12.5,26.5) {4};
+\node[gray!75] at (13.5,26.5) {7};
+\node[gray!75] at (14.5,26.5) {10};
+\node[gray!75] at (15.5,26.5) {13};
+\node[gray!75] at (16.5,26.5) {16};
+\node[gray!75] at (17.5,26.5) {19};
+\node[gray!75] at (18.5,26.5) {26};
+\node[gray!75] at (19.5,26.5) {2};
+\node[gray!75] at (20.5,26.5) {5};
+\node[gray!75] at (21.5,26.5) {8};
+\node[gray!75] at (22.5,26.5) {11};
+\node[gray!75] at (23.5,26.5) {14};
+\node[gray!75] at (24.5,26.5) {17};
+\fill[red!25] (25,26) rectangle ++(1,1);
+\draw[red!85!black, thick] (25,26) rectangle ++(1,1);
+\node at (25.5,26.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{20}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{2}}}};
+\node[gray!75] at (26.5,26.5) {23};
+\node[gray!75] at (0.5,25.5) {19};
+\node[gray!75] at (1.5,25.5) {22};
+\node[gray!75] at (2.5,25.5) {25};
+\node[gray!75] at (3.5,25.5) {1};
+\node[gray!75] at (4.5,25.5) {4};
+\node[gray!75] at (5.5,25.5) {7};
+\node[gray!75] at (6.5,25.5) {10};
+\node[gray!75] at (7.5,25.5) {13};
+\node[gray!75] at (8.5,25.5) {16};
+\node[gray!75] at (9.5,25.5) {23};
+\node[gray!75] at (10.5,25.5) {26};
+\node[gray!75] at (11.5,25.5) {2};
+\node[gray!75] at (12.5,25.5) {5};
+\node[gray!75] at (13.5,25.5) {8};
+\node[gray!75] at (14.5,25.5) {11};
+\node[gray!75] at (15.5,25.5) {14};
+\node[gray!75] at (16.5,25.5) {17};
+\node[gray!75] at (17.5,25.5) {20};
+\node[gray!75] at (18.5,25.5) {0};
+\node[gray!75] at (19.5,25.5) {3};
+\node[gray!75] at (20.5,25.5) {6};
+\node[gray!75] at (21.5,25.5) {9};
+\node[gray!75] at (22.5,25.5) {12};
+\node[gray!75] at (23.5,25.5) {15};
+\fill[red!25] (24,25) rectangle ++(1,1);
+\draw[red!85!black, thick] (24,25) rectangle ++(1,1);
+\node at (24.5,25.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{18}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{9}}}};
+\node[gray!75] at (25.5,25.5) {21};
+\node[gray!75] at (26.5,25.5) {24};
+\node[gray!75] at (0.5,24.5) {20};
+\node[gray!75] at (1.5,24.5) {23};
+\node[gray!75] at (2.5,24.5) {26};
+\node[gray!75] at (3.5,24.5) {2};
+\node[gray!75] at (4.5,24.5) {5};
+\node[gray!75] at (5.5,24.5) {8};
+\node[gray!75] at (6.5,24.5) {11};
+\node[gray!75] at (7.5,24.5) {14};
+\node[gray!75] at (8.5,24.5) {17};
+\node[gray!75] at (9.5,24.5) {24};
+\node[gray!75] at (10.5,24.5) {0};
+\node[gray!75] at (11.5,24.5) {3};
+\node[gray!75] at (12.5,24.5) {6};
+\node[gray!75] at (13.5,24.5) {9};
+\node[gray!75] at (14.5,24.5) {12};
+\node[gray!75] at (15.5,24.5) {15};
+\node[gray!75] at (16.5,24.5) {18};
+\node[gray!75] at (17.5,24.5) {21};
+\node[gray!75] at (18.5,24.5) {1};
+\node[gray!75] at (19.5,24.5) {4};
+\node[gray!75] at (20.5,24.5) {7};
+\node[gray!75] at (21.5,24.5) {10};
+\node[gray!75] at (22.5,24.5) {13};
+\fill[red!25] (23,24) rectangle ++(1,1);
+\draw[red!85!black, thick] (23,24) rectangle ++(1,1);
+\node at (23.5,24.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{16}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{7}}}};
+\node[gray!75] at (24.5,24.5) {19};
+\node[gray!75] at (25.5,24.5) {22};
+\node[gray!75] at (26.5,24.5) {25};
+\node[gray!75] at (0.5,23.5) {21};
+\node[gray!75] at (1.5,23.5) {24};
+\node[gray!75] at (2.5,23.5) {0};
+\node[gray!75] at (3.5,23.5) {3};
+\node[gray!75] at (4.5,23.5) {6};
+\node[gray!75] at (5.5,23.5) {9};
+\node[gray!75] at (6.5,23.5) {12};
+\node[gray!75] at (7.5,23.5) {15};
+\node[gray!75] at (8.5,23.5) {18};
+\node[gray!75] at (9.5,23.5) {25};
+\node[gray!75] at (10.5,23.5) {1};
+\node[gray!75] at (11.5,23.5) {4};
+\node[gray!75] at (12.5,23.5) {7};
+\node[gray!75] at (13.5,23.5) {10};
+\node[gray!75] at (14.5,23.5) {13};
+\node[gray!75] at (15.5,23.5) {16};
+\node[gray!75] at (16.5,23.5) {19};
+\node[gray!75] at (17.5,23.5) {22};
+\node[gray!75] at (18.5,23.5) {2};
+\node[gray!75] at (19.5,23.5) {5};
+\node[gray!75] at (20.5,23.5) {8};
+\node[gray!75] at (21.5,23.5) {11};
+\fill[blue!12] (22,23) rectangle ++(1,1);
+\draw[blue!45, thick] (22,23) rectangle ++(1,1);
+\node[blue!85!black] at (22.5,23.5) {\textbf{14}};
+\node[gray!75] at (23.5,23.5) {17};
+\node[gray!75] at (24.5,23.5) {20};
+\node[gray!75] at (25.5,23.5) {23};
+\node[gray!75] at (26.5,23.5) {26};
+\node[gray!75] at (0.5,22.5) {22};
+\node[gray!75] at (1.5,22.5) {25};
+\node[gray!75] at (2.5,22.5) {1};
+\node[gray!75] at (3.5,22.5) {4};
+\node[gray!75] at (4.5,22.5) {7};
+\node[gray!75] at (5.5,22.5) {10};
+\node[gray!75] at (6.5,22.5) {13};
+\node[gray!75] at (7.5,22.5) {16};
+\node[gray!75] at (8.5,22.5) {19};
+\node[gray!75] at (9.5,22.5) {26};
+\node[gray!75] at (10.5,22.5) {2};
+\node[gray!75] at (11.5,22.5) {5};
+\node[gray!75] at (12.5,22.5) {8};
+\node[gray!75] at (13.5,22.5) {11};
+\node[gray!75] at (14.5,22.5) {14};
+\node[gray!75] at (15.5,22.5) {17};
+\node[gray!75] at (16.5,22.5) {20};
+\node[gray!75] at (17.5,22.5) {23};
+\node[gray!75] at (18.5,22.5) {3};
+\node[gray!75] at (19.5,22.5) {6};
+\node[gray!75] at (20.5,22.5) {9};
+\fill[blue!12] (21,22) rectangle ++(1,1);
+\draw[blue!45, thick] (21,22) rectangle ++(1,1);
+\node[blue!85!black] at (21.5,22.5) {\textbf{12}};
+\node[gray!75] at (22.5,22.5) {15};
+\node[gray!75] at (23.5,22.5) {18};
+\node[gray!75] at (24.5,22.5) {21};
+\node[gray!75] at (25.5,22.5) {24};
+\node[gray!75] at (26.5,22.5) {0};
+\node[gray!75] at (0.5,21.5) {23};
+\node[gray!75] at (1.5,21.5) {26};
+\node[gray!75] at (2.5,21.5) {2};
+\node[gray!75] at (3.5,21.5) {5};
+\node[gray!75] at (4.5,21.5) {8};
+\node[gray!75] at (5.5,21.5) {11};
+\node[gray!75] at (6.5,21.5) {14};
+\node[gray!75] at (7.5,21.5) {17};
+\node[gray!75] at (8.5,21.5) {20};
+\node[gray!75] at (9.5,21.5) {0};
+\node[gray!75] at (10.5,21.5) {3};
+\node[gray!75] at (11.5,21.5) {6};
+\node[gray!75] at (12.5,21.5) {9};
+\node[gray!75] at (13.5,21.5) {12};
+\node[gray!75] at (14.5,21.5) {15};
+\node[gray!75] at (15.5,21.5) {18};
+\node[gray!75] at (16.5,21.5) {21};
+\node[gray!75] at (17.5,21.5) {24};
+\node[gray!75] at (18.5,21.5) {4};
+\node[gray!75] at (19.5,21.5) {7};
+\fill[blue!12] (20,21) rectangle ++(1,1);
+\draw[blue!45, thick] (20,21) rectangle ++(1,1);
+\node[blue!85!black] at (20.5,21.5) {\textbf{10}};
+\node[gray!75] at (21.5,21.5) {13};
+\node[gray!75] at (22.5,21.5) {16};
+\node[gray!75] at (23.5,21.5) {19};
+\node[gray!75] at (24.5,21.5) {22};
+\node[gray!75] at (25.5,21.5) {25};
+\node[gray!75] at (26.5,21.5) {1};
+\node[gray!75] at (0.5,20.5) {24};
+\node[gray!75] at (1.5,20.5) {0};
+\node[gray!75] at (2.5,20.5) {3};
+\node[gray!75] at (3.5,20.5) {6};
+\node[gray!75] at (4.5,20.5) {9};
+\node[gray!75] at (5.5,20.5) {12};
+\node[gray!75] at (6.5,20.5) {15};
+\node[gray!75] at (7.5,20.5) {18};
+\node[gray!75] at (8.5,20.5) {21};
+\node[gray!75] at (9.5,20.5) {1};
+\node[gray!75] at (10.5,20.5) {4};
+\node[gray!75] at (11.5,20.5) {7};
+\node[gray!75] at (12.5,20.5) {10};
+\node[gray!75] at (13.5,20.5) {13};
+\node[gray!75] at (14.5,20.5) {16};
+\node[gray!75] at (15.5,20.5) {19};
+\node[gray!75] at (16.5,20.5) {22};
+\node[gray!75] at (17.5,20.5) {25};
+\node[gray!75] at (18.5,20.5) {5};
+\fill[blue!12] (19,20) rectangle ++(1,1);
+\draw[blue!45, thick] (19,20) rectangle ++(1,1);
+\node[blue!85!black] at (19.5,20.5) {\textbf{8}};
+\node[gray!75] at (20.5,20.5) {11};
+\node[gray!75] at (21.5,20.5) {14};
+\node[gray!75] at (22.5,20.5) {17};
+\node[gray!75] at (23.5,20.5) {20};
+\node[gray!75] at (24.5,20.5) {23};
+\node[gray!75] at (25.5,20.5) {26};
+\node[gray!75] at (26.5,20.5) {2};
+\node[gray!75] at (0.5,19.5) {25};
+\node[gray!75] at (1.5,19.5) {1};
+\node[gray!75] at (2.5,19.5) {4};
+\node[gray!75] at (3.5,19.5) {7};
+\node[gray!75] at (4.5,19.5) {10};
+\node[gray!75] at (5.5,19.5) {13};
+\node[gray!75] at (6.5,19.5) {16};
+\node[gray!75] at (7.5,19.5) {19};
+\node[gray!75] at (8.5,19.5) {22};
+\node[gray!75] at (9.5,19.5) {2};
+\node[gray!75] at (10.5,19.5) {5};
+\node[gray!75] at (11.5,19.5) {8};
+\node[gray!75] at (12.5,19.5) {11};
+\node[gray!75] at (13.5,19.5) {14};
+\node[gray!75] at (14.5,19.5) {17};
+\node[gray!75] at (15.5,19.5) {20};
+\node[gray!75] at (16.5,19.5) {23};
+\node[gray!75] at (17.5,19.5) {26};
+\fill[blue!12] (18,19) rectangle ++(1,1);
+\draw[blue!45, thick] (18,19) rectangle ++(1,1);
+\node[blue!85!black] at (18.5,19.5) {\textbf{6}};
+\node[gray!75] at (19.5,19.5) {9};
+\node[gray!75] at (20.5,19.5) {12};
+\node[gray!75] at (21.5,19.5) {15};
+\node[gray!75] at (22.5,19.5) {18};
+\node[gray!75] at (23.5,19.5) {21};
+\node[gray!75] at (24.5,19.5) {24};
+\node[gray!75] at (25.5,19.5) {0};
+\node[gray!75] at (26.5,19.5) {3};
+\node[gray!75] at (0.5,18.5) {26};
+\node[gray!75] at (1.5,18.5) {2};
+\node[gray!75] at (2.5,18.5) {5};
+\node[gray!75] at (3.5,18.5) {8};
+\node[gray!75] at (4.5,18.5) {11};
+\node[gray!75] at (5.5,18.5) {14};
+\node[gray!75] at (6.5,18.5) {17};
+\node[gray!75] at (7.5,18.5) {20};
+\node[gray!75] at (8.5,18.5) {23};
+\node[gray!75] at (9.5,18.5) {3};
+\node[gray!75] at (10.5,18.5) {6};
+\node[gray!75] at (11.5,18.5) {9};
+\node[gray!75] at (12.5,18.5) {12};
+\node[gray!75] at (13.5,18.5) {15};
+\node[gray!75] at (14.5,18.5) {18};
+\node[gray!75] at (15.5,18.5) {21};
+\node[gray!75] at (16.5,18.5) {24};
+\fill[blue!12] (17,18) rectangle ++(1,1);
+\draw[blue!45, thick] (17,18) rectangle ++(1,1);
+\node[blue!85!black] at (17.5,18.5) {\textbf{0}};
+\node[gray!75] at (18.5,18.5) {7};
+\node[gray!75] at (19.5,18.5) {10};
+\node[gray!75] at (20.5,18.5) {13};
+\node[gray!75] at (21.5,18.5) {16};
+\node[gray!75] at (22.5,18.5) {19};
+\node[gray!75] at (23.5,18.5) {22};
+\node[gray!75] at (24.5,18.5) {25};
+\node[gray!75] at (25.5,18.5) {1};
+\node[gray!75] at (26.5,18.5) {4};
+\node[gray!75] at (0.5,17.5) {0};
+\node[gray!75] at (1.5,17.5) {3};
+\node[gray!75] at (2.5,17.5) {6};
+\node[gray!75] at (3.5,17.5) {9};
+\node[gray!75] at (4.5,17.5) {12};
+\node[gray!75] at (5.5,17.5) {15};
+\node[gray!75] at (6.5,17.5) {18};
+\node[gray!75] at (7.5,17.5) {21};
+\node[gray!75] at (8.5,17.5) {24};
+\node[gray!75] at (9.5,17.5) {4};
+\node[gray!75] at (10.5,17.5) {7};
+\node[gray!75] at (11.5,17.5) {10};
+\node[gray!75] at (12.5,17.5) {13};
+\node[gray!75] at (13.5,17.5) {16};
+\node[gray!75] at (14.5,17.5) {19};
+\node[gray!75] at (15.5,17.5) {22};
+\fill[blue!12] (16,17) rectangle ++(1,1);
+\draw[blue!45, thick] (16,17) rectangle ++(1,1);
+\node[blue!85!black] at (16.5,17.5) {\textbf{25}};
+\node[gray!75] at (17.5,17.5) {1};
+\node[gray!75] at (18.5,17.5) {8};
+\node[gray!75] at (19.5,17.5) {11};
+\node[gray!75] at (20.5,17.5) {14};
+\node[gray!75] at (21.5,17.5) {17};
+\node[gray!75] at (22.5,17.5) {20};
+\node[gray!75] at (23.5,17.5) {23};
+\node[gray!75] at (24.5,17.5) {26};
+\node[gray!75] at (25.5,17.5) {2};
+\node[gray!75] at (26.5,17.5) {5};
+\node[gray!75] at (0.5,16.5) {1};
+\node[gray!75] at (1.5,16.5) {4};
+\node[gray!75] at (2.5,16.5) {7};
+\node[gray!75] at (3.5,16.5) {10};
+\node[gray!75] at (4.5,16.5) {13};
+\node[gray!75] at (5.5,16.5) {16};
+\node[gray!75] at (6.5,16.5) {19};
+\node[gray!75] at (7.5,16.5) {22};
+\node[gray!75] at (8.5,16.5) {25};
+\node[gray!75] at (9.5,16.5) {5};
+\node[gray!75] at (10.5,16.5) {8};
+\node[gray!75] at (11.5,16.5) {11};
+\node[gray!75] at (12.5,16.5) {14};
+\node[gray!75] at (13.5,16.5) {17};
+\node[gray!75] at (14.5,16.5) {20};
+\fill[blue!12] (15,16) rectangle ++(1,1);
+\draw[blue!45, thick] (15,16) rectangle ++(1,1);
+\node[blue!85!black] at (15.5,16.5) {\textbf{23}};
+\node[gray!75] at (16.5,16.5) {26};
+\node[gray!75] at (17.5,16.5) {2};
+\node[gray!75] at (18.5,16.5) {9};
+\node[gray!75] at (19.5,16.5) {12};
+\node[gray!75] at (20.5,16.5) {15};
+\node[gray!75] at (21.5,16.5) {18};
+\node[gray!75] at (22.5,16.5) {21};
+\node[gray!75] at (23.5,16.5) {24};
+\node[gray!75] at (24.5,16.5) {0};
+\node[gray!75] at (25.5,16.5) {3};
+\node[gray!75] at (26.5,16.5) {6};
+\node[gray!75] at (0.5,15.5) {2};
+\node[gray!75] at (1.5,15.5) {5};
+\node[gray!75] at (2.5,15.5) {8};
+\node[gray!75] at (3.5,15.5) {11};
+\node[gray!75] at (4.5,15.5) {14};
+\node[gray!75] at (5.5,15.5) {17};
+\node[gray!75] at (6.5,15.5) {20};
+\node[gray!75] at (7.5,15.5) {23};
+\node[gray!75] at (8.5,15.5) {26};
+\node[gray!75] at (9.5,15.5) {6};
+\node[gray!75] at (10.5,15.5) {9};
+\node[gray!75] at (11.5,15.5) {12};
+\node[gray!75] at (12.5,15.5) {15};
+\node[gray!75] at (13.5,15.5) {18};
+\fill[blue!12] (14,15) rectangle ++(1,1);
+\draw[blue!45, thick] (14,15) rectangle ++(1,1);
+\node[blue!85!black] at (14.5,15.5) {\textbf{21}};
+\node[gray!75] at (15.5,15.5) {24};
+\node[gray!75] at (16.5,15.5) {0};
+\node[gray!75] at (17.5,15.5) {3};
+\node[gray!75] at (18.5,15.5) {10};
+\node[gray!75] at (19.5,15.5) {13};
+\node[gray!75] at (20.5,15.5) {16};
+\node[gray!75] at (21.5,15.5) {19};
+\node[gray!75] at (22.5,15.5) {22};
+\node[gray!75] at (23.5,15.5) {25};
+\node[gray!75] at (24.5,15.5) {1};
+\node[gray!75] at (25.5,15.5) {4};
+\node[gray!75] at (26.5,15.5) {7};
+\node[gray!75] at (0.5,14.5) {3};
+\node[gray!75] at (1.5,14.5) {6};
+\node[gray!75] at (2.5,14.5) {9};
+\node[gray!75] at (3.5,14.5) {12};
+\node[gray!75] at (4.5,14.5) {15};
+\node[gray!75] at (5.5,14.5) {18};
+\node[gray!75] at (6.5,14.5) {21};
+\node[gray!75] at (7.5,14.5) {24};
+\node[gray!75] at (8.5,14.5) {0};
+\node[gray!75] at (9.5,14.5) {7};
+\node[gray!75] at (10.5,14.5) {10};
+\node[gray!75] at (11.5,14.5) {13};
+\node[gray!75] at (12.5,14.5) {16};
+\fill[blue!12] (13,14) rectangle ++(1,1);
+\draw[blue!45, thick] (13,14) rectangle ++(1,1);
+\node[blue!85!black] at (13.5,14.5) {\textbf{19}};
+\node[gray!75] at (14.5,14.5) {22};
+\node[gray!75] at (15.5,14.5) {25};
+\node[gray!75] at (16.5,14.5) {1};
+\node[gray!75] at (17.5,14.5) {4};
+\node[gray!75] at (18.5,14.5) {11};
+\node[gray!75] at (19.5,14.5) {14};
+\node[gray!75] at (20.5,14.5) {17};
+\node[gray!75] at (21.5,14.5) {20};
+\node[gray!75] at (22.5,14.5) {23};
+\node[gray!75] at (23.5,14.5) {26};
+\node[gray!75] at (24.5,14.5) {2};
+\node[gray!75] at (25.5,14.5) {5};
+\node[gray!75] at (26.5,14.5) {8};
+\node[gray!75] at (0.5,13.5) {4};
+\node[gray!75] at (1.5,13.5) {7};
+\node[gray!75] at (2.5,13.5) {10};
+\node[gray!75] at (3.5,13.5) {13};
+\node[gray!75] at (4.5,13.5) {16};
+\node[gray!75] at (5.5,13.5) {19};
+\node[gray!75] at (6.5,13.5) {22};
+\node[gray!75] at (7.5,13.5) {25};
+\node[gray!75] at (8.5,13.5) {1};
+\node[gray!75] at (9.5,13.5) {8};
+\node[gray!75] at (10.5,13.5) {11};
+\node[gray!75] at (11.5,13.5) {14};
+\fill[blue!12] (12,13) rectangle ++(1,1);
+\draw[blue!45, thick] (12,13) rectangle ++(1,1);
+\node[blue!85!black] at (12.5,13.5) {\textbf{17}};
+\node[gray!75] at (13.5,13.5) {20};
+\node[gray!75] at (14.5,13.5) {23};
+\node[gray!75] at (15.5,13.5) {26};
+\node[gray!75] at (16.5,13.5) {2};
+\node[gray!75] at (17.5,13.5) {5};
+\node[gray!75] at (18.5,13.5) {12};
+\node[gray!75] at (19.5,13.5) {15};
+\node[gray!75] at (20.5,13.5) {18};
+\node[gray!75] at (21.5,13.5) {21};
+\node[gray!75] at (22.5,13.5) {24};
+\node[gray!75] at (23.5,13.5) {0};
+\node[gray!75] at (24.5,13.5) {3};
+\node[gray!75] at (25.5,13.5) {6};
+\node[gray!75] at (26.5,13.5) {9};
+\node[gray!75] at (0.5,12.5) {5};
+\node[gray!75] at (1.5,12.5) {8};
+\node[gray!75] at (2.5,12.5) {11};
+\node[gray!75] at (3.5,12.5) {14};
+\node[gray!75] at (4.5,12.5) {17};
+\node[gray!75] at (5.5,12.5) {20};
+\node[gray!75] at (6.5,12.5) {23};
+\node[gray!75] at (7.5,12.5) {26};
+\node[gray!75] at (8.5,12.5) {2};
+\node[gray!75] at (9.5,12.5) {9};
+\node[gray!75] at (10.5,12.5) {12};
+\fill[blue!12] (11,12) rectangle ++(1,1);
+\draw[blue!45, thick] (11,12) rectangle ++(1,1);
+\node[blue!85!black] at (11.5,12.5) {\textbf{15}};
+\node[gray!75] at (12.5,12.5) {18};
+\node[gray!75] at (13.5,12.5) {21};
+\node[gray!75] at (14.5,12.5) {24};
+\node[gray!75] at (15.5,12.5) {0};
+\node[gray!75] at (16.5,12.5) {3};
+\node[gray!75] at (17.5,12.5) {6};
+\node[gray!75] at (18.5,12.5) {13};
+\node[gray!75] at (19.5,12.5) {16};
+\node[gray!75] at (20.5,12.5) {19};
+\node[gray!75] at (21.5,12.5) {22};
+\node[gray!75] at (22.5,12.5) {25};
+\node[gray!75] at (23.5,12.5) {1};
+\node[gray!75] at (24.5,12.5) {4};
+\node[gray!75] at (25.5,12.5) {7};
+\node[gray!75] at (26.5,12.5) {10};
+\node[gray!75] at (0.5,11.5) {6};
+\node[gray!75] at (1.5,11.5) {9};
+\node[gray!75] at (2.5,11.5) {12};
+\node[gray!75] at (3.5,11.5) {15};
+\node[gray!75] at (4.5,11.5) {18};
+\node[gray!75] at (5.5,11.5) {21};
+\node[gray!75] at (6.5,11.5) {24};
+\node[gray!75] at (7.5,11.5) {0};
+\node[gray!75] at (8.5,11.5) {3};
+\node[gray!75] at (9.5,11.5) {10};
+\fill[blue!12] (10,11) rectangle ++(1,1);
+\draw[blue!45, thick] (10,11) rectangle ++(1,1);
+\node[blue!85!black] at (10.5,11.5) {\textbf{13}};
+\node[gray!75] at (11.5,11.5) {16};
+\node[gray!75] at (12.5,11.5) {19};
+\node[gray!75] at (13.5,11.5) {22};
+\node[gray!75] at (14.5,11.5) {25};
+\node[gray!75] at (15.5,11.5) {1};
+\node[gray!75] at (16.5,11.5) {4};
+\node[gray!75] at (17.5,11.5) {7};
+\node[gray!75] at (18.5,11.5) {14};
+\node[gray!75] at (19.5,11.5) {17};
+\node[gray!75] at (20.5,11.5) {20};
+\node[gray!75] at (21.5,11.5) {23};
+\node[gray!75] at (22.5,11.5) {26};
+\node[gray!75] at (23.5,11.5) {2};
+\node[gray!75] at (24.5,11.5) {5};
+\node[gray!75] at (25.5,11.5) {8};
+\node[gray!75] at (26.5,11.5) {11};
+\node[gray!75] at (0.5,10.5) {7};
+\node[gray!75] at (1.5,10.5) {10};
+\node[gray!75] at (2.5,10.5) {13};
+\node[gray!75] at (3.5,10.5) {16};
+\node[gray!75] at (4.5,10.5) {19};
+\node[gray!75] at (5.5,10.5) {22};
+\node[gray!75] at (6.5,10.5) {25};
+\node[gray!75] at (7.5,10.5) {1};
+\node[gray!75] at (8.5,10.5) {4};
+\fill[blue!12] (9,10) rectangle ++(1,1);
+\draw[blue!45, thick] (9,10) rectangle ++(1,1);
+\node[blue!85!black] at (9.5,10.5) {\textbf{11}};
+\node[gray!75] at (10.5,10.5) {14};
+\node[gray!75] at (11.5,10.5) {17};
+\node[gray!75] at (12.5,10.5) {20};
+\node[gray!75] at (13.5,10.5) {23};
+\node[gray!75] at (14.5,10.5) {26};
+\node[gray!75] at (15.5,10.5) {2};
+\node[gray!75] at (16.5,10.5) {5};
+\node[gray!75] at (17.5,10.5) {8};
+\node[gray!75] at (18.5,10.5) {15};
+\node[gray!75] at (19.5,10.5) {18};
+\node[gray!75] at (20.5,10.5) {21};
+\node[gray!75] at (21.5,10.5) {24};
+\node[gray!75] at (22.5,10.5) {0};
+\node[gray!75] at (23.5,10.5) {3};
+\node[gray!75] at (24.5,10.5) {6};
+\node[gray!75] at (25.5,10.5) {9};
+\node[gray!75] at (26.5,10.5) {12};
+\node[gray!75] at (0.5,9.5) {8};
+\node[gray!75] at (1.5,9.5) {11};
+\node[gray!75] at (2.5,9.5) {14};
+\node[gray!75] at (3.5,9.5) {17};
+\node[gray!75] at (4.5,9.5) {20};
+\node[gray!75] at (5.5,9.5) {23};
+\node[gray!75] at (6.5,9.5) {26};
+\node[gray!75] at (7.5,9.5) {2};
+\fill[blue!12] (8,9) rectangle ++(1,1);
+\draw[blue!45, thick] (8,9) rectangle ++(1,1);
+\node[blue!85!black] at (8.5,9.5) {\textbf{5}};
+\node[gray!75] at (9.5,9.5) {12};
+\node[gray!75] at (10.5,9.5) {15};
+\node[gray!75] at (11.5,9.5) {18};
+\node[gray!75] at (12.5,9.5) {21};
+\node[gray!75] at (13.5,9.5) {24};
+\node[gray!75] at (14.5,9.5) {0};
+\node[gray!75] at (15.5,9.5) {3};
+\node[gray!75] at (16.5,9.5) {6};
+\node[gray!75] at (17.5,9.5) {9};
+\node[gray!75] at (18.5,9.5) {16};
+\node[gray!75] at (19.5,9.5) {19};
+\node[gray!75] at (20.5,9.5) {22};
+\node[gray!75] at (21.5,9.5) {25};
+\node[gray!75] at (22.5,9.5) {1};
+\node[gray!75] at (23.5,9.5) {4};
+\node[gray!75] at (24.5,9.5) {7};
+\node[gray!75] at (25.5,9.5) {10};
+\node[gray!75] at (26.5,9.5) {13};
+\node[gray!75] at (0.5,8.5) {9};
+\node[gray!75] at (1.5,8.5) {12};
+\node[gray!75] at (2.5,8.5) {15};
+\node[gray!75] at (3.5,8.5) {18};
+\node[gray!75] at (4.5,8.5) {21};
+\node[gray!75] at (5.5,8.5) {24};
+\node[gray!75] at (6.5,8.5) {0};
+\fill[blue!12] (7,8) rectangle ++(1,1);
+\draw[blue!45, thick] (7,8) rectangle ++(1,1);
+\node[blue!85!black] at (7.5,8.5) {\textbf{3}};
+\node[gray!75] at (8.5,8.5) {6};
+\node[gray!75] at (9.5,8.5) {13};
+\node[gray!75] at (10.5,8.5) {16};
+\node[gray!75] at (11.5,8.5) {19};
+\node[gray!75] at (12.5,8.5) {22};
+\node[gray!75] at (13.5,8.5) {25};
+\node[gray!75] at (14.5,8.5) {1};
+\node[gray!75] at (15.5,8.5) {4};
+\node[gray!75] at (16.5,8.5) {7};
+\node[gray!75] at (17.5,8.5) {10};
+\node[gray!75] at (18.5,8.5) {17};
+\node[gray!75] at (19.5,8.5) {20};
+\node[gray!75] at (20.5,8.5) {23};
+\node[gray!75] at (21.5,8.5) {26};
+\node[gray!75] at (22.5,8.5) {2};
+\node[gray!75] at (23.5,8.5) {5};
+\node[gray!75] at (24.5,8.5) {8};
+\node[gray!75] at (25.5,8.5) {11};
+\node[gray!75] at (26.5,8.5) {14};
+\node[gray!75] at (0.5,7.5) {10};
+\node[gray!75] at (1.5,7.5) {13};
+\node[gray!75] at (2.5,7.5) {16};
+\node[gray!75] at (3.5,7.5) {19};
+\node[gray!75] at (4.5,7.5) {22};
+\node[gray!75] at (5.5,7.5) {25};
+\fill[blue!12] (6,7) rectangle ++(1,1);
+\draw[blue!45, thick] (6,7) rectangle ++(1,1);
+\node[blue!85!black] at (6.5,7.5) {\textbf{1}};
+\node[gray!75] at (7.5,7.5) {4};
+\node[gray!75] at (8.5,7.5) {7};
+\node[gray!75] at (9.5,7.5) {14};
+\node[gray!75] at (10.5,7.5) {17};
+\node[gray!75] at (11.5,7.5) {20};
+\node[gray!75] at (12.5,7.5) {23};
+\node[gray!75] at (13.5,7.5) {26};
+\node[gray!75] at (14.5,7.5) {2};
+\node[gray!75] at (15.5,7.5) {5};
+\node[gray!75] at (16.5,7.5) {8};
+\node[gray!75] at (17.5,7.5) {11};
+\node[gray!75] at (18.5,7.5) {18};
+\node[gray!75] at (19.5,7.5) {21};
+\node[gray!75] at (20.5,7.5) {24};
+\node[gray!75] at (21.5,7.5) {0};
+\node[gray!75] at (22.5,7.5) {3};
+\node[gray!75] at (23.5,7.5) {6};
+\node[gray!75] at (24.5,7.5) {9};
+\node[gray!75] at (25.5,7.5) {12};
+\node[gray!75] at (26.5,7.5) {15};
+\node[gray!75] at (0.5,6.5) {11};
+\node[gray!75] at (1.5,6.5) {14};
+\node[gray!75] at (2.5,6.5) {17};
+\node[gray!75] at (3.5,6.5) {20};
+\node[gray!75] at (4.5,6.5) {23};
+\fill[blue!12] (5,6) rectangle ++(1,1);
+\draw[blue!45, thick] (5,6) rectangle ++(1,1);
+\node[blue!85!black] at (5.5,6.5) {\textbf{26}};
+\node[gray!75] at (6.5,6.5) {2};
+\node[gray!75] at (7.5,6.5) {5};
+\node[gray!75] at (8.5,6.5) {8};
+\node[gray!75] at (9.5,6.5) {15};
+\node[gray!75] at (10.5,6.5) {18};
+\node[gray!75] at (11.5,6.5) {21};
+\node[gray!75] at (12.5,6.5) {24};
+\node[gray!75] at (13.5,6.5) {0};
+\node[gray!75] at (14.5,6.5) {3};
+\node[gray!75] at (15.5,6.5) {6};
+\node[gray!75] at (16.5,6.5) {9};
+\node[gray!75] at (17.5,6.5) {12};
+\node[gray!75] at (18.5,6.5) {19};
+\node[gray!75] at (19.5,6.5) {22};
+\node[gray!75] at (20.5,6.5) {25};
+\node[gray!75] at (21.5,6.5) {1};
+\node[gray!75] at (22.5,6.5) {4};
+\node[gray!75] at (23.5,6.5) {7};
+\node[gray!75] at (24.5,6.5) {10};
+\node[gray!75] at (25.5,6.5) {13};
+\node[gray!75] at (26.5,6.5) {16};
+\node[gray!75] at (0.5,5.5) {12};
+\node[gray!75] at (1.5,5.5) {15};
+\node[gray!75] at (2.5,5.5) {18};
+\node[gray!75] at (3.5,5.5) {21};
+\fill[blue!12] (4,5) rectangle ++(1,1);
+\draw[blue!45, thick] (4,5) rectangle ++(1,1);
+\node[blue!85!black] at (4.5,5.5) {\textbf{24}};
+\node[gray!75] at (5.5,5.5) {0};
+\node[gray!75] at (6.5,5.5) {3};
+\node[gray!75] at (7.5,5.5) {6};
+\node[gray!75] at (8.5,5.5) {9};
+\node[gray!75] at (9.5,5.5) {16};
+\node[gray!75] at (10.5,5.5) {19};
+\node[gray!75] at (11.5,5.5) {22};
+\node[gray!75] at (12.5,5.5) {25};
+\node[gray!75] at (13.5,5.5) {1};
+\node[gray!75] at (14.5,5.5) {4};
+\node[gray!75] at (15.5,5.5) {7};
+\node[gray!75] at (16.5,5.5) {10};
+\node[gray!75] at (17.5,5.5) {13};
+\node[gray!75] at (18.5,5.5) {20};
+\node[gray!75] at (19.5,5.5) {23};
+\node[gray!75] at (20.5,5.5) {26};
+\node[gray!75] at (21.5,5.5) {2};
+\node[gray!75] at (22.5,5.5) {5};
+\node[gray!75] at (23.5,5.5) {8};
+\node[gray!75] at (24.5,5.5) {11};
+\node[gray!75] at (25.5,5.5) {14};
+\node[gray!75] at (26.5,5.5) {17};
+\node[gray!75] at (0.5,4.5) {13};
+\node[gray!75] at (1.5,4.5) {16};
+\node[gray!75] at (2.5,4.5) {19};
+\fill[blue!12] (3,4) rectangle ++(1,1);
+\draw[blue!45, thick] (3,4) rectangle ++(1,1);
+\node[blue!85!black] at (3.5,4.5) {\textbf{22}};
+\node[gray!75] at (4.5,4.5) {25};
+\node[gray!75] at (5.5,4.5) {1};
+\node[gray!75] at (6.5,4.5) {4};
+\node[gray!75] at (7.5,4.5) {7};
+\node[gray!75] at (8.5,4.5) {10};
+\node[gray!75] at (9.5,4.5) {17};
+\node[gray!75] at (10.5,4.5) {20};
+\node[gray!75] at (11.5,4.5) {23};
+\node[gray!75] at (12.5,4.5) {26};
+\node[gray!75] at (13.5,4.5) {2};
+\node[gray!75] at (14.5,4.5) {5};
+\node[gray!75] at (15.5,4.5) {8};
+\node[gray!75] at (16.5,4.5) {11};
+\node[gray!75] at (17.5,4.5) {14};
+\node[gray!75] at (18.5,4.5) {21};
+\node[gray!75] at (19.5,4.5) {24};
+\node[gray!75] at (20.5,4.5) {0};
+\node[gray!75] at (21.5,4.5) {3};
+\node[gray!75] at (22.5,4.5) {6};
+\node[gray!75] at (23.5,4.5) {9};
+\node[gray!75] at (24.5,4.5) {12};
+\node[gray!75] at (25.5,4.5) {15};
+\node[gray!75] at (26.5,4.5) {18};
+\node[gray!75] at (0.5,3.5) {14};
+\node[gray!75] at (1.5,3.5) {17};
+\fill[orange!25] (2,3) rectangle ++(1,1);
+\draw[orange!90!black, thick] (2,3) rectangle ++(1,1);
+\node at (2.5,3.5) {\color{orange!90!black}\textbf{20}};
+\node[gray!75] at (3.5,3.5) {23};
+\node[gray!75] at (4.5,3.5) {26};
+\node[gray!75] at (5.5,3.5) {2};
+\node[gray!75] at (6.5,3.5) {5};
+\node[gray!75] at (7.5,3.5) {8};
+\node[gray!75] at (8.5,3.5) {11};
+\node[gray!75] at (9.5,3.5) {18};
+\node[gray!75] at (10.5,3.5) {21};
+\node[gray!75] at (11.5,3.5) {24};
+\node[gray!75] at (12.5,3.5) {0};
+\node[gray!75] at (13.5,3.5) {3};
+\node[gray!75] at (14.5,3.5) {6};
+\node[gray!75] at (15.5,3.5) {9};
+\node[gray!75] at (16.5,3.5) {12};
+\node[gray!75] at (17.5,3.5) {15};
+\node[gray!75] at (18.5,3.5) {22};
+\node[gray!75] at (19.5,3.5) {25};
+\node[gray!75] at (20.5,3.5) {1};
+\node[gray!75] at (21.5,3.5) {4};
+\node[gray!75] at (22.5,3.5) {7};
+\node[gray!75] at (23.5,3.5) {10};
+\node[gray!75] at (24.5,3.5) {13};
+\node[gray!75] at (25.5,3.5) {16};
+\node[gray!75] at (26.5,3.5) {19};
+\node[gray!75] at (0.5,2.5) {15};
+\fill[orange!25] (1,2) rectangle ++(1,1);
+\draw[orange!90!black, thick] (1,2) rectangle ++(1,1);
+\node at (1.5,2.5) {\color{orange!90!black}\textbf{18}};
+\node[gray!75] at (2.5,2.5) {21};
+\node[gray!75] at (3.5,2.5) {24};
+\node[gray!75] at (4.5,2.5) {0};
+\node[gray!75] at (5.5,2.5) {3};
+\node[gray!75] at (6.5,2.5) {6};
+\node[gray!75] at (7.5,2.5) {9};
+\node[gray!75] at (8.5,2.5) {12};
+\node[gray!75] at (9.5,2.5) {19};
+\node[gray!75] at (10.5,2.5) {22};
+\node[gray!75] at (11.5,2.5) {25};
+\node[gray!75] at (12.5,2.5) {1};
+\node[gray!75] at (13.5,2.5) {4};
+\node[gray!75] at (14.5,2.5) {7};
+\node[gray!75] at (15.5,2.5) {10};
+\node[gray!75] at (16.5,2.5) {13};
+\node[gray!75] at (17.5,2.5) {16};
+\node[gray!75] at (18.5,2.5) {23};
+\node[gray!75] at (19.5,2.5) {26};
+\node[gray!75] at (20.5,2.5) {2};
+\node[gray!75] at (21.5,2.5) {5};
+\node[gray!75] at (22.5,2.5) {8};
+\node[gray!75] at (23.5,2.5) {11};
+\node[gray!75] at (24.5,2.5) {14};
+\node[gray!75] at (25.5,2.5) {17};
+\node[gray!75] at (26.5,2.5) {20};
+\fill[orange!25] (0,1) rectangle ++(1,1);
+\draw[orange!90!black, thick] (0,1) rectangle ++(1,1);
+\node at (0.5,1.5) {\color{orange!90!black}\textbf{16}};
+\node[gray!75] at (1.5,1.5) {19};
+\node[gray!75] at (2.5,1.5) {22};
+\node[gray!75] at (3.5,1.5) {25};
+\node[gray!75] at (4.5,1.5) {1};
+\node[gray!75] at (5.5,1.5) {4};
+\node[gray!75] at (6.5,1.5) {7};
+\node[gray!75] at (7.5,1.5) {10};
+\node[gray!75] at (8.5,1.5) {13};
+\node[gray!75] at (9.5,1.5) {20};
+\node[gray!75] at (10.5,1.5) {23};
+\node[gray!75] at (11.5,1.5) {26};
+\node[gray!75] at (12.5,1.5) {2};
+\node[gray!75] at (13.5,1.5) {5};
+\node[gray!75] at (14.5,1.5) {8};
+\node[gray!75] at (15.5,1.5) {11};
+\node[gray!75] at (16.5,1.5) {14};
+\node[gray!75] at (17.5,1.5) {17};
+\node[gray!75] at (18.5,1.5) {24};
+\node[gray!75] at (19.5,1.5) {0};
+\node[gray!75] at (20.5,1.5) {3};
+\node[gray!75] at (21.5,1.5) {6};
+\node[gray!75] at (22.5,1.5) {9};
+\node[gray!75] at (23.5,1.5) {12};
+\node[gray!75] at (24.5,1.5) {15};
+\node[gray!75] at (25.5,1.5) {18};
+\node[gray!75] at (26.5,1.5) {21};
+\node[gray!75] at (0.5,0.5) {17};
+\node[gray!75] at (1.5,0.5) {20};
+\node[gray!75] at (2.5,0.5) {23};
+\node[gray!75] at (3.5,0.5) {26};
+\node[gray!75] at (4.5,0.5) {2};
+\node[gray!75] at (5.5,0.5) {5};
+\node[gray!75] at (6.5,0.5) {8};
+\node[gray!75] at (7.5,0.5) {11};
+\node[gray!75] at (8.5,0.5) {14};
+\node[gray!75] at (9.5,0.5) {21};
+\node[gray!75] at (10.5,0.5) {24};
+\node[gray!75] at (11.5,0.5) {0};
+\node[gray!75] at (12.5,0.5) {3};
+\node[gray!75] at (13.5,0.5) {6};
+\node[gray!75] at (14.5,0.5) {9};
+\node[gray!75] at (15.5,0.5) {12};
+\node[gray!75] at (16.5,0.5) {15};
+\node[gray!75] at (17.5,0.5) {18};
+\node[gray!75] at (18.5,0.5) {25};
+\node[gray!75] at (19.5,0.5) {1};
+\node[gray!75] at (20.5,0.5) {4};
+\node[gray!75] at (21.5,0.5) {7};
+\node[gray!75] at (22.5,0.5) {10};
+\node[gray!75] at (23.5,0.5) {13};
+\node[gray!75] at (24.5,0.5) {16};
+\node[gray!75] at (25.5,0.5) {19};
+\node[gray!75] at (26.5,0.5) {22};
+\end{tikzpicture}\\[4pt]
+\footnotesize
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Cell $(i,j)$ & $S_{i,j}$ & $f(i,j)$ & Status \\
+\midrule
+$(25, 0)$ & 16 & 16 & Keeps value \\
+$(24, 1)$ & 18 & 18 & Keeps value \\
+$(23, 2)$ & 20 & 20 & Keeps value \\
+$\dots$ & $\dots$ & $\dots$ & Block $u = 0$ \\
+$(17, 8) \to (16, 9)$ & $5 \to 11$ & $5 \to 11$ & Skips $\mathbf{7, 9}$ \\
+$(8, 17) \to (7, 18)$ & $0 \to 6$ & $0 \to 6$ & Skips $\mathbf{2, 4}$ \\
+$(2, 23)$ & 16 & \textbf{7} & \textbf{Steals 7 ($-k$)} \\
+$(1, 24)$ & 18 & \textbf{9} & \textbf{Steals 9 ($-k$)} \\
+$(0, 25)$ & 20 & \textbf{2} & \textbf{Steals 2 ($-2k$)} \\
+\bottomrule
+\end{tabular}
+\caption{Family 3 ($n = 27$, $k = 9$): $s$-diagonal $s = 25$ collisions in the $4 \times 4$
+top-right corner shifted by $-k$ and $-2k$ into slots skipped at $j = 9, 18$.}
+\label{fig:fam3_sum}
+\end{figure}
+\clearpage
+
+\begin{example}[Family 3 $d$-Diagonal Block Jumps: $n = 27$, $d = 0$]\label{ex:fam3_diff}
+Along the main $d$-diagonal $i - j = 0$ for $n = 27$ ($k = 9$), the step inside each block is $+4$.
+At $j = 8 \to 9$, $S_{i,i}$ jumps from $23$ to $4$, skipping $\mathbf{0} \equiv d \pmod{27}$; at
+$j = 17 \to 18$, $S_{i,i}$ jumps from $9$ to $17$, skipping
+$\mathbf{13} \equiv d + k + 4 \pmod{27}$. In the $2 \times 2$ bottom-right corner
+($j_2 - j_1 = n - 2 = 25$), $(25, 25)$ collides with $(0, 0)$ at $18$ and steals
+$f(25, 25) = 18 - 2k = 0$, while $(26, 26)$ collides with $(1, 1)$ at $22$ and steals
+$f(26, 26) = 22 - k = 13$ (Figure~\ref{fig:fam3_diff}).
+\end{example}
+
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[scale=0.42, every node/.style={font=\fontsize{6}{7}\selectfont}]
+\draw[step=1cm, gray!45, thin] (0,0) grid (27,27);
+\node[above, gray!85, inner sep=1pt] at (0.5,27) {0};
+\node[above, gray!85, inner sep=1pt] at (1.5,27) {1};
+\node[above, gray!85, inner sep=1pt] at (2.5,27) {2};
+\node[above, gray!85, inner sep=1pt] at (3.5,27) {3};
+\node[above, gray!85, inner sep=1pt] at (4.5,27) {4};
+\node[above, gray!85, inner sep=1pt] at (5.5,27) {5};
+\node[above, gray!85, inner sep=1pt] at (6.5,27) {6};
+\node[above, gray!85, inner sep=1pt] at (7.5,27) {7};
+\node[above, gray!85, inner sep=1pt] at (8.5,27) {8};
+\node[above, gray!85, inner sep=1pt] at (9.5,27) {9};
+\node[above, gray!85, inner sep=1pt] at (10.5,27) {10};
+\node[above, gray!85, inner sep=1pt] at (11.5,27) {11};
+\node[above, gray!85, inner sep=1pt] at (12.5,27) {12};
+\node[above, gray!85, inner sep=1pt] at (13.5,27) {13};
+\node[above, gray!85, inner sep=1pt] at (14.5,27) {14};
+\node[above, gray!85, inner sep=1pt] at (15.5,27) {15};
+\node[above, gray!85, inner sep=1pt] at (16.5,27) {16};
+\node[above, gray!85, inner sep=1pt] at (17.5,27) {17};
+\node[above, gray!85, inner sep=1pt] at (18.5,27) {18};
+\node[above, gray!85, inner sep=1pt] at (19.5,27) {19};
+\node[above, gray!85, inner sep=1pt] at (20.5,27) {20};
+\node[above, gray!85, inner sep=1pt] at (21.5,27) {21};
+\node[above, gray!85, inner sep=1pt] at (22.5,27) {22};
+\node[above, gray!85, inner sep=1pt] at (23.5,27) {23};
+\node[above, gray!85, inner sep=1pt] at (24.5,27) {24};
+\node[above, gray!85, inner sep=1pt] at (25.5,27) {25};
+\node[above, gray!85, inner sep=1pt] at (26.5,27) {26};
+\node[left, gray!85, inner sep=1pt] at (0,26.5) {0};
+\node[left, gray!85, inner sep=1pt] at (0,25.5) {1};
+\node[left, gray!85, inner sep=1pt] at (0,24.5) {2};
+\node[left, gray!85, inner sep=1pt] at (0,23.5) {3};
+\node[left, gray!85, inner sep=1pt] at (0,22.5) {4};
+\node[left, gray!85, inner sep=1pt] at (0,21.5) {5};
+\node[left, gray!85, inner sep=1pt] at (0,20.5) {6};
+\node[left, gray!85, inner sep=1pt] at (0,19.5) {7};
+\node[left, gray!85, inner sep=1pt] at (0,18.5) {8};
+\node[left, gray!85, inner sep=1pt] at (0,17.5) {9};
+\node[left, gray!85, inner sep=1pt] at (0,16.5) {10};
+\node[left, gray!85, inner sep=1pt] at (0,15.5) {11};
+\node[left, gray!85, inner sep=1pt] at (0,14.5) {12};
+\node[left, gray!85, inner sep=1pt] at (0,13.5) {13};
+\node[left, gray!85, inner sep=1pt] at (0,12.5) {14};
+\node[left, gray!85, inner sep=1pt] at (0,11.5) {15};
+\node[left, gray!85, inner sep=1pt] at (0,10.5) {16};
+\node[left, gray!85, inner sep=1pt] at (0,9.5) {17};
+\node[left, gray!85, inner sep=1pt] at (0,8.5) {18};
+\node[left, gray!85, inner sep=1pt] at (0,7.5) {19};
+\node[left, gray!85, inner sep=1pt] at (0,6.5) {20};
+\node[left, gray!85, inner sep=1pt] at (0,5.5) {21};
+\node[left, gray!85, inner sep=1pt] at (0,4.5) {22};
+\node[left, gray!85, inner sep=1pt] at (0,3.5) {23};
+\node[left, gray!85, inner sep=1pt] at (0,2.5) {24};
+\node[left, gray!85, inner sep=1pt] at (0,1.5) {25};
+\node[left, gray!85, inner sep=1pt] at (0,0.5) {26};
+\fill[orange!25] (0,26) rectangle ++(1,1);
+\draw[orange!90!black, thick] (0,26) rectangle ++(1,1);
+\node at (0.5,26.5) {\color{orange!90!black}\textbf{18}};
+\node[gray!75] at (1.5,26.5) {21};
+\node[gray!75] at (2.5,26.5) {24};
+\node[gray!75] at (3.5,26.5) {0};
+\node[gray!75] at (4.5,26.5) {3};
+\node[gray!75] at (5.5,26.5) {6};
+\node[gray!75] at (6.5,26.5) {9};
+\node[gray!75] at (7.5,26.5) {12};
+\node[gray!75] at (8.5,26.5) {15};
+\node[gray!75] at (9.5,26.5) {22};
+\node[gray!75] at (10.5,26.5) {25};
+\node[gray!75] at (11.5,26.5) {1};
+\node[gray!75] at (12.5,26.5) {4};
+\node[gray!75] at (13.5,26.5) {7};
+\node[gray!75] at (14.5,26.5) {10};
+\node[gray!75] at (15.5,26.5) {13};
+\node[gray!75] at (16.5,26.5) {16};
+\node[gray!75] at (17.5,26.5) {19};
+\node[gray!75] at (18.5,26.5) {26};
+\node[gray!75] at (19.5,26.5) {2};
+\node[gray!75] at (20.5,26.5) {5};
+\node[gray!75] at (21.5,26.5) {8};
+\node[gray!75] at (22.5,26.5) {11};
+\node[gray!75] at (23.5,26.5) {14};
+\node[gray!75] at (24.5,26.5) {17};
+\node[gray!75] at (25.5,26.5) {20};
+\node[gray!75] at (26.5,26.5) {23};
+\node[gray!75] at (0.5,25.5) {19};
+\fill[orange!25] (1,25) rectangle ++(1,1);
+\draw[orange!90!black, thick] (1,25) rectangle ++(1,1);
+\node at (1.5,25.5) {\color{orange!90!black}\textbf{22}};
+\node[gray!75] at (2.5,25.5) {25};
+\node[gray!75] at (3.5,25.5) {1};
+\node[gray!75] at (4.5,25.5) {4};
+\node[gray!75] at (5.5,25.5) {7};
+\node[gray!75] at (6.5,25.5) {10};
+\node[gray!75] at (7.5,25.5) {13};
+\node[gray!75] at (8.5,25.5) {16};
+\node[gray!75] at (9.5,25.5) {23};
+\node[gray!75] at (10.5,25.5) {26};
+\node[gray!75] at (11.5,25.5) {2};
+\node[gray!75] at (12.5,25.5) {5};
+\node[gray!75] at (13.5,25.5) {8};
+\node[gray!75] at (14.5,25.5) {11};
+\node[gray!75] at (15.5,25.5) {14};
+\node[gray!75] at (16.5,25.5) {17};
+\node[gray!75] at (17.5,25.5) {20};
+\node[gray!75] at (18.5,25.5) {0};
+\node[gray!75] at (19.5,25.5) {3};
+\node[gray!75] at (20.5,25.5) {6};
+\node[gray!75] at (21.5,25.5) {9};
+\node[gray!75] at (22.5,25.5) {12};
+\node[gray!75] at (23.5,25.5) {15};
+\node[gray!75] at (24.5,25.5) {18};
+\node[gray!75] at (25.5,25.5) {21};
+\node[gray!75] at (26.5,25.5) {24};
+\node[gray!75] at (0.5,24.5) {20};
+\node[gray!75] at (1.5,24.5) {23};
+\fill[blue!12] (2,24) rectangle ++(1,1);
+\draw[blue!45, thick] (2,24) rectangle ++(1,1);
+\node[blue!85!black] at (2.5,24.5) {\textbf{26}};
+\node[gray!75] at (3.5,24.5) {2};
+\node[gray!75] at (4.5,24.5) {5};
+\node[gray!75] at (5.5,24.5) {8};
+\node[gray!75] at (6.5,24.5) {11};
+\node[gray!75] at (7.5,24.5) {14};
+\node[gray!75] at (8.5,24.5) {17};
+\node[gray!75] at (9.5,24.5) {24};
+\node[gray!75] at (10.5,24.5) {0};
+\node[gray!75] at (11.5,24.5) {3};
+\node[gray!75] at (12.5,24.5) {6};
+\node[gray!75] at (13.5,24.5) {9};
+\node[gray!75] at (14.5,24.5) {12};
+\node[gray!75] at (15.5,24.5) {15};
+\node[gray!75] at (16.5,24.5) {18};
+\node[gray!75] at (17.5,24.5) {21};
+\node[gray!75] at (18.5,24.5) {1};
+\node[gray!75] at (19.5,24.5) {4};
+\node[gray!75] at (20.5,24.5) {7};
+\node[gray!75] at (21.5,24.5) {10};
+\node[gray!75] at (22.5,24.5) {13};
+\node[gray!75] at (23.5,24.5) {16};
+\node[gray!75] at (24.5,24.5) {19};
+\node[gray!75] at (25.5,24.5) {22};
+\node[gray!75] at (26.5,24.5) {25};
+\node[gray!75] at (0.5,23.5) {21};
+\node[gray!75] at (1.5,23.5) {24};
+\node[gray!75] at (2.5,23.5) {0};
+\fill[blue!12] (3,23) rectangle ++(1,1);
+\draw[blue!45, thick] (3,23) rectangle ++(1,1);
+\node[blue!85!black] at (3.5,23.5) {\textbf{3}};
+\node[gray!75] at (4.5,23.5) {6};
+\node[gray!75] at (5.5,23.5) {9};
+\node[gray!75] at (6.5,23.5) {12};
+\node[gray!75] at (7.5,23.5) {15};
+\node[gray!75] at (8.5,23.5) {18};
+\node[gray!75] at (9.5,23.5) {25};
+\node[gray!75] at (10.5,23.5) {1};
+\node[gray!75] at (11.5,23.5) {4};
+\node[gray!75] at (12.5,23.5) {7};
+\node[gray!75] at (13.5,23.5) {10};
+\node[gray!75] at (14.5,23.5) {13};
+\node[gray!75] at (15.5,23.5) {16};
+\node[gray!75] at (16.5,23.5) {19};
+\node[gray!75] at (17.5,23.5) {22};
+\node[gray!75] at (18.5,23.5) {2};
+\node[gray!75] at (19.5,23.5) {5};
+\node[gray!75] at (20.5,23.5) {8};
+\node[gray!75] at (21.5,23.5) {11};
+\node[gray!75] at (22.5,23.5) {14};
+\node[gray!75] at (23.5,23.5) {17};
+\node[gray!75] at (24.5,23.5) {20};
+\node[gray!75] at (25.5,23.5) {23};
+\node[gray!75] at (26.5,23.5) {26};
+\node[gray!75] at (0.5,22.5) {22};
+\node[gray!75] at (1.5,22.5) {25};
+\node[gray!75] at (2.5,22.5) {1};
+\node[gray!75] at (3.5,22.5) {4};
+\fill[blue!12] (4,22) rectangle ++(1,1);
+\draw[blue!45, thick] (4,22) rectangle ++(1,1);
+\node[blue!85!black] at (4.5,22.5) {\textbf{7}};
+\node[gray!75] at (5.5,22.5) {10};
+\node[gray!75] at (6.5,22.5) {13};
+\node[gray!75] at (7.5,22.5) {16};
+\node[gray!75] at (8.5,22.5) {19};
+\node[gray!75] at (9.5,22.5) {26};
+\node[gray!75] at (10.5,22.5) {2};
+\node[gray!75] at (11.5,22.5) {5};
+\node[gray!75] at (12.5,22.5) {8};
+\node[gray!75] at (13.5,22.5) {11};
+\node[gray!75] at (14.5,22.5) {14};
+\node[gray!75] at (15.5,22.5) {17};
+\node[gray!75] at (16.5,22.5) {20};
+\node[gray!75] at (17.5,22.5) {23};
+\node[gray!75] at (18.5,22.5) {3};
+\node[gray!75] at (19.5,22.5) {6};
+\node[gray!75] at (20.5,22.5) {9};
+\node[gray!75] at (21.5,22.5) {12};
+\node[gray!75] at (22.5,22.5) {15};
+\node[gray!75] at (23.5,22.5) {18};
+\node[gray!75] at (24.5,22.5) {21};
+\node[gray!75] at (25.5,22.5) {24};
+\node[gray!75] at (26.5,22.5) {0};
+\node[gray!75] at (0.5,21.5) {23};
+\node[gray!75] at (1.5,21.5) {26};
+\node[gray!75] at (2.5,21.5) {2};
+\node[gray!75] at (3.5,21.5) {5};
+\node[gray!75] at (4.5,21.5) {8};
+\fill[blue!12] (5,21) rectangle ++(1,1);
+\draw[blue!45, thick] (5,21) rectangle ++(1,1);
+\node[blue!85!black] at (5.5,21.5) {\textbf{11}};
+\node[gray!75] at (6.5,21.5) {14};
+\node[gray!75] at (7.5,21.5) {17};
+\node[gray!75] at (8.5,21.5) {20};
+\node[gray!75] at (9.5,21.5) {0};
+\node[gray!75] at (10.5,21.5) {3};
+\node[gray!75] at (11.5,21.5) {6};
+\node[gray!75] at (12.5,21.5) {9};
+\node[gray!75] at (13.5,21.5) {12};
+\node[gray!75] at (14.5,21.5) {15};
+\node[gray!75] at (15.5,21.5) {18};
+\node[gray!75] at (16.5,21.5) {21};
+\node[gray!75] at (17.5,21.5) {24};
+\node[gray!75] at (18.5,21.5) {4};
+\node[gray!75] at (19.5,21.5) {7};
+\node[gray!75] at (20.5,21.5) {10};
+\node[gray!75] at (21.5,21.5) {13};
+\node[gray!75] at (22.5,21.5) {16};
+\node[gray!75] at (23.5,21.5) {19};
+\node[gray!75] at (24.5,21.5) {22};
+\node[gray!75] at (25.5,21.5) {25};
+\node[gray!75] at (26.5,21.5) {1};
+\node[gray!75] at (0.5,20.5) {24};
+\node[gray!75] at (1.5,20.5) {0};
+\node[gray!75] at (2.5,20.5) {3};
+\node[gray!75] at (3.5,20.5) {6};
+\node[gray!75] at (4.5,20.5) {9};
+\node[gray!75] at (5.5,20.5) {12};
+\fill[blue!12] (6,20) rectangle ++(1,1);
+\draw[blue!45, thick] (6,20) rectangle ++(1,1);
+\node[blue!85!black] at (6.5,20.5) {\textbf{15}};
+\node[gray!75] at (7.5,20.5) {18};
+\node[gray!75] at (8.5,20.5) {21};
+\node[gray!75] at (9.5,20.5) {1};
+\node[gray!75] at (10.5,20.5) {4};
+\node[gray!75] at (11.5,20.5) {7};
+\node[gray!75] at (12.5,20.5) {10};
+\node[gray!75] at (13.5,20.5) {13};
+\node[gray!75] at (14.5,20.5) {16};
+\node[gray!75] at (15.5,20.5) {19};
+\node[gray!75] at (16.5,20.5) {22};
+\node[gray!75] at (17.5,20.5) {25};
+\node[gray!75] at (18.5,20.5) {5};
+\node[gray!75] at (19.5,20.5) {8};
+\node[gray!75] at (20.5,20.5) {11};
+\node[gray!75] at (21.5,20.5) {14};
+\node[gray!75] at (22.5,20.5) {17};
+\node[gray!75] at (23.5,20.5) {20};
+\node[gray!75] at (24.5,20.5) {23};
+\node[gray!75] at (25.5,20.5) {26};
+\node[gray!75] at (26.5,20.5) {2};
+\node[gray!75] at (0.5,19.5) {25};
+\node[gray!75] at (1.5,19.5) {1};
+\node[gray!75] at (2.5,19.5) {4};
+\node[gray!75] at (3.5,19.5) {7};
+\node[gray!75] at (4.5,19.5) {10};
+\node[gray!75] at (5.5,19.5) {13};
+\node[gray!75] at (6.5,19.5) {16};
+\fill[blue!12] (7,19) rectangle ++(1,1);
+\draw[blue!45, thick] (7,19) rectangle ++(1,1);
+\node[blue!85!black] at (7.5,19.5) {\textbf{19}};
+\node[gray!75] at (8.5,19.5) {22};
+\node[gray!75] at (9.5,19.5) {2};
+\node[gray!75] at (10.5,19.5) {5};
+\node[gray!75] at (11.5,19.5) {8};
+\node[gray!75] at (12.5,19.5) {11};
+\node[gray!75] at (13.5,19.5) {14};
+\node[gray!75] at (14.5,19.5) {17};
+\node[gray!75] at (15.5,19.5) {20};
+\node[gray!75] at (16.5,19.5) {23};
+\node[gray!75] at (17.5,19.5) {26};
+\node[gray!75] at (18.5,19.5) {6};
+\node[gray!75] at (19.5,19.5) {9};
+\node[gray!75] at (20.5,19.5) {12};
+\node[gray!75] at (21.5,19.5) {15};
+\node[gray!75] at (22.5,19.5) {18};
+\node[gray!75] at (23.5,19.5) {21};
+\node[gray!75] at (24.5,19.5) {24};
+\node[gray!75] at (25.5,19.5) {0};
+\node[gray!75] at (26.5,19.5) {3};
+\node[gray!75] at (0.5,18.5) {26};
+\node[gray!75] at (1.5,18.5) {2};
+\node[gray!75] at (2.5,18.5) {5};
+\node[gray!75] at (3.5,18.5) {8};
+\node[gray!75] at (4.5,18.5) {11};
+\node[gray!75] at (5.5,18.5) {14};
+\node[gray!75] at (6.5,18.5) {17};
+\node[gray!75] at (7.5,18.5) {20};
+\fill[blue!12] (8,18) rectangle ++(1,1);
+\draw[blue!45, thick] (8,18) rectangle ++(1,1);
+\node[blue!85!black] at (8.5,18.5) {\textbf{23}};
+\node[gray!75] at (9.5,18.5) {3};
+\node[gray!75] at (10.5,18.5) {6};
+\node[gray!75] at (11.5,18.5) {9};
+\node[gray!75] at (12.5,18.5) {12};
+\node[gray!75] at (13.5,18.5) {15};
+\node[gray!75] at (14.5,18.5) {18};
+\node[gray!75] at (15.5,18.5) {21};
+\node[gray!75] at (16.5,18.5) {24};
+\node[gray!75] at (17.5,18.5) {0};
+\node[gray!75] at (18.5,18.5) {7};
+\node[gray!75] at (19.5,18.5) {10};
+\node[gray!75] at (20.5,18.5) {13};
+\node[gray!75] at (21.5,18.5) {16};
+\node[gray!75] at (22.5,18.5) {19};
+\node[gray!75] at (23.5,18.5) {22};
+\node[gray!75] at (24.5,18.5) {25};
+\node[gray!75] at (25.5,18.5) {1};
+\node[gray!75] at (26.5,18.5) {4};
+\node[gray!75] at (0.5,17.5) {0};
+\node[gray!75] at (1.5,17.5) {3};
+\node[gray!75] at (2.5,17.5) {6};
+\node[gray!75] at (3.5,17.5) {9};
+\node[gray!75] at (4.5,17.5) {12};
+\node[gray!75] at (5.5,17.5) {15};
+\node[gray!75] at (6.5,17.5) {18};
+\node[gray!75] at (7.5,17.5) {21};
+\node[gray!75] at (8.5,17.5) {24};
+\fill[blue!12] (9,17) rectangle ++(1,1);
+\draw[blue!45, thick] (9,17) rectangle ++(1,1);
+\node[blue!85!black] at (9.5,17.5) {\textbf{4}};
+\node[gray!75] at (10.5,17.5) {7};
+\node[gray!75] at (11.5,17.5) {10};
+\node[gray!75] at (12.5,17.5) {13};
+\node[gray!75] at (13.5,17.5) {16};
+\node[gray!75] at (14.5,17.5) {19};
+\node[gray!75] at (15.5,17.5) {22};
+\node[gray!75] at (16.5,17.5) {25};
+\node[gray!75] at (17.5,17.5) {1};
+\node[gray!75] at (18.5,17.5) {8};
+\node[gray!75] at (19.5,17.5) {11};
+\node[gray!75] at (20.5,17.5) {14};
+\node[gray!75] at (21.5,17.5) {17};
+\node[gray!75] at (22.5,17.5) {20};
+\node[gray!75] at (23.5,17.5) {23};
+\node[gray!75] at (24.5,17.5) {26};
+\node[gray!75] at (25.5,17.5) {2};
+\node[gray!75] at (26.5,17.5) {5};
+\node[gray!75] at (0.5,16.5) {1};
+\node[gray!75] at (1.5,16.5) {4};
+\node[gray!75] at (2.5,16.5) {7};
+\node[gray!75] at (3.5,16.5) {10};
+\node[gray!75] at (4.5,16.5) {13};
+\node[gray!75] at (5.5,16.5) {16};
+\node[gray!75] at (6.5,16.5) {19};
+\node[gray!75] at (7.5,16.5) {22};
+\node[gray!75] at (8.5,16.5) {25};
+\node[gray!75] at (9.5,16.5) {5};
+\fill[blue!12] (10,16) rectangle ++(1,1);
+\draw[blue!45, thick] (10,16) rectangle ++(1,1);
+\node[blue!85!black] at (10.5,16.5) {\textbf{8}};
+\node[gray!75] at (11.5,16.5) {11};
+\node[gray!75] at (12.5,16.5) {14};
+\node[gray!75] at (13.5,16.5) {17};
+\node[gray!75] at (14.5,16.5) {20};
+\node[gray!75] at (15.5,16.5) {23};
+\node[gray!75] at (16.5,16.5) {26};
+\node[gray!75] at (17.5,16.5) {2};
+\node[gray!75] at (18.5,16.5) {9};
+\node[gray!75] at (19.5,16.5) {12};
+\node[gray!75] at (20.5,16.5) {15};
+\node[gray!75] at (21.5,16.5) {18};
+\node[gray!75] at (22.5,16.5) {21};
+\node[gray!75] at (23.5,16.5) {24};
+\node[gray!75] at (24.5,16.5) {0};
+\node[gray!75] at (25.5,16.5) {3};
+\node[gray!75] at (26.5,16.5) {6};
+\node[gray!75] at (0.5,15.5) {2};
+\node[gray!75] at (1.5,15.5) {5};
+\node[gray!75] at (2.5,15.5) {8};
+\node[gray!75] at (3.5,15.5) {11};
+\node[gray!75] at (4.5,15.5) {14};
+\node[gray!75] at (5.5,15.5) {17};
+\node[gray!75] at (6.5,15.5) {20};
+\node[gray!75] at (7.5,15.5) {23};
+\node[gray!75] at (8.5,15.5) {26};
+\node[gray!75] at (9.5,15.5) {6};
+\node[gray!75] at (10.5,15.5) {9};
+\fill[blue!12] (11,15) rectangle ++(1,1);
+\draw[blue!45, thick] (11,15) rectangle ++(1,1);
+\node[blue!85!black] at (11.5,15.5) {\textbf{12}};
+\node[gray!75] at (12.5,15.5) {15};
+\node[gray!75] at (13.5,15.5) {18};
+\node[gray!75] at (14.5,15.5) {21};
+\node[gray!75] at (15.5,15.5) {24};
+\node[gray!75] at (16.5,15.5) {0};
+\node[gray!75] at (17.5,15.5) {3};
+\node[gray!75] at (18.5,15.5) {10};
+\node[gray!75] at (19.5,15.5) {13};
+\node[gray!75] at (20.5,15.5) {16};
+\node[gray!75] at (21.5,15.5) {19};
+\node[gray!75] at (22.5,15.5) {22};
+\node[gray!75] at (23.5,15.5) {25};
+\node[gray!75] at (24.5,15.5) {1};
+\node[gray!75] at (25.5,15.5) {4};
+\node[gray!75] at (26.5,15.5) {7};
+\node[gray!75] at (0.5,14.5) {3};
+\node[gray!75] at (1.5,14.5) {6};
+\node[gray!75] at (2.5,14.5) {9};
+\node[gray!75] at (3.5,14.5) {12};
+\node[gray!75] at (4.5,14.5) {15};
+\node[gray!75] at (5.5,14.5) {18};
+\node[gray!75] at (6.5,14.5) {21};
+\node[gray!75] at (7.5,14.5) {24};
+\node[gray!75] at (8.5,14.5) {0};
+\node[gray!75] at (9.5,14.5) {7};
+\node[gray!75] at (10.5,14.5) {10};
+\node[gray!75] at (11.5,14.5) {13};
+\fill[blue!12] (12,14) rectangle ++(1,1);
+\draw[blue!45, thick] (12,14) rectangle ++(1,1);
+\node[blue!85!black] at (12.5,14.5) {\textbf{16}};
+\node[gray!75] at (13.5,14.5) {19};
+\node[gray!75] at (14.5,14.5) {22};
+\node[gray!75] at (15.5,14.5) {25};
+\node[gray!75] at (16.5,14.5) {1};
+\node[gray!75] at (17.5,14.5) {4};
+\node[gray!75] at (18.5,14.5) {11};
+\node[gray!75] at (19.5,14.5) {14};
+\node[gray!75] at (20.5,14.5) {17};
+\node[gray!75] at (21.5,14.5) {20};
+\node[gray!75] at (22.5,14.5) {23};
+\node[gray!75] at (23.5,14.5) {26};
+\node[gray!75] at (24.5,14.5) {2};
+\node[gray!75] at (25.5,14.5) {5};
+\node[gray!75] at (26.5,14.5) {8};
+\node[gray!75] at (0.5,13.5) {4};
+\node[gray!75] at (1.5,13.5) {7};
+\node[gray!75] at (2.5,13.5) {10};
+\node[gray!75] at (3.5,13.5) {13};
+\node[gray!75] at (4.5,13.5) {16};
+\node[gray!75] at (5.5,13.5) {19};
+\node[gray!75] at (6.5,13.5) {22};
+\node[gray!75] at (7.5,13.5) {25};
+\node[gray!75] at (8.5,13.5) {1};
+\node[gray!75] at (9.5,13.5) {8};
+\node[gray!75] at (10.5,13.5) {11};
+\node[gray!75] at (11.5,13.5) {14};
+\node[gray!75] at (12.5,13.5) {17};
+\fill[blue!12] (13,13) rectangle ++(1,1);
+\draw[blue!45, thick] (13,13) rectangle ++(1,1);
+\node[blue!85!black] at (13.5,13.5) {\textbf{20}};
+\node[gray!75] at (14.5,13.5) {23};
+\node[gray!75] at (15.5,13.5) {26};
+\node[gray!75] at (16.5,13.5) {2};
+\node[gray!75] at (17.5,13.5) {5};
+\node[gray!75] at (18.5,13.5) {12};
+\node[gray!75] at (19.5,13.5) {15};
+\node[gray!75] at (20.5,13.5) {18};
+\node[gray!75] at (21.5,13.5) {21};
+\node[gray!75] at (22.5,13.5) {24};
+\node[gray!75] at (23.5,13.5) {0};
+\node[gray!75] at (24.5,13.5) {3};
+\node[gray!75] at (25.5,13.5) {6};
+\node[gray!75] at (26.5,13.5) {9};
+\node[gray!75] at (0.5,12.5) {5};
+\node[gray!75] at (1.5,12.5) {8};
+\node[gray!75] at (2.5,12.5) {11};
+\node[gray!75] at (3.5,12.5) {14};
+\node[gray!75] at (4.5,12.5) {17};
+\node[gray!75] at (5.5,12.5) {20};
+\node[gray!75] at (6.5,12.5) {23};
+\node[gray!75] at (7.5,12.5) {26};
+\node[gray!75] at (8.5,12.5) {2};
+\node[gray!75] at (9.5,12.5) {9};
+\node[gray!75] at (10.5,12.5) {12};
+\node[gray!75] at (11.5,12.5) {15};
+\node[gray!75] at (12.5,12.5) {18};
+\node[gray!75] at (13.5,12.5) {21};
+\fill[blue!12] (14,12) rectangle ++(1,1);
+\draw[blue!45, thick] (14,12) rectangle ++(1,1);
+\node[blue!85!black] at (14.5,12.5) {\textbf{24}};
+\node[gray!75] at (15.5,12.5) {0};
+\node[gray!75] at (16.5,12.5) {3};
+\node[gray!75] at (17.5,12.5) {6};
+\node[gray!75] at (18.5,12.5) {13};
+\node[gray!75] at (19.5,12.5) {16};
+\node[gray!75] at (20.5,12.5) {19};
+\node[gray!75] at (21.5,12.5) {22};
+\node[gray!75] at (22.5,12.5) {25};
+\node[gray!75] at (23.5,12.5) {1};
+\node[gray!75] at (24.5,12.5) {4};
+\node[gray!75] at (25.5,12.5) {7};
+\node[gray!75] at (26.5,12.5) {10};
+\node[gray!75] at (0.5,11.5) {6};
+\node[gray!75] at (1.5,11.5) {9};
+\node[gray!75] at (2.5,11.5) {12};
+\node[gray!75] at (3.5,11.5) {15};
+\node[gray!75] at (4.5,11.5) {18};
+\node[gray!75] at (5.5,11.5) {21};
+\node[gray!75] at (6.5,11.5) {24};
+\node[gray!75] at (7.5,11.5) {0};
+\node[gray!75] at (8.5,11.5) {3};
+\node[gray!75] at (9.5,11.5) {10};
+\node[gray!75] at (10.5,11.5) {13};
+\node[gray!75] at (11.5,11.5) {16};
+\node[gray!75] at (12.5,11.5) {19};
+\node[gray!75] at (13.5,11.5) {22};
+\node[gray!75] at (14.5,11.5) {25};
+\fill[blue!12] (15,11) rectangle ++(1,1);
+\draw[blue!45, thick] (15,11) rectangle ++(1,1);
+\node[blue!85!black] at (15.5,11.5) {\textbf{1}};
+\node[gray!75] at (16.5,11.5) {4};
+\node[gray!75] at (17.5,11.5) {7};
+\node[gray!75] at (18.5,11.5) {14};
+\node[gray!75] at (19.5,11.5) {17};
+\node[gray!75] at (20.5,11.5) {20};
+\node[gray!75] at (21.5,11.5) {23};
+\node[gray!75] at (22.5,11.5) {26};
+\node[gray!75] at (23.5,11.5) {2};
+\node[gray!75] at (24.5,11.5) {5};
+\node[gray!75] at (25.5,11.5) {8};
+\node[gray!75] at (26.5,11.5) {11};
+\node[gray!75] at (0.5,10.5) {7};
+\node[gray!75] at (1.5,10.5) {10};
+\node[gray!75] at (2.5,10.5) {13};
+\node[gray!75] at (3.5,10.5) {16};
+\node[gray!75] at (4.5,10.5) {19};
+\node[gray!75] at (5.5,10.5) {22};
+\node[gray!75] at (6.5,10.5) {25};
+\node[gray!75] at (7.5,10.5) {1};
+\node[gray!75] at (8.5,10.5) {4};
+\node[gray!75] at (9.5,10.5) {11};
+\node[gray!75] at (10.5,10.5) {14};
+\node[gray!75] at (11.5,10.5) {17};
+\node[gray!75] at (12.5,10.5) {20};
+\node[gray!75] at (13.5,10.5) {23};
+\node[gray!75] at (14.5,10.5) {26};
+\node[gray!75] at (15.5,10.5) {2};
+\fill[blue!12] (16,10) rectangle ++(1,1);
+\draw[blue!45, thick] (16,10) rectangle ++(1,1);
+\node[blue!85!black] at (16.5,10.5) {\textbf{5}};
+\node[gray!75] at (17.5,10.5) {8};
+\node[gray!75] at (18.5,10.5) {15};
+\node[gray!75] at (19.5,10.5) {18};
+\node[gray!75] at (20.5,10.5) {21};
+\node[gray!75] at (21.5,10.5) {24};
+\node[gray!75] at (22.5,10.5) {0};
+\node[gray!75] at (23.5,10.5) {3};
+\node[gray!75] at (24.5,10.5) {6};
+\node[gray!75] at (25.5,10.5) {9};
+\node[gray!75] at (26.5,10.5) {12};
+\node[gray!75] at (0.5,9.5) {8};
+\node[gray!75] at (1.5,9.5) {11};
+\node[gray!75] at (2.5,9.5) {14};
+\node[gray!75] at (3.5,9.5) {17};
+\node[gray!75] at (4.5,9.5) {20};
+\node[gray!75] at (5.5,9.5) {23};
+\node[gray!75] at (6.5,9.5) {26};
+\node[gray!75] at (7.5,9.5) {2};
+\node[gray!75] at (8.5,9.5) {5};
+\node[gray!75] at (9.5,9.5) {12};
+\node[gray!75] at (10.5,9.5) {15};
+\node[gray!75] at (11.5,9.5) {18};
+\node[gray!75] at (12.5,9.5) {21};
+\node[gray!75] at (13.5,9.5) {24};
+\node[gray!75] at (14.5,9.5) {0};
+\node[gray!75] at (15.5,9.5) {3};
+\node[gray!75] at (16.5,9.5) {6};
+\fill[blue!12] (17,9) rectangle ++(1,1);
+\draw[blue!45, thick] (17,9) rectangle ++(1,1);
+\node[blue!85!black] at (17.5,9.5) {\textbf{9}};
+\node[gray!75] at (18.5,9.5) {16};
+\node[gray!75] at (19.5,9.5) {19};
+\node[gray!75] at (20.5,9.5) {22};
+\node[gray!75] at (21.5,9.5) {25};
+\node[gray!75] at (22.5,9.5) {1};
+\node[gray!75] at (23.5,9.5) {4};
+\node[gray!75] at (24.5,9.5) {7};
+\node[gray!75] at (25.5,9.5) {10};
+\node[gray!75] at (26.5,9.5) {13};
+\node[gray!75] at (0.5,8.5) {9};
+\node[gray!75] at (1.5,8.5) {12};
+\node[gray!75] at (2.5,8.5) {15};
+\node[gray!75] at (3.5,8.5) {18};
+\node[gray!75] at (4.5,8.5) {21};
+\node[gray!75] at (5.5,8.5) {24};
+\node[gray!75] at (6.5,8.5) {0};
+\node[gray!75] at (7.5,8.5) {3};
+\node[gray!75] at (8.5,8.5) {6};
+\node[gray!75] at (9.5,8.5) {13};
+\node[gray!75] at (10.5,8.5) {16};
+\node[gray!75] at (11.5,8.5) {19};
+\node[gray!75] at (12.5,8.5) {22};
+\node[gray!75] at (13.5,8.5) {25};
+\node[gray!75] at (14.5,8.5) {1};
+\node[gray!75] at (15.5,8.5) {4};
+\node[gray!75] at (16.5,8.5) {7};
+\node[gray!75] at (17.5,8.5) {10};
+\fill[blue!12] (18,8) rectangle ++(1,1);
+\draw[blue!45, thick] (18,8) rectangle ++(1,1);
+\node[blue!85!black] at (18.5,8.5) {\textbf{17}};
+\node[gray!75] at (19.5,8.5) {20};
+\node[gray!75] at (20.5,8.5) {23};
+\node[gray!75] at (21.5,8.5) {26};
+\node[gray!75] at (22.5,8.5) {2};
+\node[gray!75] at (23.5,8.5) {5};
+\node[gray!75] at (24.5,8.5) {8};
+\node[gray!75] at (25.5,8.5) {11};
+\node[gray!75] at (26.5,8.5) {14};
+\node[gray!75] at (0.5,7.5) {10};
+\node[gray!75] at (1.5,7.5) {13};
+\node[gray!75] at (2.5,7.5) {16};
+\node[gray!75] at (3.5,7.5) {19};
+\node[gray!75] at (4.5,7.5) {22};
+\node[gray!75] at (5.5,7.5) {25};
+\node[gray!75] at (6.5,7.5) {1};
+\node[gray!75] at (7.5,7.5) {4};
+\node[gray!75] at (8.5,7.5) {7};
+\node[gray!75] at (9.5,7.5) {14};
+\node[gray!75] at (10.5,7.5) {17};
+\node[gray!75] at (11.5,7.5) {20};
+\node[gray!75] at (12.5,7.5) {23};
+\node[gray!75] at (13.5,7.5) {26};
+\node[gray!75] at (14.5,7.5) {2};
+\node[gray!75] at (15.5,7.5) {5};
+\node[gray!75] at (16.5,7.5) {8};
+\node[gray!75] at (17.5,7.5) {11};
+\node[gray!75] at (18.5,7.5) {18};
+\fill[blue!12] (19,7) rectangle ++(1,1);
+\draw[blue!45, thick] (19,7) rectangle ++(1,1);
+\node[blue!85!black] at (19.5,7.5) {\textbf{21}};
+\node[gray!75] at (20.5,7.5) {24};
+\node[gray!75] at (21.5,7.5) {0};
+\node[gray!75] at (22.5,7.5) {3};
+\node[gray!75] at (23.5,7.5) {6};
+\node[gray!75] at (24.5,7.5) {9};
+\node[gray!75] at (25.5,7.5) {12};
+\node[gray!75] at (26.5,7.5) {15};
+\node[gray!75] at (0.5,6.5) {11};
+\node[gray!75] at (1.5,6.5) {14};
+\node[gray!75] at (2.5,6.5) {17};
+\node[gray!75] at (3.5,6.5) {20};
+\node[gray!75] at (4.5,6.5) {23};
+\node[gray!75] at (5.5,6.5) {26};
+\node[gray!75] at (6.5,6.5) {2};
+\node[gray!75] at (7.5,6.5) {5};
+\node[gray!75] at (8.5,6.5) {8};
+\node[gray!75] at (9.5,6.5) {15};
+\node[gray!75] at (10.5,6.5) {18};
+\node[gray!75] at (11.5,6.5) {21};
+\node[gray!75] at (12.5,6.5) {24};
+\node[gray!75] at (13.5,6.5) {0};
+\node[gray!75] at (14.5,6.5) {3};
+\node[gray!75] at (15.5,6.5) {6};
+\node[gray!75] at (16.5,6.5) {9};
+\node[gray!75] at (17.5,6.5) {12};
+\node[gray!75] at (18.5,6.5) {19};
+\node[gray!75] at (19.5,6.5) {22};
+\fill[blue!12] (20,6) rectangle ++(1,1);
+\draw[blue!45, thick] (20,6) rectangle ++(1,1);
+\node[blue!85!black] at (20.5,6.5) {\textbf{25}};
+\node[gray!75] at (21.5,6.5) {1};
+\node[gray!75] at (22.5,6.5) {4};
+\node[gray!75] at (23.5,6.5) {7};
+\node[gray!75] at (24.5,6.5) {10};
+\node[gray!75] at (25.5,6.5) {13};
+\node[gray!75] at (26.5,6.5) {16};
+\node[gray!75] at (0.5,5.5) {12};
+\node[gray!75] at (1.5,5.5) {15};
+\node[gray!75] at (2.5,5.5) {18};
+\node[gray!75] at (3.5,5.5) {21};
+\node[gray!75] at (4.5,5.5) {24};
+\node[gray!75] at (5.5,5.5) {0};
+\node[gray!75] at (6.5,5.5) {3};
+\node[gray!75] at (7.5,5.5) {6};
+\node[gray!75] at (8.5,5.5) {9};
+\node[gray!75] at (9.5,5.5) {16};
+\node[gray!75] at (10.5,5.5) {19};
+\node[gray!75] at (11.5,5.5) {22};
+\node[gray!75] at (12.5,5.5) {25};
+\node[gray!75] at (13.5,5.5) {1};
+\node[gray!75] at (14.5,5.5) {4};
+\node[gray!75] at (15.5,5.5) {7};
+\node[gray!75] at (16.5,5.5) {10};
+\node[gray!75] at (17.5,5.5) {13};
+\node[gray!75] at (18.5,5.5) {20};
+\node[gray!75] at (19.5,5.5) {23};
+\node[gray!75] at (20.5,5.5) {26};
+\fill[blue!12] (21,5) rectangle ++(1,1);
+\draw[blue!45, thick] (21,5) rectangle ++(1,1);
+\node[blue!85!black] at (21.5,5.5) {\textbf{2}};
+\node[gray!75] at (22.5,5.5) {5};
+\node[gray!75] at (23.5,5.5) {8};
+\node[gray!75] at (24.5,5.5) {11};
+\node[gray!75] at (25.5,5.5) {14};
+\node[gray!75] at (26.5,5.5) {17};
+\node[gray!75] at (0.5,4.5) {13};
+\node[gray!75] at (1.5,4.5) {16};
+\node[gray!75] at (2.5,4.5) {19};
+\node[gray!75] at (3.5,4.5) {22};
+\node[gray!75] at (4.5,4.5) {25};
+\node[gray!75] at (5.5,4.5) {1};
+\node[gray!75] at (6.5,4.5) {4};
+\node[gray!75] at (7.5,4.5) {7};
+\node[gray!75] at (8.5,4.5) {10};
+\node[gray!75] at (9.5,4.5) {17};
+\node[gray!75] at (10.5,4.5) {20};
+\node[gray!75] at (11.5,4.5) {23};
+\node[gray!75] at (12.5,4.5) {26};
+\node[gray!75] at (13.5,4.5) {2};
+\node[gray!75] at (14.5,4.5) {5};
+\node[gray!75] at (15.5,4.5) {8};
+\node[gray!75] at (16.5,4.5) {11};
+\node[gray!75] at (17.5,4.5) {14};
+\node[gray!75] at (18.5,4.5) {21};
+\node[gray!75] at (19.5,4.5) {24};
+\node[gray!75] at (20.5,4.5) {0};
+\node[gray!75] at (21.5,4.5) {3};
+\fill[blue!12] (22,4) rectangle ++(1,1);
+\draw[blue!45, thick] (22,4) rectangle ++(1,1);
+\node[blue!85!black] at (22.5,4.5) {\textbf{6}};
+\node[gray!75] at (23.5,4.5) {9};
+\node[gray!75] at (24.5,4.5) {12};
+\node[gray!75] at (25.5,4.5) {15};
+\node[gray!75] at (26.5,4.5) {18};
+\node[gray!75] at (0.5,3.5) {14};
+\node[gray!75] at (1.5,3.5) {17};
+\node[gray!75] at (2.5,3.5) {20};
+\node[gray!75] at (3.5,3.5) {23};
+\node[gray!75] at (4.5,3.5) {26};
+\node[gray!75] at (5.5,3.5) {2};
+\node[gray!75] at (6.5,3.5) {5};
+\node[gray!75] at (7.5,3.5) {8};
+\node[gray!75] at (8.5,3.5) {11};
+\node[gray!75] at (9.5,3.5) {18};
+\node[gray!75] at (10.5,3.5) {21};
+\node[gray!75] at (11.5,3.5) {24};
+\node[gray!75] at (12.5,3.5) {0};
+\node[gray!75] at (13.5,3.5) {3};
+\node[gray!75] at (14.5,3.5) {6};
+\node[gray!75] at (15.5,3.5) {9};
+\node[gray!75] at (16.5,3.5) {12};
+\node[gray!75] at (17.5,3.5) {15};
+\node[gray!75] at (18.5,3.5) {22};
+\node[gray!75] at (19.5,3.5) {25};
+\node[gray!75] at (20.5,3.5) {1};
+\node[gray!75] at (21.5,3.5) {4};
+\node[gray!75] at (22.5,3.5) {7};
+\fill[blue!12] (23,3) rectangle ++(1,1);
+\draw[blue!45, thick] (23,3) rectangle ++(1,1);
+\node[blue!85!black] at (23.5,3.5) {\textbf{10}};
+\node[gray!75] at (24.5,3.5) {13};
+\node[gray!75] at (25.5,3.5) {16};
+\node[gray!75] at (26.5,3.5) {19};
+\node[gray!75] at (0.5,2.5) {15};
+\node[gray!75] at (1.5,2.5) {18};
+\node[gray!75] at (2.5,2.5) {21};
+\node[gray!75] at (3.5,2.5) {24};
+\node[gray!75] at (4.5,2.5) {0};
+\node[gray!75] at (5.5,2.5) {3};
+\node[gray!75] at (6.5,2.5) {6};
+\node[gray!75] at (7.5,2.5) {9};
+\node[gray!75] at (8.5,2.5) {12};
+\node[gray!75] at (9.5,2.5) {19};
+\node[gray!75] at (10.5,2.5) {22};
+\node[gray!75] at (11.5,2.5) {25};
+\node[gray!75] at (12.5,2.5) {1};
+\node[gray!75] at (13.5,2.5) {4};
+\node[gray!75] at (14.5,2.5) {7};
+\node[gray!75] at (15.5,2.5) {10};
+\node[gray!75] at (16.5,2.5) {13};
+\node[gray!75] at (17.5,2.5) {16};
+\node[gray!75] at (18.5,2.5) {23};
+\node[gray!75] at (19.5,2.5) {26};
+\node[gray!75] at (20.5,2.5) {2};
+\node[gray!75] at (21.5,2.5) {5};
+\node[gray!75] at (22.5,2.5) {8};
+\node[gray!75] at (23.5,2.5) {11};
+\fill[blue!12] (24,2) rectangle ++(1,1);
+\draw[blue!45, thick] (24,2) rectangle ++(1,1);
+\node[blue!85!black] at (24.5,2.5) {\textbf{14}};
+\node[gray!75] at (25.5,2.5) {17};
+\node[gray!75] at (26.5,2.5) {20};
+\node[gray!75] at (0.5,1.5) {16};
+\node[gray!75] at (1.5,1.5) {19};
+\node[gray!75] at (2.5,1.5) {22};
+\node[gray!75] at (3.5,1.5) {25};
+\node[gray!75] at (4.5,1.5) {1};
+\node[gray!75] at (5.5,1.5) {4};
+\node[gray!75] at (6.5,1.5) {7};
+\node[gray!75] at (7.5,1.5) {10};
+\node[gray!75] at (8.5,1.5) {13};
+\node[gray!75] at (9.5,1.5) {20};
+\node[gray!75] at (10.5,1.5) {23};
+\node[gray!75] at (11.5,1.5) {26};
+\node[gray!75] at (12.5,1.5) {2};
+\node[gray!75] at (13.5,1.5) {5};
+\node[gray!75] at (14.5,1.5) {8};
+\node[gray!75] at (15.5,1.5) {11};
+\node[gray!75] at (16.5,1.5) {14};
+\node[gray!75] at (17.5,1.5) {17};
+\node[gray!75] at (18.5,1.5) {24};
+\node[gray!75] at (19.5,1.5) {0};
+\node[gray!75] at (20.5,1.5) {3};
+\node[gray!75] at (21.5,1.5) {6};
+\node[gray!75] at (22.5,1.5) {9};
+\node[gray!75] at (23.5,1.5) {12};
+\node[gray!75] at (24.5,1.5) {15};
+\fill[red!25] (25,1) rectangle ++(1,1);
+\draw[red!85!black, thick] (25,1) rectangle ++(1,1);
+\node at (25.5,1.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{18}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{0}}}};
+\node[gray!75] at (26.5,1.5) {21};
+\node[gray!75] at (0.5,0.5) {17};
+\node[gray!75] at (1.5,0.5) {20};
+\node[gray!75] at (2.5,0.5) {23};
+\node[gray!75] at (3.5,0.5) {26};
+\node[gray!75] at (4.5,0.5) {2};
+\node[gray!75] at (5.5,0.5) {5};
+\node[gray!75] at (6.5,0.5) {8};
+\node[gray!75] at (7.5,0.5) {11};
+\node[gray!75] at (8.5,0.5) {14};
+\node[gray!75] at (9.5,0.5) {21};
+\node[gray!75] at (10.5,0.5) {24};
+\node[gray!75] at (11.5,0.5) {0};
+\node[gray!75] at (12.5,0.5) {3};
+\node[gray!75] at (13.5,0.5) {6};
+\node[gray!75] at (14.5,0.5) {9};
+\node[gray!75] at (15.5,0.5) {12};
+\node[gray!75] at (16.5,0.5) {15};
+\node[gray!75] at (17.5,0.5) {18};
+\node[gray!75] at (18.5,0.5) {25};
+\node[gray!75] at (19.5,0.5) {1};
+\node[gray!75] at (20.5,0.5) {4};
+\node[gray!75] at (21.5,0.5) {7};
+\node[gray!75] at (22.5,0.5) {10};
+\node[gray!75] at (23.5,0.5) {13};
+\node[gray!75] at (24.5,0.5) {16};
+\node[gray!75] at (25.5,0.5) {19};
+\fill[red!25] (26,0) rectangle ++(1,1);
+\draw[red!85!black, thick] (26,0) rectangle ++(1,1);
+\node at (26.5,0.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{22}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{13}}}};
+\end{tikzpicture}\\[4pt]
+\footnotesize
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Cell $(i,j)$ & $S_{i,j}$ & $f(i,j)$ & Status \\
+\midrule
+$(0, 0)$ & 18 & 18 & Keeps value \\
+$(1, 1)$ & 22 & 22 & Keeps value \\
+$\dots$ & $\dots$ & $\dots$ & Block $u = 0$ \\
+$(8, 8) \to (9, 9)$ & $23 \to 4$ & $23 \to 4$ & Skips $\mathbf{0}$ \\
+$(17, 17) \to (18, 18)$ & $9 \to 17$ & $9 \to 17$ & Skips $\mathbf{13}$ \\
+$\dots$ & $\dots$ & $\dots$ & Block $u = 2$ \\
+$(24, 24)$ & 14 & 14 & Distinct \\
+$(25, 25)$ & 18 & \textbf{0} & \textbf{Steals 0 ($-2k$)} \\
+$(26, 26)$ & 22 & \textbf{13} & \textbf{Steals 13 ($-k$)} \\
+\bottomrule
+\end{tabular}
+\caption{Family 3 ($n = 27$, $k = 9$): $d$-diagonal $d = 0$ collisions in the $2 \times 2$
+bottom-right corner shifted by $-2k$ and $-k$ into slots skipped at $j = 9, 18$.}
+\label{fig:fam3_diff}
+\end{figure}
+\clearpage
+
+\begin{example}[Family 4 $s$-Diagonal Seam Shifts: $n = 12$, $s = 9$]\label{ex:fam4_sum}
+For $n = 12$ ($m = 6, k = 4$), $p = (10, 4, 6, 8, 0, 1, 3, 5, 7, 9, 11, 2)$. Along $i + j = 9$,
+the first main block ($1 \le j \le 3$) visits $\{0, 1, 2\}$ and the second main block
+($5 \le j \le 10$) visits $\{5, 6, 7, 8, 9\}$, leaving $\mathbf{3} \equiv s + m \pmod{12}$ and
+$\mathbf{4} \equiv s + m + 1 \pmod{12}$ vacant between the two blocks. Two seam collisions occur
+with the pins: $(4, 5)$ ($j = m - 1$) collides with pin $(5, 4)$ ($j = m - 2$) at $S = 5$ and
+shifts to $f(4, 5) = 5 - 1 = 4$; $(2, 7)$ ($j = n - 5$) collides with pin $(9, 0)$ ($j = 0$) at
+$S = 7$ and shifts by $-(m - 2) = -4$ to $f(2, 7) = 7 - 4 = 3$ (Figure~\ref{fig:fam4_sum}).
+\end{example}
+
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[scale=0.45, every node/.style={font=\fontsize{6.5}{7.5}\selectfont}]
+\draw[step=1cm, gray!45, thin] (0,0) grid (12,12);
+\node[above, gray!85, inner sep=1pt] at (0.5,12) {0};
+\node[above, gray!85, inner sep=1pt] at (1.5,12) {1};
+\node[above, gray!85, inner sep=1pt] at (2.5,12) {2};
+\node[above, gray!85, inner sep=1pt] at (3.5,12) {3};
+\node[above, gray!85, inner sep=1pt] at (4.5,12) {4};
+\node[above, gray!85, inner sep=1pt] at (5.5,12) {5};
+\node[above, gray!85, inner sep=1pt] at (6.5,12) {6};
+\node[above, gray!85, inner sep=1pt] at (7.5,12) {7};
+\node[above, gray!85, inner sep=1pt] at (8.5,12) {8};
+\node[above, gray!85, inner sep=1pt] at (9.5,12) {9};
+\node[above, gray!85, inner sep=1pt] at (10.5,12) {10};
+\node[above, gray!85, inner sep=1pt] at (11.5,12) {11};
+\node[left, gray!85, inner sep=1pt] at (0,11.5) {0};
+\node[left, gray!85, inner sep=1pt] at (0,10.5) {1};
+\node[left, gray!85, inner sep=1pt] at (0,9.5) {2};
+\node[left, gray!85, inner sep=1pt] at (0,8.5) {3};
+\node[left, gray!85, inner sep=1pt] at (0,7.5) {4};
+\node[left, gray!85, inner sep=1pt] at (0,6.5) {5};
+\node[left, gray!85, inner sep=1pt] at (0,5.5) {6};
+\node[left, gray!85, inner sep=1pt] at (0,4.5) {7};
+\node[left, gray!85, inner sep=1pt] at (0,3.5) {8};
+\node[left, gray!85, inner sep=1pt] at (0,2.5) {9};
+\node[left, gray!85, inner sep=1pt] at (0,1.5) {10};
+\node[left, gray!85, inner sep=1pt] at (0,0.5) {11};
+\node[gray!75] at (0.5,11.5) {10};
+\node[gray!75] at (1.5,11.5) {4};
+\node[gray!75] at (2.5,11.5) {6};
+\node[gray!75] at (3.5,11.5) {8};
+\node[gray!75] at (4.5,11.5) {0};
+\node[gray!75] at (5.5,11.5) {1};
+\node[gray!75] at (6.5,11.5) {3};
+\node[gray!75] at (7.5,11.5) {5};
+\node[gray!75] at (8.5,11.5) {7};
+\fill[blue!12] (9,11) rectangle ++(1,1);
+\draw[blue!45, thick] (9,11) rectangle ++(1,1);
+\node[blue!85!black] at (9.5,11.5) {\textbf{9}};
+\node[gray!75] at (10.5,11.5) {11};
+\node[gray!75] at (11.5,11.5) {2};
+\node[gray!75] at (0.5,10.5) {11};
+\node[gray!75] at (1.5,10.5) {5};
+\node[gray!75] at (2.5,10.5) {7};
+\node[gray!75] at (3.5,10.5) {9};
+\node[gray!75] at (4.5,10.5) {1};
+\node[gray!75] at (5.5,10.5) {2};
+\node[gray!75] at (6.5,10.5) {4};
+\node[gray!75] at (7.5,10.5) {6};
+\fill[blue!12] (8,10) rectangle ++(1,1);
+\draw[blue!45, thick] (8,10) rectangle ++(1,1);
+\node[blue!85!black] at (8.5,10.5) {\textbf{8}};
+\node[gray!75] at (9.5,10.5) {10};
+\node[gray!75] at (10.5,10.5) {0};
+\node[gray!75] at (11.5,10.5) {3};
+\node[gray!75] at (0.5,9.5) {0};
+\node[gray!75] at (1.5,9.5) {6};
+\node[gray!75] at (2.5,9.5) {8};
+\node[gray!75] at (3.5,9.5) {10};
+\node[gray!75] at (4.5,9.5) {2};
+\node[gray!75] at (5.5,9.5) {3};
+\node[gray!75] at (6.5,9.5) {5};
+\fill[red!25] (7,9) rectangle ++(1,1);
+\draw[red!85!black, thick] (7,9) rectangle ++(1,1);
+\node at (7.5,9.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{7}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{3}}}};
+\node[gray!75] at (8.5,9.5) {9};
+\node[gray!75] at (9.5,9.5) {11};
+\node[gray!75] at (10.5,9.5) {1};
+\node[gray!75] at (11.5,9.5) {4};
+\node[gray!75] at (0.5,8.5) {1};
+\node[gray!75] at (1.5,8.5) {7};
+\node[gray!75] at (2.5,8.5) {9};
+\node[gray!75] at (3.5,8.5) {11};
+\node[gray!75] at (4.5,8.5) {3};
+\node[gray!75] at (5.5,8.5) {4};
+\fill[blue!12] (6,8) rectangle ++(1,1);
+\draw[blue!45, thick] (6,8) rectangle ++(1,1);
+\node[blue!85!black] at (6.5,8.5) {\textbf{6}};
+\node[gray!75] at (7.5,8.5) {8};
+\node[gray!75] at (8.5,8.5) {10};
+\node[gray!75] at (9.5,8.5) {0};
+\node[gray!75] at (10.5,8.5) {2};
+\node[gray!75] at (11.5,8.5) {5};
+\node[gray!75] at (0.5,7.5) {2};
+\node[gray!75] at (1.5,7.5) {8};
+\node[gray!75] at (2.5,7.5) {10};
+\node[gray!75] at (3.5,7.5) {0};
+\node[gray!75] at (4.5,7.5) {4};
+\fill[red!25] (5,7) rectangle ++(1,1);
+\draw[red!85!black, thick] (5,7) rectangle ++(1,1);
+\node at (5.5,7.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{5}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{4}}}};
+\node[gray!75] at (6.5,7.5) {7};
+\node[gray!75] at (7.5,7.5) {9};
+\node[gray!75] at (8.5,7.5) {11};
+\node[gray!75] at (9.5,7.5) {1};
+\node[gray!75] at (10.5,7.5) {3};
+\node[gray!75] at (11.5,7.5) {6};
+\node[gray!75] at (0.5,6.5) {3};
+\node[gray!75] at (1.5,6.5) {9};
+\node[gray!75] at (2.5,6.5) {11};
+\node[gray!75] at (3.5,6.5) {1};
+\fill[orange!25] (4,6) rectangle ++(1,1);
+\draw[orange!90!black, thick] (4,6) rectangle ++(1,1);
+\node at (4.5,6.5) {\color{orange!90!black}\textbf{5}};
+\node[gray!75] at (5.5,6.5) {6};
+\node[gray!75] at (6.5,6.5) {8};
+\node[gray!75] at (7.5,6.5) {10};
+\node[gray!75] at (8.5,6.5) {0};
+\node[gray!75] at (9.5,6.5) {2};
+\node[gray!75] at (10.5,6.5) {4};
+\node[gray!75] at (11.5,6.5) {7};
+\node[gray!75] at (0.5,5.5) {4};
+\node[gray!75] at (1.5,5.5) {10};
+\node[gray!75] at (2.5,5.5) {0};
+\fill[blue!12] (3,5) rectangle ++(1,1);
+\draw[blue!45, thick] (3,5) rectangle ++(1,1);
+\node[blue!85!black] at (3.5,5.5) {\textbf{2}};
+\node[gray!75] at (4.5,5.5) {6};
+\node[gray!75] at (5.5,5.5) {7};
+\node[gray!75] at (6.5,5.5) {9};
+\node[gray!75] at (7.5,5.5) {11};
+\node[gray!75] at (8.5,5.5) {1};
+\node[gray!75] at (9.5,5.5) {3};
+\node[gray!75] at (10.5,5.5) {5};
+\node[gray!75] at (11.5,5.5) {8};
+\node[gray!75] at (0.5,4.5) {5};
+\node[gray!75] at (1.5,4.5) {11};
+\fill[blue!12] (2,4) rectangle ++(1,1);
+\draw[blue!45, thick] (2,4) rectangle ++(1,1);
+\node[blue!85!black] at (2.5,4.5) {\textbf{1}};
+\node[gray!75] at (3.5,4.5) {3};
+\node[gray!75] at (4.5,4.5) {7};
+\node[gray!75] at (5.5,4.5) {8};
+\node[gray!75] at (6.5,4.5) {10};
+\node[gray!75] at (7.5,4.5) {0};
+\node[gray!75] at (8.5,4.5) {2};
+\node[gray!75] at (9.5,4.5) {4};
+\node[gray!75] at (10.5,4.5) {6};
+\node[gray!75] at (11.5,4.5) {9};
+\node[gray!75] at (0.5,3.5) {6};
+\fill[blue!12] (1,3) rectangle ++(1,1);
+\draw[blue!45, thick] (1,3) rectangle ++(1,1);
+\node[blue!85!black] at (1.5,3.5) {\textbf{0}};
+\node[gray!75] at (2.5,3.5) {2};
+\node[gray!75] at (3.5,3.5) {4};
+\node[gray!75] at (4.5,3.5) {8};
+\node[gray!75] at (5.5,3.5) {9};
+\node[gray!75] at (6.5,3.5) {11};
+\node[gray!75] at (7.5,3.5) {1};
+\node[gray!75] at (8.5,3.5) {3};
+\node[gray!75] at (9.5,3.5) {5};
+\node[gray!75] at (10.5,3.5) {7};
+\node[gray!75] at (11.5,3.5) {10};
+\fill[orange!25] (0,2) rectangle ++(1,1);
+\draw[orange!90!black, thick] (0,2) rectangle ++(1,1);
+\node at (0.5,2.5) {\color{orange!90!black}\textbf{7}};
+\node[gray!75] at (1.5,2.5) {1};
+\node[gray!75] at (2.5,2.5) {3};
+\node[gray!75] at (3.5,2.5) {5};
+\node[gray!75] at (4.5,2.5) {9};
+\node[gray!75] at (5.5,2.5) {10};
+\node[gray!75] at (6.5,2.5) {0};
+\node[gray!75] at (7.5,2.5) {2};
+\node[gray!75] at (8.5,2.5) {4};
+\node[gray!75] at (9.5,2.5) {6};
+\node[gray!75] at (10.5,2.5) {8};
+\node[gray!75] at (11.5,2.5) {11};
+\node[gray!75] at (0.5,1.5) {8};
+\node[gray!75] at (1.5,1.5) {2};
+\node[gray!75] at (2.5,1.5) {4};
+\node[gray!75] at (3.5,1.5) {6};
+\node[gray!75] at (4.5,1.5) {10};
+\node[gray!75] at (5.5,1.5) {11};
+\node[gray!75] at (6.5,1.5) {1};
+\node[gray!75] at (7.5,1.5) {3};
+\node[gray!75] at (8.5,1.5) {5};
+\node[gray!75] at (9.5,1.5) {7};
+\node[gray!75] at (10.5,1.5) {9};
+\node[gray!75] at (11.5,1.5) {0};
+\node[gray!75] at (0.5,0.5) {9};
+\node[gray!75] at (1.5,0.5) {3};
+\node[gray!75] at (2.5,0.5) {5};
+\node[gray!75] at (3.5,0.5) {7};
+\node[gray!75] at (4.5,0.5) {11};
+\node[gray!75] at (5.5,0.5) {0};
+\node[gray!75] at (6.5,0.5) {2};
+\node[gray!75] at (7.5,0.5) {4};
+\node[gray!75] at (8.5,0.5) {6};
+\node[gray!75] at (9.5,0.5) {8};
+\node[gray!75] at (10.5,0.5) {10};
+\node[gray!75] at (11.5,0.5) {1};
+\end{tikzpicture}\\[4pt]
+\footnotesize
+\begin{tabular}{@{}cccc@{}}
+\toprule
+Cell $(i,j)$ & $S_{i,j}$ & $f(i,j)$ & Status \\
+\midrule
+$(9, 0)$ & 7 & 7 & Pin $j = 0$ \\
+$(8, 1)$ & 0 & 0 & Distinct \\
+$(7, 2)$ & 1 & 1 & Distinct \\
+$(6, 3)$ & 2 & 2 & Distinct \\
+$(5, 4)$ & 5 & 5 & Pin $j = m - 2$ \\
+$(4, 5)$ & 5 & \textbf{4} & \textbf{Steals 4 ($-1$)} \\
+$(3, 6)$ & 6 & 6 & Distinct \\
+$(2, 7)$ & 7 & \textbf{3} & \textbf{Steals 3 ($-(m-2)$)} \\
+$(1, 8)$ & 8 & 8 & Distinct \\
+$(0, 9)$ & 9 & 9 & Distinct \\
+\bottomrule
+\end{tabular}
+\caption{Family 4 ($n = 12$, $m = 6, k = 4$): $s$-diagonal $s = 9$ seam collisions at
+$j = m - 1 = 5$ and $j = n - 5 = 7$ shifted into vacant slots $\{3, 4\}$.}
+\label{fig:fam4_sum}
+\end{figure}
+\clearpage
+
+\begin{example}[Family 4 $d$-Diagonal Modular Wrap-Around: $n = 12$, $d = -4$]\label{ex:fam4_diff}
+Along $i - j = -4$ ($i = j - 4$) for $n = 12$ ($m = 6, k = 4$), the second main block ($5 \le j \le
+10$) steps by $+3$: $S_{1,5} = 2$, $S_{2,6} = 5$, $S_{3,7} = 8$, $S_{4,8} = 11$, all in residue
+class $2 \pmod 3$, while pins $(0, 4)$ and $(7, 11)$ have values $0$ and $9$ ($0 \pmod 3$), leaving
+residue class $1 \pmod 3$ ($\{1, 4, 7, 10\}$) completely vacant. At $j = 9 = m - 1 + k$ and
+$j = 10 = m + k$, the progression wraps around $12$ to $S_{5,9} = 2 = S_{1,5}$ and
+$S_{6,10} = 5 = S_{2,6}$. Shifting by $-1$ at $j = 9$ gives $f(5, 9) = 1$, and shifting by $-2$
+at $j = 10$ gives $f(6, 10) = 3$, resolving both collisions (Figure~\ref{fig:fam4_diff}).
+\end{example}
+
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[scale=0.45, every node/.style={font=\fontsize{6.5}{7.5}\selectfont}]
 \draw[step=1cm, gray!45, thin] (0,0) grid (12,12);
 \node[above, gray!85, inner sep=1pt] at (0.5,12) {0};
 \node[above, gray!85, inner sep=1pt] at (1.5,12) {1};
@@ -1381,7 +3127,8 @@ $(9, 9)$ & 6 & \textbf{1} & \textbf{Steals vacant 1 ($< 6$)} \\
 \node[gray!75] at (8.5,6.5) {0};
 \fill[red!25] (9,6) rectangle ++(1,1);
 \draw[red!85!black, thick] (9,6) rectangle ++(1,1);
-\node at (9.5,6.5) {\color{red!85!black}\shortstack[c]{\textbf{2}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{1}}}};
+\node at (9.5,6.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{2}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{1}}}};
 \node[gray!75] at (10.5,6.5) {4};
 \node[gray!75] at (11.5,6.5) {7};
 \node[gray!75] at (0.5,5.5) {4};
@@ -1396,7 +3143,8 @@ $(9, 9)$ & 6 & \textbf{1} & \textbf{Steals vacant 1 ($< 6$)} \\
 \node[gray!75] at (9.5,5.5) {3};
 \fill[red!25] (10,5) rectangle ++(1,1);
 \draw[red!85!black, thick] (10,5) rectangle ++(1,1);
-\node at (10.5,5.5) {\color{red!85!black}\shortstack[c]{\textbf{5}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{3}}}};
+\node at (10.5,5.5) {\color{red!85!black}%
+  \shortstack[c]{\textbf{5}\\[-2pt]{\fontsize{4.5}{5}\selectfont$\downarrow$\textbf{3}}}};
 \node[gray!75] at (11.5,5.5) {8};
 \node[gray!75] at (0.5,4.5) {5};
 \node[gray!75] at (1.5,4.5) {11};
@@ -1464,28 +3212,22 @@ $(9, 9)$ & 6 & \textbf{1} & \textbf{Steals vacant 1 ($< 6$)} \\
 \footnotesize
 \begin{tabular}{@{}cccc@{}}
 \toprule
-Cell $(i,j)$ & $v(i,j)$ & $f(i,j)$ & Status \\
+Cell $(i,j)$ & $S_{i,j}$ & $f(i,j)$ & Status \\
 \midrule
-$(0, 4)$ & 0 & 0 & Boundary pin \\
+$(0, 4)$ & 0 & 0 & Pin $j = m - 2$ \\
 $(1, 5)$ & 2 & 2 & Keeps value \\
 $(2, 6)$ & 5 & 5 & Keeps value \\
 $(3, 7)$ & 8 & 8 & Distinct \\
 $(4, 8)$ & 11 & 11 & Distinct \\
-$(5, 9)$ & 2 & \textbf{1} & \textbf{Steals vacant 1 ($< 2$)} \\
-$(6, 10)$ & 5 & \textbf{3} & \textbf{Steals vacant 3 ($< 5$)} \\
-$(7, 11)$ & 9 & 9 & Boundary pin \\
+$(5, 9)$ & 2 & \textbf{1} & \textbf{Steals 1 ($-1$)} \\
+$(6, 10)$ & 5 & \textbf{3} & \textbf{Steals 3 ($-2$)} \\
+$(7, 11)$ & 9 & 9 & Pin $j = n - 1$ \\
 \bottomrule
 \end{tabular}
-\caption{Difference-diagonal $d = -4$ on $n = 12$.}
-\label{subfig:dm4}
-\end{subfigure}
-\caption{Difference-diagonal collisions and reassignment. Off-diagonal values and grid lines
-are shown in gray. (a) Parity jump between $(0,0)$ and $(9,9)$ for $n = 10$. (b) Pure modular
-wrap-around at $n = 12$ inside a linear block with step $+3$, where wrapped cells land in the
-vacant residue class $1 \pmod 3$.}
-\label{fig:diff_diag_examples}
+\caption{Family 4 ($n = 12$, $m = 6, k = 4$): $d$-diagonal $d = -4$ wrap-around collisions at
+$j_2 - j_1 = k = 4$ shifted into vacant residue class $1 \pmod 3$.}
+\label{fig:fam4_diff}
 \end{figure}
-
 \FloatBarrier
 \begin{thebibliography}{9}
 \bibitem{LLW1990}

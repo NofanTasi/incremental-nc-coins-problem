@@ -19,7 +19,7 @@ the search tree when asking for the first solution (`head (coins n)`).
 
 With this **constructive formula**, we do not search at all: every cell is
 determined in O(1) arithmetic operations:
-    isCoin(i, j) <=> (i + q(j)) mod n < c
+    isCoin(i, j) <=> (i + p(j)) mod n < c
 
 Haskell's laziness provides powerful advantages here:
 1. **On-Demand Subgrid Evaluation**: To get the coin positions in row `i`,
@@ -34,27 +34,27 @@ Haskell's laziness provides powerful advantages here:
 -}
 
 --------------------------------------------------------------------------------
--- 1. Permutation Families q(j)
+-- 1. Permutation Families p(j)
 --------------------------------------------------------------------------------
 
 -- | Family 1: n ≡ 1, 5 (mod 6)
-q1 :: Int -> Int -> Int
-q1 n j
+p1 :: Int -> Int -> Int
+p1 n j
   | j == 0      = 0
   | 2 * j < n   = n - 2 * j
   | otherwise   = 2 * n - 2 * j
 
 -- | Family 2: n ≡ 2, 4 (mod 6), n ≥ 10
-q2 :: Int -> Int -> Int
-q2 n j =
+p2 :: Int -> Int -> Int
+p2 n j =
   let m = n `div` 2
   in if j < m
      then if 2 * j + m + 1 < n then 2 * j + m + 1 else 2 * j + m + 1 - n
      else if 2 * (j - m) + m + 4 < n then 2 * (j - m) + m + 4 else 2 * (j - m) + m + 4 - n
 
--- | Family 4: n ≡ 3 (mod 6), n ≥ 27
-q4 :: Int -> Int -> Int
-q4 n j =
+-- | Family 3: n ≡ 3 (mod 6), n ≥ 27
+p3 :: Int -> Int -> Int
+p3 n j =
   let k = n `div` 3
   in if j < k
      then if 3 * j + 2 * k < n then 3 * j + 2 * k else 3 * j + 2 * k - n
@@ -62,9 +62,9 @@ q4 n j =
           then if 3 * (j - k) + 2 * k + 4 < n then 3 * (j - k) + 2 * k + 4 else 3 * (j - k) + 2 * k + 4 - n
           else if 3 * (j - 2 * k) + 2 * k + 8 < n then 3 * (j - 2 * k) + 2 * k + 8 else 3 * (j - 2 * k) + 2 * k + 8 - n
 
--- | Family 3: n ≡ 0 (mod 6), n ≥ 12
-q3 :: Int -> Int -> Int
-q3 n j =
+-- | Family 4: n ≡ 0 (mod 6), n ≥ 12
+p4 :: Int -> Int -> Int
+p4 n j =
   let m = n `div` 2
   in if j == 0 then n - 2
      else if j < m - 2 then 2 * j + 2
@@ -73,23 +73,23 @@ q3 n j =
      else 2
 
 -- | Small exceptional cases
-q8, q9, q15, q21 :: Int -> Int
-q8 j = [0, 4, 1, 3, 6, 2, 7, 5] !! (j `mod` 8)
-q9 j = [0, 6, 3, 1, 8, 5, 2, 4, 7] !! (j `mod` 9)
-q15 j = [0, 3, 6, 9, 12, 8, 5, 2, 13, 1, 4, 7, 10, 14, 11] !! (j `mod` 15)
-q21 j = [0, 18, 15, 12, 9, 6, 3, 7, 4, 1, 14, 17, 10, 16, 2, 5, 11, 8, 20, 13, 19] !! (j `mod` 21)
+p8, p9, p15, p21 :: Int -> Int
+p8 j = [0, 4, 1, 3, 6, 2, 7, 5] !! (j `mod` 8)
+p9 j = [0, 6, 3, 1, 8, 5, 2, 4, 7] !! (j `mod` 9)
+p15 j = [0, 3, 6, 9, 12, 8, 5, 2, 13, 1, 4, 7, 10, 14, 11] !! (j `mod` 15)
+p21 j = [0, 18, 15, 12, 9, 6, 3, 7, 4, 1, 14, 17, 10, 16, 2, 5, 11, 8, 20, 13, 19] !! (j `mod` 21)
 
 -- | Master permutation dispatch
-q :: Int -> Int -> Int
-q n j
-  | n == 8        = q8 j
-  | n == 9        = q9 j
-  | n == 15       = q15 j
-  | n == 21       = q21 j
-  | r == 1 || r == 5 = q1 n j
-  | r == 2 || r == 4 = q2 n j
-  | r == 3        = q4 n j
-  | otherwise     = q3 n j
+p :: Int -> Int -> Int
+p n j
+  | n == 8        = p8 j
+  | n == 9        = p9 j
+  | n == 15       = p15 j
+  | n == 21       = p21 j
+  | r == 1 || r == 5 = p1 n j
+  | r == 2 || r == 4 = p2 n j
+  | r == 3        = p3 n j
+  | otherwise     = p4 n j
   where r = n `mod` 6
 
 --------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ q n j
 
 -- | Value of cell (i, j) in the Incremental Latin Square
 cellValue :: Int -> Int -> Int -> Int
-cellValue n i j = (i + q n j) `mod` n
+cellValue n i j = (i + p n j) `mod` n
 
 -- | True if cell (i, j) contains a coin in the (n, c)-coins placement
 isCoin :: Int -> Int -> Int -> Int -> Bool
