@@ -119,11 +119,11 @@ end
 # 4. Solver & Display
 # ============================================================================
 """
- * solve(range;print_p,print_L,print_I,verify,benchmark)
+ * solve(range;print_P,print_L,print_I,verify,benchmark)
 Generates, optionally benchmarks, verifies, displays any range of n and its nc's.
 """
 function solve(range;
-               print_p=true, # print permutation p
+               print_P=true, # print permutation p
                print_L=true, # print latin square L solution
                print_I=false, # print incremental boards
                verify=true, # verify solution
@@ -176,7 +176,7 @@ function solve(range;
             println("$v -> $msg")
         end
 
-        if print_p
+        if print_P
             println("column Permutation (0:(n-1) valued):")
             print("p = ")
             println(p)
@@ -213,15 +213,15 @@ end
 
 # example invocation: 8x8 board and it's (8,c)-coins solutions
 # r = collect(8:8)
-# solve(r,print_p=true,print_L=true,print_I=true,verify=false)
+# solve(r,print_P=true,print_L=true,print_I=true,verify=false)
 # exit(0)
 
 # example invocation: show everything and verify up to 32
 r = collect(4:32)
-solve(r,print_p=true,print_L=true,print_I=true,verify=true)
+solve(r,print_P=true,print_L=true,print_I=true,verify=true)
 exit(0)
 
 # example invocation: show nothing and do not verify but benchmark up to 2^12
 # r = collect(4:2^12)
-# solve(r,print_p=false,print_L=false,print_I=false,verify=false,benchmark=true)
+# solve(r,print_P=false,print_L=false,print_I=false,verify=false,benchmark=true)
 # exit(0)
