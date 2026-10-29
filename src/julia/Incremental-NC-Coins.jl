@@ -10,17 +10,17 @@
 # 1. Utilities
 # ============================================================================
 """
- * cyclic(n,q)
-Constructs the 1:n valued cyclic Latin square L[i,j] = 1 + ((i + q[j]) mod n).
+ * cyclic(n,p)
+Constructs the 0:(n-1) valued cyclic Latin square L[i,j] = (i + p[j]) mod n.
 """
-cyclic(n,q) = [mod(i+q[j],n) + 1 for i in 0:(n-1), j in 1:n]
+cyclic(n,p) = [mod(i+p[j],n) for i in 0:(n-1), j in 1:n]
 
 # ============================================================================
 # 2. Families (compressed somewhat compact formulas extracted from Lean)
 # ============================================================================
 """
  * F_f(n,j)
-Formula for permutation q to be used by Family f
+Formula for permutation p to be used by Family f
 """
 # Family 1: n = 1 or 5 (mod 6) (n >= 1)
 F_1(n,j) = j == 0 ? 0 : 2j < n ? n - 2j : 2n - 2j
@@ -42,8 +42,8 @@ const Qs = Dict(
     21 => [0,18,15,12,9,6,3,7,4,1,14,17,10,16,2,5,11,8,20,13,19] # f3: 21 < 27
 )
 
-# get F_f where 1 <= f <= 4 providing q for Family f
-function get_f_for_q(n)
+# get F_f where 1 <= f <= 4 providing p for Family f
+function get_f_for_p(n)
     if haskey(Qs,n)
         return (n,j) -> Qs[n][j+1]
     end
@@ -73,40 +73,49 @@ end
 # ============================================================================
 """
  * correct(L,n)
-Verifies that L is a Latin square (bijective rows and columns) and that 
-for every threshold k (0 <= k <= n), every sum-diagonal and dif-diagonal 
-contains at most k cells with value <= k.
+Verifies that L is a 0:(n-1)-valued Latin square (bijective rows and columns)
+and that, for every threshold c (0 <= c <= n), every sum-diagonal and
+dif-diagonal contains at most c cells with value < c.
+
+This is Lean's `IsIncremental` form relabelled: Lean states
+  ∀ k < n,  #(sumDiagOk k L) ≤ k + 1  ∧  #(diffDiagOk k L) ≤ k + 1
+where `sumDiagOk k L` = { cells with value ≤ k }.  Setting c = k + 1 gives
+  ∀ c ∈ 0:n,  #{ cells with value < c on a diagonal } ≤ c,
+which is what we check below.  With 1:n-valued L (old convention) the same
+statement reads `count(L ≤ c) ≤ c`; both forms describe the same (n,c) coins
+constraint, only the label on the value axis changes.
 """
 function correct(L,n)
     # 1. Check Row and Col Bijectivity
+    #    L is 0:(n-1)-valued; isperm expects 1:n, so shift by 1 first.
     for r in 1:n
-        if !isperm(L[r,:])
+        if !isperm(L[r,:] .+ 1)
             return false,"Row $r is not a Permutation"
         end
     end
     for c in 1:n
-        if !isperm(L[:,c])
+        if !isperm(L[:,c] .+ 1)
             return false,"Col $c is not a Permutation"
         end
     end
 
-    # 2. Check Diagonals for every threshold k
-    for k in 0:n
+    # 2. Check Diagonals for every threshold c
+    for c in 0:n
         # Check all sum-diagonals (sum s from 0 to 2n-2)
         for s in 0:(2n-2)
-            cnt = count(i->L[i+1,s-i+1] <= k, max(0,s-n+1):min(n-1,s))
-            if cnt > k
+            cnt = count(i->L[i+1,s-i+1] < c, max(0,s-n+1):min(n-1,s))
+            if cnt > c
                 return false,
-                "Sum-diagonal $s count $cnt > $k"
+                "Sum-diagonal $s count $cnt > $c (threshold c=$c)"
             end
         end
 
         # Check all dif-diagonals (dif d from -(n-1) to n-1)
         for d in -(n-1):(n-1)
-            cnt = count(i->L[i+1,i-d+1] <= k, max(0,d):min(n-1,n-1+d))
-            if cnt > k
+            cnt = count(i->L[i+1,i-d+1] < c, max(0,d):min(n-1,n-1+d))
+            if cnt > c
                 return false,
-                "Dif-diagonal $d count $cnt > $k"
+                "Dif-diagonal $d count $cnt > $c (threshold c=$c)"
             end
         end
     end
@@ -118,11 +127,11 @@ end
 # 4. Solver & Display
 # ============================================================================
 """
- * solve(range;print_q,print_L,print_I,verify,benchmark)
+ * solve(range;print_p,print_L,print_I,verify,benchmark)
 Generates, optionally benchmarks, verifies, displays any range of n and its nc's.
 """
 function solve(range;
-               print_q=true, # print permutation q
+               print_p=true, # print permutation p
                print_L=true, # print latin square L solution
                print_I=false, # print incremental boards
                verify=true, # verify solution
@@ -145,29 +154,28 @@ function solve(range;
             println("skipping Dimension n = $n < 4")
             continue
         elseif n == 4
-            # an Explicit non-cyclic L4
+            # an Explicit non-cyclic L4 (0:(n-1)-valued)
             L = [
-                3 1 2 4;
-                2 4 3 1;
-                1 3 4 2;
-                4 2 1 3
+                2 0 1 3;
+                1 3 2 0;
+                0 2 3 1;
+                3 1 0 2
             ]
-            q = missing
+            p = missing
         elseif n == 6
-            # an Explicit non-cyclic L6
+            # an Explicit non-cyclic L6 (0:(n-1)-valued)
             L = [
-                2 1 3 4 6 5;
-                4 2 5 1 3 6;
-                5 4 6 3 2 1;
-                1 3 2 6 5 4;
-                3 6 1 5 4 2;
-                6 5 4 2 1 3
+                1 0 2 3 5 4;
+                3 1 4 0 2 5;
+                4 3 5 2 1 0;
+                0 2 1 5 4 3;
+                2 5 0 4 3 1;
+                5 4 3 1 0 2
             ]
-            q = missing
+            p = missing
         else
-            q = [get_f_for_q(n)(n,j) for j in 0:(n-1)]
-            L = cyclic(n,q)
-            q = q .+ 1
+            p = [get_f_for_p(n)(n,j) for j in 0:(n-1)]
+            L = cyclic(n,p)
         end
 
         if verify
@@ -176,14 +184,14 @@ function solve(range;
             println("$v -> $msg")
         end
 
-        if print_q
-            println("column Permutation (1:n valued):")
-            print("q = ")
-            println(q)
+        if print_p
+            println("column Permutation (0:(n-1) valued):")
+            print("p = ")
+            println(p)
         end
 
         if print_L
-            println("Incremental Latin Square (1:n valued):")
+            println("Incremental Latin Square (0:(n-1) valued):")
             for r in eachrow(L)
                 println(" ", join(lpad.(r,l)))
             end
@@ -194,7 +202,7 @@ function solve(range;
             for c in 0:n
                 println("Increment c = $c:")
                 for r in eachrow(L)
-                    println(" ", join(lpad.(Int.(r.<=c),2),""))
+                    println(" ", join(lpad.(Int.(r.<c),2),""))
                 end
             end
         end
@@ -213,15 +221,15 @@ end
 
 # example invocation: 8x8 board and it's (8,c)-coins solutions
 # r = collect(8:8)
-# solve(r,print_q=true,print_L=true,print_I=true,verify=false)
+# solve(r,print_p=true,print_L=true,print_I=true,verify=false)
 # exit(0)
 
 # example invocation: show everything and verify up to 32
 r = collect(4:32)
-solve(r,print_q=true,print_L=true,print_I=true,verify=true)
+solve(r,print_p=true,print_L=true,print_I=true,verify=true)
 exit(0)
 
 # example invocation: show nothing and do not verify but benchmark up to 2^12
 # r = collect(4:2^12)
-# solve(r,print_q=false,print_L=false,print_I=false,verify=false,benchmark=true)
+# solve(r,print_p=false,print_L=false,print_I=false,verify=false,benchmark=true)
 # exit(0)
