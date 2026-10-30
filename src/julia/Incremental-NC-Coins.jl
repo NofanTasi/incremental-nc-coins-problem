@@ -28,11 +28,11 @@ F_1(n,j) = j == 0 ? 0 : 2j < n ? n - 2j : 2n - 2j
 # Family 2: n = 2 or 4 (mod 6) (n >= 10)
 F_2(n,j) = (d = div(n,2); r = j < d ? 2j + d + 1 : 2(j - d) + d + 4; r < n ? r : r - n)
 
-# Family 3: n = 0 (mod 6) (n >= 12)
-F_3(n,j) = (d = div(n,2); j == 0 ? n - 2 : j < d - 2 ? 2j + 2 : j == d - 2 ? 0 : j < n - 1 ? 2(j - d + 1) + 1 : 2)
+# Family 3: n = 3 (mod 6) (n >= 27)
+F_3(n,j) = (d = div(n,3); r = j < d ? 3j + 2d : j < 2d ? 3(j - d) + 2d + 4 : 3(j - 2d) + 2d + 8; r < n ? r : r - n)
 
-# Family 4: n = 3 (mod 6) (n >= 27)
-F_4(n,j) = (d = div(n,3); r = j < d ? 3j + 2d : j < 2d ? 3(j - d) + 2d + 4 : 3(j - 2d) + 2d + 8; r < n ? r : r - n)
+# Family 4: n = 0 (mod 6) (n >= 12)
+F_4(n,j) = (d = div(n,2); j == 0 ? n - 2 : j < d - 2 ? 2j + 2 : j == d - 2 ? 0 : j < n - 1 ? 2(j - d + 1) + 1 : 2)
 
 # some finite small Permutations (0:(n-1) valued) below minimal values supported per family
 const Qs = Dict(
@@ -49,7 +49,7 @@ function get_f_for_p(n)
     end
 
     # minimal values per family
-    (m_2,m_3,m_4) = (10,12,27)
+    (m_2,m_3,m_4) = (10,27,12)
 
     r = mod(n,6)
     if r == 1 || r == 5
@@ -57,10 +57,10 @@ function get_f_for_p(n)
     elseif r == 2 || r == 4
         n >= m_2 || error("Family 2 requires n >= $m_2 (n = $n)")
         return F_2
-    elseif r == 0
+    elseif r == 3
         n >= m_3 || error("Family 3 requires n >= $m_3 (n = $n)")
         return F_3
-    elseif r == 3
+    elseif r == 0
         n >= m_4 || error("Family 4 requires n >= $m_4 (n = $n)")
         return F_4
     else

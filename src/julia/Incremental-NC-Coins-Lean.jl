@@ -19,21 +19,21 @@ using Printf
 # ============================================================
 
 """
-    val_nat(n, q, i, j)   —  Lean: `val_nat n q_nat i j`
+    val_nat(n, p, i, j)   —  Lean: `val_nat n p_nat i j`
 
-Conditional-subtraction form of `(i + q[j+1]) mod n`, valid for `i, q[j+1] < n`.
-Equals `L[i+1, j+1]` for `L = cyclicSquare(n, q)` (Lean: `mod_eq_val_nat`).
+Conditional-subtraction form of `(i + p[j+1]) mod n`, valid for `i, p[j+1] < n`.
+Equals `L[i+1, j+1]` for `L = cyclicSquare(n, p)` (Lean: `mod_eq_val_nat`).
 """
-val_nat(n::Int, q::Vector{Int}, i::Int, j::Int) =
-    (s = i + q[j+1]; s < n ? s : s - n)
+val_nat(n::Int, p::Vector{Int}, i::Int, j::Int) =
+    (s = i + p[j+1]; s < n ? s : s - n)
 
 """
-    cyclicSquare(n, q)   —  Lean: `cyclicSquare n q h hn`
+    cyclicSquare(n, p)   —  Lean: `cyclicSquare n p h hn`
 
-Cyclic Latin square `L[i+1, j+1] = (i + q[j+1]) mod n` (0-indexed entries).
+Cyclic Latin square `L[i+1, j+1] = (i + p[j+1]) mod n` (0-indexed entries).
 """
-cyclicSquare(n::Int, q::Vector{Int}) =
-    [mod(i + q[j+1], n) for i in 0:n-1, j in 0:n-1]
+cyclicSquare(n::Int, p::Vector{Int}) =
+    [mod(i + p[j+1], n) for i in 0:n-1, j in 0:n-1]
 
 # Diagonal cell generators (0-indexed cells) — the two index ranges
 # are exactly the ones Lean's `univ.filter` enumerates.
@@ -96,23 +96,23 @@ end
 # ============================================================
 
 """
-    check_hypotheses(n, q, f_sum, f_diff)   —  hypotheses of
+    check_hypotheses(n, p, f_sum, f_diff)   —  hypotheses of
     `exists_incremental_of_nat`
 
 Checks:
-  * `q` is a permutation of `0:n-1`                (hq_lt + hq_inj)
+  * `p` is a permutation of `0:n-1`                (hp_lt + hp_inj)
   * `f_sum, f_diff ∈ [0, val_nat]`                 (h_sum_le + h_diff_le,
                                                     ℕ-valued in Lean ⇒ ≥ 0)
   * `f_sum` injective on every sum-diagonal        (h_sum_inj)
   * `f_diff` injective on every diff-diagonal      (h_diff_inj)
 """
-function check_hypotheses(n::Int, q::Vector{Int},
+function check_hypotheses(n::Int, p::Vector{Int},
                           f_sum::Function, f_diff::Function;
                           verbose::Bool = true)::Bool
-    sort(q) == collect(0:n-1) ||
-        (verbose && println("  hq_lt / hq_inj FAILS"); return false)
+    sort(p) == collect(0:n-1) ||
+        (verbose && println("  hp_lt / hp_inj FAILS"); return false)
     for i in 0:n-1, j in 0:n-1
-        v = val_nat(n, q, i, j)
+        v = val_nat(n, p, i, j)
         fs, fd = f_sum(i, j), f_diff(i, j)
         (fs < 0 || fs > v) &&
             (verbose && @printf("  h_sum_le at (%d,%d): %d ∉ [0,%d]\n", i, j, fs, v); return false)
@@ -160,15 +160,15 @@ end
 
 # ============================================================
 # §3  Family 1 — n ≡ 1, 5 (mod 6)
-#     Lean: q1_nat, solve_family1
+#     Lean: p1_nat, solve_family1
 # ============================================================
 
 """
-    q1_nat(n, j)   —  Lean: `q1_nat n j`
+    p1_nat(n, j)   —  Lean: `p1_nat n j`
 
-`q1(j) = (-2j) mod n`, written as three linear branches.
+`p1(j) = (-2j) mod n`, written as three linear branches.
 """
-q1_nat(n::Int, j::Int) =
+p1_nat(n::Int, j::Int) =
     j == 0   ? 0       :
     2j < n   ? n - 2j  :
                2n - 2j
@@ -179,23 +179,23 @@ q1_nat(n::Int, j::Int) =
 `gcd(6, n) = 1` ⇒ no diagonal collisions ⇒ `f_sum = f_diff = val_nat`.
 """
 function family1(n::Int)
-    q = [q1_nat(n, j) for j in 0:n-1]
-    q, ((i, j) -> val_nat(n, q, i, j)), ((i, j) -> val_nat(n, q, i, j)),
+    p = [p1_nat(n, j) for j in 0:n-1]
+    p, ((i, j) -> val_nat(n, p, i, j)), ((i, j) -> val_nat(n, p, i, j)),
     "Family 1  (n≡1,5 mod 6)"
 end
 
 # ============================================================
 # §4  Family 2 — n ≡ 2, 4 (mod 6), n ≥ 10
-#     Lean: q2_nat, f2_sum, f2_diff, solve_family2
+#     Lean: p2_nat, f2_sum, f2_diff, solve_family2
 # ============================================================
 
 """
-    q2_nat(n, j)   —  Lean: `q2_nat n j`
+    p2_nat(n, j)   —  Lean: `p2_nat n j`
 
 Two-block permutation: step `+2` inside each half of `n/2`, with a `+3`
 parity switch at `j = n/2`.
 """
-q2_nat(n::Int, j::Int) =
+p2_nat(n::Int, j::Int) =
     let m = n ÷ 2
         if j < m
             v = 2j + m + 1
@@ -212,24 +212,24 @@ q2_nat(n::Int, j::Int) =
 `f2_sum` shifts the 3×3 top-right corner; `f2_diff` shifts cell `(n-1, n-1)`.
 """
 function family2(n::Int)
-    q = [q2_nat(n, j) for j in 0:n-1]
-    f_sum  = (i, j) -> (i < 3     && j ≥ n - 3) ? j - (n - 3) : val_nat(n, q, i, j)
-    f_diff = (i, j) -> (i == n-1  && j == n-1 ) ? 1           : val_nat(n, q, i, j)
-    q, f_sum, f_diff, "Family 2  (n≡2,4 mod 6, n≥10)"
+    p = [p2_nat(n, j) for j in 0:n-1]
+    f_sum  = (i, j) -> (i < 3     && j ≥ n - 3) ? j - (n - 3) : val_nat(n, p, i, j)
+    f_diff = (i, j) -> (i == n-1  && j == n-1 ) ? 1           : val_nat(n, p, i, j)
+    p, f_sum, f_diff, "Family 2  (n≡2,4 mod 6, n≥10)"
 end
 
 # ============================================================
-# §5  Family 4 — n ≡ 3 (mod 6), n ≥ 27
-#     Lean: q4_nat, f4_sum, f4_diff, solve_family4
+# §5  Family 3 — n ≡ 3 (mod 6), n ≥ 27
+#     Lean: p3_nat, f3_sum, f3_diff, solve_family3
 # ============================================================
 
 """
-    q4_nat(n, j)   —  Lean: `q4_nat n j`
+    p3_nat(n, j)   —  Lean: `p3_nat n j`
 
 Three-block permutation: step `+3` inside each block of length `k = n/3`,
 with `+4` jumps between blocks.
 """
-q4_nat(n::Int, j::Int) =
+p3_nat(n::Int, j::Int) =
     let k = n ÷ 3
         j < k    ? (v = 3j          + 2k;     v < n ? v : v - n) :
         j < 2k   ? (v = 3(j - k)    + 2k + 4; v < n ? v : v - n) :
@@ -237,39 +237,39 @@ q4_nat(n::Int, j::Int) =
     end
 
 """
-    family4(n)   —  Lean: `solve_family4`
+    family3(n)   —  Lean: `solve_family3`
 
-`f4_sum` shifts the 4×4 top-right corner; `f4_diff` shifts the 2×2
+`f3_sum` shifts the 4×4 top-right corner; `f3_diff` shifts the 2×2
 bottom-right corner.
 """
-function family4(n::Int)
-    q = [q4_nat(n, j) for j in 0:n-1]
+function family3(n::Int)
+    p = [p3_nat(n, j) for j in 0:n-1]
     k = n ÷ 3
-    f_sum  = (i, j) -> let v = val_nat(n, q, i, j)
+    f_sum  = (i, j) -> let v = val_nat(n, p, i, j)
         i < 4 && (j == n-4 || j == n-3) ? v - k  :
         i < 4 && (j == n-2 || j == n-1) ? v - 2k :
                                           v
     end
-    f_diff = (i, j) -> let v = val_nat(n, q, i, j)
+    f_diff = (i, j) -> let v = val_nat(n, p, i, j)
         i ≥ n-2 && j == n-2 ? v - 2k :
         i ≥ n-2 && j == n-1 ? v - k  :
                               v
     end
-    q, f_sum, f_diff, "Family 4  (n≡3 mod 6, n≥27)"
+    p, f_sum, f_diff, "Family 3  (n≡3 mod 6, n≥27)"
 end
 
 # ============================================================
-# §6  Family 3 — n ≡ 0 (mod 6), n ≥ 12
-#     Lean: q3_nat, f3_sum, f3_diff, solve_family3
+# §6  Family 4 — n ≡ 0 (mod 6), n ≥ 12
+#     Lean: p4_nat, f4_sum, f4_diff, solve_family4
 # ============================================================
 
 """
-    q3_nat(n, j)   —  Lean: `q3_nat n j`
+    p4_nat(n, j)   —  Lean: `p4_nat n j`
 
 Five-piece permutation: boundary pins `{0, m-2, n-1}` + two main blocks
 (even residues / odd residues) with `m = n/2`.
 """
-q3_nat(n::Int, j::Int) =
+p4_nat(n::Int, j::Int) =
     let m = n ÷ 2
         j == 0    ? n - 2                :
         j < m - 2 ? 2j + 2               :
@@ -279,21 +279,21 @@ q3_nat(n::Int, j::Int) =
     end
 
 """
-    family3(n)   —  Lean: `solve_family3`
+    family4(n)   —  Lean: `solve_family4`
 
-`f3_sum` shifts three seam columns; `f3_diff` shifts wrapped portions of
+`f4_sum` shifts three seam columns; `f4_diff` shifts wrapped portions of
 each block into the vacant mod-3 residue class.
 """
-function family3(n::Int)
-    q = [q3_nat(n, j) for j in 0:n-1]
+function family4(n::Int)
+    p = [p4_nat(n, j) for j in 0:n-1]
     m, k = n ÷ 2, n ÷ 3
-    f_sum = (i, j) -> let v = val_nat(n, q, i, j)
+    f_sum = (i, j) -> let v = val_nat(n, p, i, j)
         j == m - 1 && i < n - 1 ? v - 1       :
         j == n - 5 && i + j < n ? v - (m - 2) :
         j == n - 1 && i < 2     ? v - 1       :
                                   v
     end
-    f_diff = (i, j) -> let v = val_nat(n, q, i, j)
+    f_diff = (i, j) -> let v = val_nat(n, p, i, j)
         1 + k ≤ j ≤ m - 3     && i ≥ k          ? v - 1 :
         j == m - 1 + k && k ≤ i < 2k            ? v - 1 :
         j == m - 1 + k && i ≥ 2k && n == 12     ? v - 4 :
@@ -301,48 +301,48 @@ function family3(n::Int)
         m + k ≤ j ≤ n - 2     && i ≥ k          ? v - 2 :
                                                   v
     end
-    q, f_sum, f_diff, "Family 3  (n≡0 mod 6, n≥12)"
+    p, f_sum, f_diff, "Family 4  (n≡0 mod 6, n≥12)"
 end
 
 # ============================================================
 # §7  Small exceptional cases n = 8, 9, 15, 21
-#     Lean: q{8,9,15,21}_nat, f*_{sum,diff}, solve_{8,9,15,21}
+#     Lean: p{8,9,15,21}_nat, f*_{sum,diff}, solve_{8,9,15,21}
 # ============================================================
 
-const Q8  = [0, 4, 1, 3, 6, 2, 7, 5]
-const Q9  = [0, 6, 3, 1, 8, 5, 2, 4, 7]
-const Q15 = [0, 3, 6, 9, 12, 8, 5, 2, 13, 1, 4, 7, 10, 14, 11]
-const Q21 = [0, 18, 15, 12, 9, 6, 3, 7, 4, 1, 14, 17, 10, 16, 2, 5, 11, 8, 20, 13, 19]
+const P8  = [0, 4, 1, 3, 6, 2, 7, 5]
+const P9  = [0, 6, 3, 1, 8, 5, 2, 4, 7]
+const P15 = [0, 3, 6, 9, 12, 8, 5, 2, 13, 1, 4, 7, 10, 14, 11]
+const P21 = [0, 18, 15, 12, 9, 6, 3, 7, 4, 1, 14, 17, 10, 16, 2, 5, 11, 8, 20, 13, 19]
 
 function small_case(n::Int)
     if n == 8
         f_sum  = (i, j) -> (j == 3 && i < 4) ? i + 1 :
                            (j == 3 && i == 4) ? 3    :
-                           val_nat(8, Q8, i, j)
+                           val_nat(8, P8, i, j)
         f_diff = (i, j) -> (j == 6 && (i == 5 || i == 6)) ? i - 5 :
                            (j == 6 && i == 7)             ? 5     :
-                           val_nat(8, Q8, i, j)
-        Q8, f_sum, f_diff, "Small case n=8"
+                           val_nat(8, P8, i, j)
+        P8, f_sum, f_diff, "Small case n=8"
     elseif n == 9
         f_sum  = (i, j) -> (j == 5 && i < 3)              ? i + 4  :
                            (j == 5 && i == 3)             ? 2      :
                            (j == 6 && i < 2)              ? i      :
                            (j == 6 && (i == 2 || i == 3)) ? 2i - 3 :
-                           val_nat(9, Q9, i, j)
-        f_diff = (i, j) -> val_nat(9, Q9, i, j)
-        Q9, f_sum, f_diff, "Small case n=9"
+                           val_nat(9, P9, i, j)
+        f_diff = (i, j) -> val_nat(9, P9, i, j)
+        P9, f_sum, f_diff, "Small case n=9"
     elseif n == 15
-        f_sum  = (i, j) -> val_nat(15, Q15, i, j)
+        f_sum  = (i, j) -> val_nat(15, P15, i, j)
         f_diff = (i, j) -> (j == 13 && i == 10)                         ? 5     :
                            (j == 13 && 11 ≤ i ≤ 14)                     ? i - 8 :
                            (j == 14 && (i == 5 || i == 6))              ? i - 5 :
                            (j == 14 && 7 ≤ i ≤ 10)                      ? i - 6 :
                            (j == 14 && (i == 11 || i == 12 || i == 14)) ? 2     :
                            (j == 14 && i == 13)                         ? 1     :
-                           val_nat(15, Q15, i, j)
-        Q15, f_sum, f_diff, "Small case n=15"
+                           val_nat(15, P15, i, j)
+        P15, f_sum, f_diff, "Small case n=15"
     elseif n == 21
-        f_sum = (i, j) -> let v = val_nat(21, Q21, i, j)
+        f_sum = (i, j) -> let v = val_nat(21, P21, i, j)
             j == 7  && i ≤ 12                                    ? i + 6 :
             j == 7  && i == 13                                   ? 13    :
             j == 8  && i ≤ 7                                     ? i + 3 :
@@ -357,13 +357,13 @@ function small_case(n::Int)
             j == 14 && 7 ≤ i ≤ 9                                 ? i + 1 :
                                                                    v
         end
-        f_diff = (i, j) -> let v = val_nat(21, Q21, i, j)
+        f_diff = (i, j) -> let v = val_nat(21, P21, i, j)
             j == 18 && 16 ≤ i ≤ 20 ? i - 13 :
             j == 19 && 14 ≤ i ≤ 16 ? i - 14 :
             j == 19 && 17 ≤ i ≤ 20 ? i - 17 :
                                      v
         end
-        Q21, f_sum, f_diff, "Small case n=21"
+        P21, f_sum, f_diff, "Small case n=21"
     else
         error("small_case: n=$n not in {8,9,15,21}")
     end
@@ -456,26 +456,26 @@ function solve(n::Int)
     n < 1            && return (status = :error, msg = "n must be ≥ 1")
     n in (2, 3)      && return (status = :no_solution,
                                 msg = "no (n,1)-queens solution exists")
-    n == 1           && return (status = :ok, n = 1, q = [0],
+    n == 1           && return (status = :ok, n = 1, p = [0],
                                 L = cyclicSquare(1, [0]),
                                 tag = "Trivial n=1",
                                 f_sum = nothing, f_diff = nothing)
-    n == 4           && return (status = :ok, n = 4, q = nothing, L = L4,
+    n == 4           && return (status = :ok, n = 4, p = nothing, L = L4,
                                 tag = "Non-cyclic L4",
                                 f_sum = nothing, f_diff = nothing)
-    n == 6           && return (status = :ok, n = 6, q = nothing, L = L6,
+    n == 6           && return (status = :ok, n = 6, p = nothing, L = L6,
                                 tag = "Non-cyclic L6",
                                 f_sum = nothing, f_diff = nothing)
 
-    (q, f_sum, f_diff, tag) =
+    (p, f_sum, f_diff, tag) =
         n in (8, 9, 15, 21)       ? small_case(n) :
         n % 6 in (1, 5)           ? family1(n)    :
         n % 6 in (2, 4) && n ≥ 10 ? family2(n)    :
-        n % 6 == 0      && n ≥ 12 ? family3(n)    :
-        n % 6 == 3      && n ≥ 27 ? family4(n)    :
+        n % 6 == 3      && n ≥ 27 ? family3(n)    :
+        n % 6 == 0      && n ≥ 12 ? family4(n)    :
         error("no family covers n=$n")
 
-    (status = :ok, n = n, q = q, L = cyclicSquare(n, q),
+    (status = :ok, n = n, p = p, L = cyclicSquare(n, p),
      tag = tag, f_sum = f_sum, f_diff = f_diff)
 end
 
@@ -527,7 +527,7 @@ function main(args)
         L = result.L
         inc = is_incremental(n, L)
         hyp = result.f_sum === nothing ? nothing :
-              check_hypotheses(n, result.q, result.f_sum, result.f_diff; verbose = false)
+              check_hypotheses(n, result.p, result.f_sum, result.f_diff; verbose = false)
         pig = (result.f_sum === nothing || fast) ? nothing :
               check_pigeonhole(n, L, result.f_sum, result.f_diff; verbose = false)
         thr = (!fast && do_thresh) ?
