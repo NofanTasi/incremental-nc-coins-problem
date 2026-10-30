@@ -5,11 +5,11 @@
 # Each function corresponds to a specific Lean definition / lemma / theorem.
 #
 # Usage:
-#   julia incremental_cyclic_checker.jl # n = 1..40
-#   julia incremental_cyclic_checker.jl 1 60
-#   julia incremental_cyclic_checker.jl 8 8 --board --solutions
-#   julia incremental_cyclic_checker.jl 4 40 --all
-#   julia incremental_cyclic_checker.jl 100 100 fast --board
+#   julia Incremental-NC-Coins-Lean.jl # n = 1..40
+#   julia Incremental-NC-Coins-Lean.jl 1 60
+#   julia Incremental-NC-Coins-Lean.jl 8 8 --board --solutions
+#   julia Incremental-NC-Coins-Lean.jl 4 40 --all
+#   julia Incremental-NC-Coins-Lean.jl 100 100 fast --board
 
 using Printf
 
@@ -484,7 +484,7 @@ end
 # ============================================================
 
 function usage()
-    println("usage: julia incremental_cyclic_checker.jl [nmin] [nmax] [options]")
+    println("usage: julia Incremental-NC-Coins-Lean.jl [nmin] [nmax] [options]")
     println("options:")
     println("  fast            skip pigeonhole + thresholding checks")
     println("  --board         print incremental board L")
