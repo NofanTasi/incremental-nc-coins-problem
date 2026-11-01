@@ -68,9 +68,9 @@ constructor, forall, exists, import, namespace, end, open, use, by_cases, split_
 \setlength{\parindent}{0pt}
 
 \title{\textbf{
-  $n \times n$ Cyclic Latin Squares \\ 
-  representing solutions of the \\
-  $(n,c)$-Coins Problem for $0 \le c \le n$
+  Cyclic $n \!\times\! n$ Latin Squares \\ 
+  representing solutions of \\
+  $(n,c)$-Coins Problems for $0 \le c \le n$
 }}
 \author{Marc Duponcheel and Luc Duponcheel}
 
@@ -84,15 +84,19 @@ constructor, forall, exists, import, namespace, end, open, use, by_cases, split_
 
 \vspace{8pt}
 
+\noindent $(n,c)$-Coins Problems~\cite{LLW1990} generalize $n$-Queens Problems allowing no more
+than $c$ coins on any row, column, sum-diagonal or difference-diagonal of an $n \!\times\! n$ square
+instead of the usual $1$ queen on any row, column, sum-diagonal and difference-diagonal.
+
+\vspace{8pt}
+
 \noindent We prove the following theorem~:
 
 \vspace{8pt}
- 
-\noindent $\forall n \in \mathbb{N}, \; n > 0, \; n \notin \{2, 3, 4, 6\}$, 
-$\exists p$, a permutation of $\{ 0, \ldots n-1 \}$, 
-such that $\forall i, j \in \{ 0, \ldots n-1 \}$, the square with cells
-$S_{i,j} = (i + p(j)) \bmod n$ is an $n \times n$ \emph{Cyclic Latin Square}, representing solutions
-of $(n,c)$\emph{-Coins Problems} $\forall c \;\; 0 \le c \le n$.
+
+\noindent For every positive natural number $n \in \mathbb{N}$ except $n \in \{2, 3, 4, 6\}$, there
+exists a Cyclic $n \!\times\! n$ Latin Square representing solutions of $(n,c)$-Coins Problems for
+all $c \in \mathbb{N}$ with $0 \le c \le n$.
 
 \vspace{8pt}
 
@@ -112,14 +116,16 @@ and also
 
 \vspace{8pt}
 
-\noindent The proof uses the \emph{Injective-Majorization Principle} that, instead of intensive
-checking inequalities on each diagonal, uses the existence of a single function
-$f(i,j) \le S_{i,j}$ that is injective on each diagonal. 
+\noindent The proof uses the \emph{Injective-Majorization Principle}. The existence of a single
+function on the whole Cyclic $n \!\times\! n$ Latin Square that is injective on each diagonal
+implies that for every threshold $0 \le k < n$, the number of cells on each diagonal with value at
+most $k$ is at most $k + 1$. The principle avoids intensive cardinality counting on each diagonal,
+which would computationally explode for large $n$.
 
 \vspace{8pt}
 
-\noindent The proof uses four subsets of $\mathbb{N}$ covering 
-all $n \in \mathbb{N}$ with the exception of $n \in \{8, 9, 15, 21\}$~:
+\noindent The proof uses four subsets of $\mathbb{N}$ covering all $n$ except
+$n \in \{8, 9, 15, 21\}$~:
 
 \vspace{8pt}
 
@@ -143,7 +149,7 @@ $n \in \{8, 9, 15, 21\}$ is handled individually.
 \vspace{8pt}
 
 \noindent Constructing a Latin Square representing solutions
-of $(n,c)$-Coins Problems $\forall c \;\; 0 \le c \le n$, for natural numbers $n \in \{4, 6\}$,
+of $(n,c)$-Coins Problems for natural numbers $n \in \{4, 6\}$,
 not dealt with by the theorem, is also handled individually.
 
 \end{abstract}
@@ -153,17 +159,17 @@ not dealt with by the theorem, is also handled individually.
 \subsection{From \texorpdfstring{$(n,c)$}{(n,c)}-Coins Problems to Latin Squares}
 
 Given $n > 0$, and $c \in \{0, \dots, n\}$ solutions of $(n,c)$-Coins Problems are subsets $S_c$ of
-$n.c$ cells of an $n \times n$ square $S_{i,j}$ such that every row, column,
+$n.c$ cells of an $n \!\times\! n$ square $S_{i,j}$ such that every row, column,
 $s$-diagonal ($i + j = s$), and $d$-diagonal ($i - j = d$), contains at most $c$ cells of $S_c$.
 
 \vspace{8pt}
 
-Le, Li and Wang~\cite{LLW1990} construct each $S_c$ separately. 
+Le, Li and Wang~\cite{LLW1990} construct each $S_c$ \emph{separately}. 
 
 \vspace{8pt}
 
-We construct square $S_{i,j}$ representing 
-$S_c = \{(i,j) \mid S_{i,j} \le c\} \;\; \forall c \;\; 0 \le c \le n$ simultaneously.
+We construct a square $S_{i,j}$, representing $S_c$ as $\{(i,j) \mid S_{i,j} \le c\}$, constructing
+all $S_c$ for $0 \le c \le n$ \emph{simultaneously}.
 
 \section{Theorem Statement}
 
@@ -190,10 +196,6 @@ Square satisfying~:
 Instead of using direct cardinality counting for $(iii)$ and $(iv)$ above,  which would
 computationally explode for large $n$, we use a principle that reduces the problem for \emph{all}
 thresholds $0 \le k < n$ simultaneously to constructing a single dominated injection.
-
-\vspace{8pt}
-
-In what follows, unless explicitely stated, diagonal refers to either $s$-diagonal or $d$-diagonal.
 
 \subsection{The Injective-Majorization Principle}
 
@@ -224,6 +226,20 @@ By condition~(2), the restriction of $f$ to $D_{\le k}$ is an injective map into
 Therefore $|D_{\le k}| \le |\{0, \dots, k\}| = k + 1$.
 
 \end{proof}
+
+\section{Explanantion and Illustation of the Lean Proof}
+
+TBD (work in progress)
+
+\begin{thebibliography}{9}
+\bibitem{LLW1990}
+Mao-Hua Le, Wen Li, and Edward T. Wang,
+\emph{A generalization of the $n$-queen problem},
+Journal of Systems Science and Mathematical Sciences \textbf{3} (1990), no.~2, 183--192, \\
+\url{https://sysmath.cjoe.ac.cn/jssc/CN/Y1990/V3/I2/183}.
+\end{thebibliography}
+
+\end{document}
 
 \section{Theorem Proof}
 
@@ -295,10 +311,6 @@ and the third case covers all even elements of $\{2, ... , f-1\}$.
 This holds for all elements $n$ of Family 1 since $n$ is odd. Therefore $p1$ is a bijection.
 
 For a specific diagonal $n = 7$, one obtains
-
-
-
-
 
 
 \begin{verbatim}
@@ -3270,12 +3282,3 @@ $j_2 - j_1 = k = 4$ shifted into vacant residue class $1 \pmod 3$.}
 \label{fig:fam4_diff}
 \end{figure}
 \FloatBarrier
-\begin{thebibliography}{9}
-\bibitem{LLW1990}
-Mao-Hua Le, Wen Li, and Edward T. Wang,
-\emph{A generalization of the $n$-queen problem},
-Journal of Systems Science and Mathematical Sciences \textbf{3} (1990), no.~2, 183--192, \\
-\url{https://sysmath.cjoe.ac.cn/jssc/CN/Y1990/V3/I2/183}.
-\end{thebibliography}
-
-\end{document}
