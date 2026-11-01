@@ -83,13 +83,16 @@ constructor, forall, exists, import, namespace, end, open, use, by_cases, split_
 \begin{abstract}
 
 \vspace{8pt}
+
+\noindent We prove the following theorem~:
+
+\vspace{8pt}
  
 \noindent $\forall n \in \mathbb{N}, \; n > 0, \; n \notin \{2, 3, 4, 6\}$, 
-$\exists p: \{ 0, \ldots n-1 \} \to \{ 0, \ldots n-1 \}$, a permutation of $\{ 0, \ldots n-1 \}$, 
+$\exists p$, a permutation of $\{ 0, \ldots n-1 \}$, 
 such that $\forall i, j \in \{ 0, \ldots n-1 \}$, the square with cells
 $S_{i,j} = (i + p(j)) \bmod n$ is an $n \times n$ \emph{Cyclic Latin Square}, representing solutions
-of $(n,c)$\emph{-Coins Problems} $\forall c \;\; 0 \le c \le n$. An $(n,c)$-Coins Problem for
-$c = 1$ corresponds to an $n$-\emph{Queens Problem}.
+of $(n,c)$\emph{-Coins Problems} $\forall c \;\; 0 \le c \le n$.
 
 \vspace{8pt}
 
@@ -115,8 +118,8 @@ $f(i,j) \le S_{i,j}$ that is injective on each diagonal.
 
 \vspace{8pt}
 
-\noindent The proof uses four subsets of $\mathbb{N}$ covering almost all 
-$\mathbb{N}\,mod\,6$ classes~:
+\noindent The proof uses four subsets of $\mathbb{N}$ covering 
+all $n \in \mathbb{N}$ with the exception of $n \in \{8, 9, 15, 21\}$~:
 
 \vspace{8pt}
 
@@ -134,13 +137,14 @@ elements.
 
 \vspace{8pt}
 
-\noindent Constructing a Cyclic Latin Square for the four uncovered natural numbers,
-$n \in \{8, 9, 15, 21\}$, is handled individually. 
+\noindent Constructing a Cyclic Latin Square for the four uncovered natural numbers
+$n \in \{8, 9, 15, 21\}$ is handled individually. 
 
 \vspace{8pt}
 
-\noindent Likewise, constructing a (non-Cyclic) Latin Square for the two remaining natural numbers, 
-$n \in \{4, 6\}$, is also handled individually.
+\noindent Constructing a Latin Square representing solutions
+of $(n,c)$-Coins Problems $\forall c \;\; 0 \le c \le n$, for natural numbers $n \in \{4, 6\}$,
+not dealt with by the theorem, is also handled individually.
 
 \end{abstract}
 
@@ -154,19 +158,18 @@ $s$-diagonal ($i + j = s$), and $d$-diagonal ($i - j = d$), contains at most $c$
 
 \vspace{8pt}
 
-The construction of Le, Li and Wang~\cite{LLW1990} constructs \emph{one} $S_c$ for each $c$. 
+Le, Li and Wang~\cite{LLW1990} construct each $S_c$ separately. 
 
 \vspace{8pt}
 
-Our construction constructs an $n \times n$ Cyclic Latin Square $S_{i,j}$ representing \emph{many}
-$S_c$'s at once using \\ 
-$S_c = \{(i,j) \mid S_{i,j} \le c\} \;\; \forall c \;\; 0 \le c \le n$.
+We construct square $S_{i,j}$ representing 
+$S_c = \{(i,j) \mid S_{i,j} \le c\} \;\; \forall c \;\; 0 \le c \le n$ simultaneously.
 
 \section{Theorem Statement}
 
 \begin{theorem}\label{thm:main}
 $\forall n \in \mathbb{N}, \; n > 0, \; n \notin \{2, 3, 4, 6\}$,
-$\exists p: \{ 0, \ldots n-1 \} \to \{ 0, \ldots n-1 \}$, a permutation, such that 
+$\exists p$, a permutation of $\{ 0, \ldots n-1 \}$, such that \\
 $S_{i,j} = (i + p(j)) \bmod n$ is a Cyclic Latin
 Square satisfying~:
 
@@ -260,9 +263,47 @@ We will define $p$ and $f$ and prove that
 \item $f(i, j) \le S_ij$ on the diagonals involved.
 \end{itemize}
 
+The definitions will be presented as simple case-based Haskell code (it might as well have
+been Julia code). As such we can illustrate the statements of proof with simple expression
+evaluations.
+
 \subsection{Family 1}
 
-Let $p(j) = (-2j) \bmod n$.
+Define 
+
+\begin{verbatim}
+p1 n ns = [p1 n j | j <- ns]
+  where
+    p1 n j
+        | j == 0    = 0
+        | 2*j < n   = n - 2*j
+        | otherwise = 2*n -2*j  
+\end{verbatim}
+
+See Example~\ref{ex:fam1_sum}, Figure~\ref{fig:fam1_sum} and Figure~\ref{fig:fam1_diff}
+
+For a specific element $n$ of Family 1, $n = 7$, one obtains
+
+\begin{verbatim}
+ghci> p1 7 [0 .. 7-1]
+[0,5,3,1,6,4,2]
+\end{verbatim}
+
+The first case covers $0$, the second case covers all odd elements of $\{1, ... , f-1\}$
+and the third case covers all even elements of $\{2, ... , f-1\}$. 
+
+This holds for all elements $n$ of Family 1 since $n$ is odd. Therefore $p1$ is a bijection.
+
+For a specific diagonal $n = 7$, one obtains
+
+
+
+
+
+
+\begin{verbatim}
+
+\end{verbatim}
 
 \vspace{8pt}
 
