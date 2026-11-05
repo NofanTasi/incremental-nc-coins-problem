@@ -16,7 +16,7 @@ cyclic(n,p) = [mod(i+p[j],n) for i in 0:(n-1), j in 1:n]
 # ============================================================================
 """
  * F_f(n,j)
-Formula for permutation p to be used by Family f
+Formula for permutation p to be used by family f
 """
 # Family 1: n = 1 or 5 (mod 6) (n >= 1)
 F_1(n,j) = j == 0 ? 0 : 2j < n ? n - 2j : 2n - 2j
@@ -30,7 +30,7 @@ F_3(n,j) = (d = div(n,3); r = j < d ? 3j + 2d : j < 2d ? 3(j - d) + 2d + 4 : 3(j
 # Family 4: n = 0 (mod 6) (n >= 12)
 F_4(n,j) = (d = div(n,2); j == 0 ? n - 2 : j < d - 2 ? 2j + 2 : j == d - 2 ? 0 : j < n - 1 ? 2(j - d + 1) + 1 : 2)
 
-# some finite small Permutations (0:(n-1) valued) below minimal values supported per family
+# some finite small permutations (0:(n-1) valued) below minimal values supported per family
 const Qs = Dict(
     8  => [0,4,1,3,6,2,7,5], # f2: 8 < 10
     9  => [0,6,3,1,8,5,2,4,7], # f3: 9 < 27
@@ -38,7 +38,7 @@ const Qs = Dict(
     21 => [0,18,15,12,9,6,3,7,4,1,14,17,10,16,2,5,11,8,20,13,19] # f3: 21 < 27
 )
 
-# get F_f where 1 <= f <= 4 providing p for Family f
+# get F_f where 1 <= f <= 4 providing p for family f
 function get_f_for_p(n)
     if haskey(Qs,n)
         return (n,j) -> Qs[n][j+1]
@@ -60,12 +60,12 @@ function get_f_for_p(n)
         n >= m_4 || error("Family 4 requires n >= $m_4 (n = $n)")
         return F_4
     else
-        error("Unsupported Dimension n = $n")
+        error("Unsupported size n = $n")
     end
 end
 
 # ============================================================================
-# 3. board Verification
+# 3. square Verification
 # ============================================================================
 """
  * correct(L,n)
@@ -78,12 +78,12 @@ function correct(L,n)
     #    L is 0:(n-1)-valued; isperm expects 1:n, so shift by 1 first.
     for r in 1:n
         if !isperm(L[r,:] .+ 1)
-            return false,"Row $r is not a Permutation"
+            return false,"Row $r is not a permutation"
         end
     end
     for c in 1:n
         if !isperm(L[:,c] .+ 1)
-            return false,"Col $c is not a Permutation"
+            return false,"Col $c is not a permutation"
         end
     end
 
@@ -119,10 +119,10 @@ end
 Generates, optionally benchmarks, verifies, displays any range of n and its nc's.
 """
 function solve(range;
-               print_P=true, # print permutation p
-               print_L=true, # print latin square L solution
-               print_I=false, # print incremental boards
-               verify=true, # verify solution
+               print_P=true,   # print permutation p
+               print_L=true,   # print latin square L solution
+               print_I=false,  # print incremental squares
+               verify=true,    # verify solution
                benchmark=false # benchmark execution
                )
 
@@ -135,11 +135,11 @@ function solve(range;
         l = Int(floor(log(10,n)))+2
 
         if !benchmark
-            println("Incremental board for n = $n")
+            println("Incremental square for n = $n")
         end
 
         if n < 4
-            println("skipping Dimension n = $n < 4")
+            println("skipping size n = $n < 4")
             continue
         elseif n == 4
             # an Explicit non-cyclic L4 (0:(n-1)-valued)
@@ -173,13 +173,13 @@ function solve(range;
         end
 
         if print_P
-            println("column Permutation (0:(n-1) valued):")
+            println("column permutation (0:(n-1) valued):")
             print("p = ")
             println(p)
         end
 
         if print_L
-            println("Incremental Latin Square (0:(n-1) valued):")
+            println("Incremental Latin square (0:(n-1) valued):")
             for r in eachrow(L)
                 println(" ", join(lpad.(r,l)))
             end
@@ -207,7 +207,7 @@ function solve(range;
     end
 end
 
-# example invocation: 8x8 board and it's (8,c)-coins solutions
+# example invocation: 8x8 square and it's (8,c)-coins solutions
 # r = collect(8:8)
 # solve(r,print_P=true,print_L=true,print_I=true,verify=false)
 # exit(0)

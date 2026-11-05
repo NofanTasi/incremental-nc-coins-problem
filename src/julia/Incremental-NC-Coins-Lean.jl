@@ -1,15 +1,15 @@
 #!/usr/bin/env julia
 # incremental_cyclic_checker.jl
 #
-# Julia checker mirroring IncrementalCyclic.lean.
+# Julia checker mirroring Incremental-NC-Coins-Proof.lean.
 # Each function corresponds to a specific Lean definition / lemma / theorem.
 #
 # Usage:
 #   julia Incremental-NC-Coins-Lean.jl # n = 1..40
 #   julia Incremental-NC-Coins-Lean.jl 1 60
-#   julia Incremental-NC-Coins-Lean.jl 8 8 --board --solutions
+#   julia Incremental-NC-Coins-Lean.jl 8 8 --square --incremental
 #   julia Incremental-NC-Coins-Lean.jl 4 40 --all
-#   julia Incremental-NC-Coins-Lean.jl 100 100 fast --board
+#   julia Incremental-NC-Coins-Lean.jl 100 100 fast --square
 
 using Printf
 
@@ -370,7 +370,7 @@ function small_case(n::Int)
 end
 
 # ============================================================
-# §8  Non-cyclic boards L4, L6
+# §8  Non-cyclic squares L4, L6
 #     (not covered by Lean: the Conjecture excludes n = 4, 6)
 # ============================================================
 
@@ -388,15 +388,15 @@ const L6 = [4 5 2 3 0 1;
 
 # ============================================================
 # §9  Thresholding
-#     Lean: thresholdBoard, n_c_of_isIncremental
+#     Lean: thresholdSquare, n_c_of_isIncremental
 # ============================================================
 
 """
-    thresholdBoard(n, c, L)   —  Lean: `thresholdBoard`
+    thresholdSquare(n, c, L)   —  Lean: `thresholdSquare`
 
 Cells `(i, j)` with `L[i+1, j+1] < c`, i.e. `S_c` of size `n*c`.
 """
-thresholdBoard(n::Int, c::Int, L::Matrix{Int}) =
+thresholdSquare(n::Int, c::Int, L::Matrix{Int}) =
     [(i, j) for i in 0:n-1, j in 0:n-1 if L[i+1, j+1] < c]
 
 """
@@ -406,7 +406,7 @@ Verifies `S_c = {L < c}` is an (n, c)-coins solution: `n*c` cells and at
 most `c` per row / column / sum-diagonal / diff-diagonal.
 """
 function check_nc_solution(n::Int, c::Int, L::Matrix{Int}; verbose::Bool = true)::Bool
-    S = thresholdBoard(n, c, L)
+    S = thresholdSquare(n, c, L)
     length(S) == n * c ||
         (verbose && @printf("  |S_%d| = %d ≠ %d\n", c, length(S), n * c); return false)
     rows = zeros(Int, n); cols = zeros(Int, n)
@@ -432,15 +432,15 @@ end
 # §10  Printing
 # ============================================================
 
-function print_board(n::Int, L::Matrix{Int})
+function print_square(n::Int, L::Matrix{Int})
     w = ndigits(n - 1)
-    println("  Incremental board L (0-based), $(n)×$(n):")
+    println("  Incremental square L (0-based), $(n)×$(n):")
     foreach(i -> println("    ", join(lpad.(L[i, :], w), " ")), 1:n)
     println()
 end
 
 function print_threshold(n::Int, c::Int, L::Matrix{Int})
-    S = Set(thresholdBoard(n, c, L))
+    S = Set(thresholdSquare(n, c, L))
     println("  S_$c = {L < $c}   (|S_$c| = $(length(S)) = $n×$c):")
     for i in 0:n-1
         println("    ", join([(i, j) in S ? "X" : "." for j in 0:n-1], " "))
@@ -487,22 +487,22 @@ function usage()
     println("usage: julia Incremental-NC-Coins-Lean.jl [nmin] [nmax] [options]")
     println("options:")
     println("  fast            skip pigeonhole + thresholding checks")
-    println("  --board         print incremental board L")
-    println("  --solutions     print S_c = {L < c} for each c")
-    println("  --all           --board --solutions")
+    println("  --square        print incremental square L")
+    println("  --incremental   print S_c = {L < c} for each c")
+    println("  --all           --square --incremental")
     println("  --no-threshold  skip S_c verification even without fast")
     println("  --help, -h      show this message")
 end
 
 function main(args)
     nmin, nmax = 1, 40
-    fast = false; do_board = false; do_sol = false; do_thresh = true
+    fast = false; do_square = false; do_incr = false; do_thresh = true
     positional = String[]
     for a in args
         a == "fast"            && (fast = true)
-        a == "--board"         && (do_board = true)
-        a == "--solutions"     && (do_sol = true)
-        a == "--all"           && (do_board = true; do_sol = true)
+        a == "--square"        && (do_square = true)
+        a == "--incremental"   && (do_incr = true)
+        a == "--all"           && (do_square = true; do_incr = true)
         a == "--no-threshold"  && (do_thresh = false)
         a in ("--help", "-h")  && (usage(); return)
         startswith(a, "-")     || push!(positional, a)
@@ -511,8 +511,8 @@ function main(args)
     length(positional) ≥ 2 && (nmax = parse(Int, positional[2]))
 
     println("="^70)
-    println("Incremental Cyclic Latin Square Checker")
-    println("Mirror of IncrementalCyclic.lean")
+    println("Incremental cyclic Latin square checker")
+    println("Mirror of Incremental-NC-Coins-Proof.lean")
     println("="^70); println()
 
     all_ok = true; verified = 0; skipped = 0
@@ -546,8 +546,8 @@ function main(args)
         ok && (verified += 1)
 
         @printf("n=%3d  [%s]  %s\n", n, rpad(result.tag, 30), join(parts, "  "))
-        do_board && print_board(n, L)
-        if do_sol
+        do_square && print_square(n, L)
+        if do_incr
             foreach(c -> print_threshold(n, c, L), 0:n)
         end
     end
