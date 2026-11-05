@@ -18,12 +18,12 @@ open scoped Finset
 def cyclicSquare
     (n : ℕ)
     (p : Fin n → Fin n)
-    (h : n > 0)
-    (_ : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6) :
+    (h : n ≥ 4)
+    (_ : n ≠ 4 ∧ n ≠ 6) :
   Fin n → Fin n → Fin n :=
 
     fun i j =>
-      ⟨(i.val + (p j).val) % n, mod_lt _ h⟩
+      ⟨(i.val + (p j).val) % n, mod_lt _ (by omega)⟩
 
 -- Cells on a diagonal of constant `s` (row + column), with value at most `k`.
 def sumDiagOk
@@ -63,6 +63,218 @@ def IsIncremental
           (∀ s : ℕ, #(sumDiagOk  n s k L) ≤ k + 1)
         ∧ (∀ d : ℤ, #(diffDiagOk n d k L) ≤ k + 1)
 
+/-!
+## Part 1: Every Incremental Latin Square Represents `(n, c)`-Coins Solutions for `0 ≤ c ≤ n`
+
+For `0 ≤ c ≤ n` (`c ∈ [0, n]`), a subset `S` of cells of the `n × n` square is a solution of the
+`(n, c)`-coins problem if:
+- `S` contains `n * c` coins (`#S = n * c`), and
+- every row, column, sum-diagonal, and difference-diagonal contains at most `c` coins.
+
+An incremental `n × n` Latin square `L` represents `(n, c)`-coins solutions simultaneously for all
+`0 ≤ c ≤ n` via:
+- `coinsFromSquare n 0 L = ∅` for `c = 0`, and
+- `coinsFromSquare n c L = {(i, j) | (L i j).val ≤ c - 1}` for `1 ≤ c ≤ n`
+  (equivalently, `{(i, j) | (L i j).val < c}` for all `0 ≤ c ≤ n`).
+-/
+
+/-- For `0 ≤ c ≤ n`, a subset `S` of cells of an `n × n` square is a valid `(n, c)`-coins solution
+    if it has `n * c` cells and at most `c` cells on every row, column, sum-diagonal,
+    and difference-diagonal. -/
+def IsNCCoinsSolution
+    (n c : ℕ)
+    (S : Finset (Fin n × Fin n)) :
+  Prop :=
+
+        #S = n * c
+      ∧ (∀ i : Fin n, #(S.filter fun ij => ij.1 = i) ≤ c)
+      ∧ (∀ j : Fin n, #(S.filter fun ij => ij.2 = j) ≤ c)
+      ∧ (∀ s : ℕ, #(S.filter fun ij => ij.1.val + ij.2.val = s) ≤ c)
+      ∧ (∀ d : ℤ, #(S.filter fun ij => ((ij.1.val : ℤ) - (ij.2.val : ℤ)) = d) ≤ c)
+
+/-- The `(n, c)`-coins subset represented by a square `L` for `0 ≤ c ≤ n`:
+    `∅` when `c = 0`, and all cells with value `≤ c - 1` when `1 ≤ c ≤ n`
+    (equivalently, all cells with value `< c`). -/
+def coinsFromSquare
+    (n c : ℕ)
+    (L : Fin n → Fin n → Fin n) :
+  Finset (Fin n × Fin n) :=
+
+    if c = 0 then ∅
+    else univ.filter fun ij : Fin n × Fin n => (L ij.1 ij.2).val ≤ c - 1
+
+/-- Equivalent characterization of `coinsFromSquare n c L` using strict inequality `< c`
+    uniformly for all `0 ≤ c ≤ n`. -/
+lemma coinsFromSquare_eq_filter_lt
+    (n c : ℕ)
+    (L : Fin n → Fin n → Fin n) :
+    coinsFromSquare n c L = univ.filter fun ij : Fin n × Fin n => (L ij.1 ij.2).val < c := by
+  unfold coinsFromSquare
+  split_ifs with hc0
+  · subst hc0
+    ext ij
+    simp
+  · ext ij
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    omega
+
+/-- If `f : Fin n → Fin n` is bijective and `k < n`, exactly `k + 1` inputs have `(f x).val ≤ k`. -/
+lemma card_filter_le_of_bijective
+    {n k : ℕ} (hk : k < n) (f : Fin n → Fin n) (hf : Bijective f) :
+    #(univ.filter fun x : Fin n => (f x).val ≤ k) = k + 1 := by
+  have hbij : #(univ.filter fun x : Fin n => (f x).val ≤ k) = #(Finset.range (k + 1)) := by
+    apply Finset.card_bij (fun x _ => (f x).val)
+    · intro x hx
+      rw [Finset.mem_filter] at hx
+      exact Finset.mem_range.mpr (by omega)
+    · intro x₁ _ x₂ _ heq
+      exact hf.injective (Fin.ext heq)
+    · intro y hy
+      rw [Finset.mem_range] at hy
+      obtain ⟨x, hx⟩ := hf.surjective ⟨y, by omega⟩
+      refine ⟨x, ?_, congrArg Fin.val hx⟩
+      rw [Finset.mem_filter]
+      exact ⟨Finset.mem_univ x, by rw [hx]; dsimp only; omega⟩
+  rw [hbij, Finset.card_range]
+
+/-- Every row `i` of `coinsFromSquare n c L` contains exactly `c` coins for `0 ≤ c ≤ n`. -/
+lemma coinsFromSquare_row_card
+    (n c : ℕ) (hc : c ≤ n)
+    (L : Fin n → Fin n → Fin n)
+    (hrow_bij : ∀ i : Fin n, Bijective (L i .))
+    (i : Fin n) :
+    #((coinsFromSquare n c L).filter fun ij => ij.1 = i) = c := by
+  unfold coinsFromSquare
+  split_ifs with hc0
+  · subst hc0
+    simp
+  · have hcard : #((univ.filter fun ij : Fin n × Fin n => (L ij.1 ij.2).val ≤ c - 1).filter
+        fun ij => ij.1 = i) =
+        #(univ.filter fun j : Fin n => (L i j).val ≤ c - 1) := by
+      apply Finset.card_bij (fun ij _ => ij.2)
+      · intro ij hij
+        rw [Finset.mem_filter, Finset.mem_filter] at hij
+        rcases hij with ⟨⟨_, hle⟩, rfl⟩
+        exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, hle⟩
+      · intro ij₁ hij₁ ij₂ hij₂ heq
+        rw [Finset.mem_filter] at hij₁ hij₂
+        exact Prod.ext (hij₁.2.trans hij₂.2.symm) heq
+      · intro j hj
+        rw [Finset.mem_filter] at hj
+        refine ⟨(i, j), ?_, rfl⟩
+        rw [Finset.mem_filter, Finset.mem_filter]
+        exact ⟨⟨Finset.mem_univ _, hj.2⟩, rfl⟩
+    rw [hcard, card_filter_le_of_bijective (by omega) (L i .) (hrow_bij i)]
+    omega
+
+/-- Total number of coins in `coinsFromSquare n c L` is `n * c`. -/
+lemma coinsFromSquare_card
+    (n c : ℕ) (hc : c ≤ n)
+    (L : Fin n → Fin n → Fin n)
+    (hrow_bij : ∀ i : Fin n, Bijective (L i .)) :
+    #(coinsFromSquare n c L) = n * c := by
+  rw [Finset.card_eq_sum_card_fiberwise (f := Prod.fst) (t := univ) (fun _ _ => Finset.mem_univ _)]
+  simp [coinsFromSquare_row_card n c hc L hrow_bij]
+
+/-- Every row `i` of `coinsFromSquare n c L` contains at most `c` coins. -/
+lemma coinsFromSquare_row_le
+    (n c : ℕ) (hc : c ≤ n)
+    (L : Fin n → Fin n → Fin n)
+    (hrow_bij : ∀ i : Fin n, Bijective (L i .)) :
+    ∀ i : Fin n, #((coinsFromSquare n c L).filter fun ij => ij.1 = i) ≤ c :=
+  fun i => (coinsFromSquare_row_card n c hc L hrow_bij i).le
+
+/-- Every column `j` of `coinsFromSquare n c L` contains at most `c` coins. -/
+lemma coinsFromSquare_col_le
+    (n c : ℕ) (hc : c ≤ n)
+    (L : Fin n → Fin n → Fin n)
+    (hcol_bij : ∀ j : Fin n, Bijective (L . j)) :
+    ∀ j : Fin n, #((coinsFromSquare n c L).filter fun ij => ij.2 = j) ≤ c := by
+  intro j
+  unfold coinsFromSquare
+  split_ifs with hc0
+  · subst hc0
+    simp
+  · have hcard : #((univ.filter fun ij : Fin n × Fin n => (L ij.1 ij.2).val ≤ c - 1).filter
+        fun ij => ij.2 = j) =
+        #(univ.filter fun i : Fin n => (L i j).val ≤ c - 1) := by
+      apply Finset.card_bij (fun ij _ => ij.1)
+      · intro ij hij
+        rw [Finset.mem_filter, Finset.mem_filter] at hij
+        rw [Finset.mem_filter]
+        rcases hij with ⟨⟨_, hle⟩, rfl⟩
+        exact ⟨Finset.mem_univ _, hle⟩
+      · intro ij₁ hij₁ ij₂ hij₂ heq
+        rw [Finset.mem_filter] at hij₁ hij₂
+        exact Prod.ext heq (hij₁.2.trans hij₂.2.symm)
+      · intro i hi
+        rw [Finset.mem_filter] at hi
+        refine ⟨(i, j), ?_, rfl⟩
+        rw [Finset.mem_filter, Finset.mem_filter]
+        exact ⟨⟨Finset.mem_univ _, hi.2⟩, rfl⟩
+    rw [hcard, card_filter_le_of_bijective (by omega) (L . j) (hcol_bij j)]
+    omega
+
+/-- Every sum-diagonal `s` of `coinsFromSquare n c L` contains at most `c` coins. -/
+lemma coinsFromSquare_sumDiag_le
+    (n c : ℕ) (hc : c ≤ n)
+    (L : Fin n → Fin n → Fin n)
+    (hdiag : ∀ k : ℕ, k < n →
+      (∀ s : ℕ, #(sumDiagOk n s k L) ≤ k + 1) ∧ (∀ d : ℤ, #(diffDiagOk n d k L) ≤ k + 1)) :
+    ∀ s : ℕ, #((coinsFromSquare n c L).filter fun ij => ij.1.val + ij.2.val = s) ≤ c := by
+  intro s
+  unfold coinsFromSquare
+  split_ifs with hc0
+  · subst hc0
+    simp
+  · have heq : ((univ.filter fun ij : Fin n × Fin n => (L ij.1 ij.2).val ≤ c - 1).filter
+        fun ij => ij.1.val + ij.2.val = s) =
+        sumDiagOk n s (c - 1) L := by
+      ext ij
+      simp only [Finset.mem_filter, sumDiagOk, Finset.mem_univ, true_and, and_comm]
+    rw [heq]
+    have hle := (hdiag (c - 1) (by omega)).1 s
+    omega
+
+/-- Every difference-diagonal `d` of `coinsFromSquare n c L` contains at most `c` coins. -/
+lemma coinsFromSquare_diffDiag_le
+    (n c : ℕ) (hc : c ≤ n)
+    (L : Fin n → Fin n → Fin n)
+    (hdiag : ∀ k : ℕ, k < n →
+      (∀ s : ℕ, #(sumDiagOk n s k L) ≤ k + 1) ∧ (∀ d : ℤ, #(diffDiagOk n d k L) ≤ k + 1)) :
+    ∀ d : ℤ, #((coinsFromSquare n c L).filter fun ij =>
+      ((ij.1.val : ℤ) - (ij.2.val : ℤ)) = d) ≤ c := by
+  intro d
+  unfold coinsFromSquare
+  split_ifs with hc0
+  · subst hc0
+    simp
+  · have heq : ((univ.filter fun ij : Fin n × Fin n => (L ij.1 ij.2).val ≤ c - 1).filter
+        fun ij => ((ij.1.val : ℤ) - (ij.2.val : ℤ)) = d) =
+        diffDiagOk n d (c - 1) L := by
+      ext ij
+      simp only [Finset.mem_filter, diffDiagOk, Finset.mem_univ, true_and, and_comm]
+    rw [heq]
+    have hle := (hdiag (c - 1) (by omega)).2 d
+    omega
+
+/-- **Part 1 Theorem:**
+    For every `n ≥ 4`, every incremental `n × n` Latin square `L` represents a valid
+    `(n, c)`-coins solution `coinsFromSquare n c L` for every `0 ≤ c ≤ n` (`c ∈ [0, n]`). -/
+theorem incremental_represents_nc_coins
+    (n c : ℕ) (_h : n ≥ 4) (hc : c ≤ n)
+    (L : Fin n → Fin n → Fin n) (hL : IsIncremental n L) :
+    IsNCCoinsSolution n c (coinsFromSquare n c L) :=
+  ⟨coinsFromSquare_card n c hc L hL.1,
+   coinsFromSquare_row_le n c hc L hL.1,
+   coinsFromSquare_col_le n c hc L hL.2.1,
+   coinsFromSquare_sumDiag_le n c hc L hL.2.2,
+   coinsFromSquare_diffDiag_le n c hc L hL.2.2⟩
+
+/-!
+## Part 2: Cyclic Incremental Latin Squares for `n ≥ 4, n ∉ {4, 6}` via a Permutation `p`
+-/
+
 /-- Conditional-subtraction form of `(i + p_nat j) % n` for `i < n` and `p_nat j < n`. -/
 def val_nat (n : ℕ) (p_nat : ℕ → ℕ) (i j : ℕ) : ℕ :=
   if i + p_nat j < n then i + p_nat j else i + p_nat j - n
@@ -89,7 +301,7 @@ lemma val_nat_prop (n : ℕ) (p_nat : ℕ → ℕ) (i j : ℕ) :
     injective along every sum-diagonal and difference-diagonal respectively, then the Latin square
     `cyclicSquare n p h hn` is incremental (`IsIncremental`). -/
 lemma exists_incremental_of_nat
-    (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
+    (n : ℕ) (h : n ≥ 4) (hn : n ≠ 4 ∧ n ≠ 6)
     (p_nat : ℕ → ℕ)
     (f_sum f_diff : ℕ → ℕ → ℕ)
     (hp_lt : ∀ j < n, p_nat j < n)
@@ -188,7 +400,7 @@ lemma exists_incremental_of_nat
         _ = k + 1 := Finset.card_range (k + 1)
 
 /-!
-### Family 1: `n ≡ 1, 5 (mod 6)` (`n ≥ 1`)
+### Family 1: `n ≡ 1, 5 (mod 6)` (`n ≥ 5`)
 
 When `gcd(n, 6) = 1`, the pure linear permutation `p₁(j) = (-2j) mod n` has:
 - Column step `-2 mod n`, which is bijective since `gcd(2, n) = 1`.
@@ -213,7 +425,7 @@ lemma p1_nat_prop (n j : ℕ) :
     (j > 0 ∧ 2 * j ≥ n ∧ p1_nat n j = 2 * n - 2 * j) := by
   dsimp only [p1_nat]; split_ifs <;> omega
 
-lemma solve_family1 (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
+lemma solve_family1 (n : ℕ) (h : n ≥ 4) (hn : n ≠ 4 ∧ n ≠ 6)
     (hmod : n % 6 = 1 ∨ n % 6 = 5) :
     ∃ p : Fin n → Fin n, Bijective p ∧ @IsIncremental n (@cyclicSquare n p h hn) := by
   apply exists_incremental_of_nat n h hn
@@ -272,9 +484,13 @@ i.e. `m ≥ 5`, ensures `m + 4 < 2m = n`, so `v(i, j) = i + m - 2 + 2δ` never w
 def p2_nat (n j : ℕ) : ℕ :=
   let m := n / 2
   if j < m then
-    if 2 * j + m + 1 < n then 2 * j + m + 1 else 2 * j + m + 1 - n
+    if 2 * j + m + 1 < n then
+      2 * j + m + 1 else
+      2 * j + m + 1 - n
   else
-    if 2 * (j - m) + m + 4 < n then 2 * (j - m) + m + 4 else 2 * (j - m) + m + 4 - n
+    if 2 * (j - m) + m + 4 < n then
+      2 * (j - m) + m + 4 else
+      2 * (j - m) + m + 4 - n
 
 lemma p2_nat_lt (n j : ℕ) (hj : j < n / 2) :
     (2 * j + n / 2 + 1 < n ∧ p2_nat n j = 2 * j + n / 2 + 1) ∨
@@ -344,7 +560,7 @@ lemma f2_diff_ge_prop (n i j : ℕ) (hge : n ≥ 10) (heven : n % 2 = 0) (hi : i
   have hv := val_nat_prop n (p2_nat n) i j
   dsimp only [f2_diff]; split_ifs <;> omega
 
-lemma solve_family2 (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
+lemma solve_family2 (n : ℕ) (h : n ≥ 4) (hn : n ≠ 4 ∧ n ≠ 6)
     (hmod : n % 6 = 2 ∨ n % 6 = 4) (hge : n ≥ 10) :
     ∃ p : Fin n → Fin n, Bijective p ∧ @IsIncremental n (@cyclicSquare n p h hn) := by
   have heven : n % 2 = 0 := by omega
@@ -549,7 +765,7 @@ lemma f3_diff_2_prop (n i j : ℕ) (hmod : n % 6 = 3) (hge : n ≥ 27) (hi : i <
   · refine ⟨by omega, Or.inr (Or.inl ⟨h2.1, h2.2, by omega⟩)⟩
   · refine ⟨by omega, Or.inr (Or.inr ⟨by omega, by omega⟩)⟩
 
-lemma solve_family3 (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
+lemma solve_family3 (n : ℕ) (h : n ≥ 4) (hn : n ≠ 4 ∧ n ≠ 6)
     (hmod : n % 6 = 3) (hge : n ≥ 27) :
     ∃ p : Fin n → Fin n, Bijective p ∧ @IsIncremental n (@cyclicSquare n p h hn) := by
   apply exists_incremental_of_nat n h hn
@@ -848,7 +1064,7 @@ lemma f4_diff_2_prop (n i j : ℕ) (hmod : n % 6 = 0) (hge : n ≥ 12) (hi : i <
           dsimp only [f4_diff]; split_ifs <;> omega
         refine ⟨by omega, Or.inr (Or.inr (Or.inr (Or.inl ⟨by omega, by omega, by omega, by omega⟩)))⟩
 
-lemma solve_family4 (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
+lemma solve_family4 (n : ℕ) (h : n ≥ 4) (hn : n ≠ 4 ∧ n ≠ 6)
     (hmod : n % 6 = 0) (hge : n ≥ 12) :
     ∃ p : Fin n → Fin n, Bijective p ∧ @IsIncremental n (@cyclicSquare n p h hn) := by
   apply exists_incremental_of_nat n h hn
@@ -933,7 +1149,7 @@ the verification to `O(n³)` triples checked by Lean's kernel `decide` tactic.
 -/
 
 lemma exists_incremental_of_fin_decide
-    (n : ℕ) (h : n > 0) (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6)
+    (n : ℕ) (h : n ≥ 4) (hn : n ≠ 4 ∧ n ≠ 6)
     (p_nat : ℕ → ℕ)
     (f_sum f_diff : ℕ → ℕ → ℕ)
     (h_all :
@@ -975,7 +1191,7 @@ def f8_diff (i j : ℕ) : ℕ :=
   else if j = 6 ∧ i = 7 then 5
   else val_nat 8 p8_nat i j
 
-lemma solve_8 (h : 8 > 0) (hn : 8 ≠ 2 ∧ 8 ≠ 3 ∧ 8 ≠ 4 ∧ 8 ≠ 6) :
+lemma solve_8 (h : 8 ≥ 4) (hn : 8 ≠ 4 ∧ 8 ≠ 6) :
     ∃ p : Fin 8 → Fin 8, Bijective p ∧ @IsIncremental 8 (@cyclicSquare 8 p h hn) :=
   exists_incremental_of_fin_decide 8 h hn
   -- with
@@ -993,7 +1209,7 @@ def f9_sum (i j : ℕ) : ℕ :=
 
 def f9_diff (i j : ℕ) : ℕ := val_nat 9 p9_nat i j
 
-lemma solve_9 (h : 9 > 0) (hn : 9 ≠ 2 ∧ 9 ≠ 3 ∧ 9 ≠ 4 ∧ 9 ≠ 6) :
+lemma solve_9 (h : 9 ≥ 4) (hn : 9 ≠ 4 ∧ 9 ≠ 6) :
     ∃ p : Fin 9 → Fin 9, Bijective p ∧ @IsIncremental 9 (@cyclicSquare 9 p h hn) :=
   exists_incremental_of_fin_decide 9 h hn
   -- with
@@ -1015,7 +1231,7 @@ def f15_diff (i j : ℕ) : ℕ :=
   else if j = 14 ∧ i = 13 then 1
   else val_nat 15 p15_nat i j
 
-lemma solve_15 (h : 15 > 0) (hn : 15 ≠ 2 ∧ 15 ≠ 3 ∧ 15 ≠ 4 ∧ 15 ≠ 6) :
+lemma solve_15 (h : 15 ≥ 4) (hn : 15 ≠ 4 ∧ 15 ≠ 6) :
     ∃ p : Fin 15 → Fin 15, Bijective p ∧ @IsIncremental 15 (@cyclicSquare 15 p h hn) :=
   exists_incremental_of_fin_decide 15 h hn
   -- with
@@ -1047,20 +1263,20 @@ def f21_diff (i j : ℕ) : ℕ :=
   else if j = 19 ∧ 17 ≤ i ∧ i ≤ 20 then i - 17
   else val_nat 21 p21_nat i j
 
-lemma solve_21 (h : 21 > 0) (hn : 21 ≠ 2 ∧ 21 ≠ 3 ∧ 21 ≠ 4 ∧ 21 ≠ 6) :
+lemma solve_21 (h : 21 ≥ 4) (hn : 21 ≠ 4 ∧ 21 ≠ 6) :
     ∃ p : Fin 21 → Fin 21, Bijective p ∧ @IsIncremental 21 (@cyclicSquare 21 p h hn) :=
   exists_incremental_of_fin_decide 21 h hn
   -- with
     p21_nat f21_sum f21_diff (by decide)
 
-/-- **Incremental Cyclic Latin Square Conjecture:**
-    For every `n > 0` with `n ∉ {2, 3, 4, 6}`, there exists a bijection `p : Fin n → Fin n`
+/-- **Part 2 Main Theorem (`Conjecture`):**
+    For every `n ≥ 4` with `n ∉ {4, 6}`, there exists a bijection `p : Fin n → Fin n`
     such that the cyclic Latin square `L(i, j) = (i + p(j)) mod n` is incremental. -/
 
 theorem Conjecture :
   ∀ (n : ℕ)
-    (h : n > 0)
-    (hn : n ≠ 2 ∧ n ≠ 3 ∧ n ≠ 4 ∧ n ≠ 6),
+    (h : n ≥ 4)
+    (hn : n ≠ 4 ∧ n ≠ 6),
   ∃ p : Fin n → Fin n,
         Bijective p
       ∧ @IsIncremental n (@cyclicSquare n p h hn) := by
@@ -1079,5 +1295,127 @@ theorem Conjecture :
   · exact solve_21 h hn
   · exact solve_family3 n h hn h3 hge
   · exact solve_family4 n h hn h4 hge
+
+/-- **Part 2 Main Theorem (alias):**
+    For every `n ≥ 4`, except `4` and `6`, a cyclic incremental `n × n` Latin square
+    can be created by means of a permutation `p`. -/
+theorem exists_cyclic_incremental
+    (n : ℕ) (h : n ≥ 4) (hn : n ≠ 4 ∧ n ≠ 6) :
+    ∃ p : Fin n → Fin n,
+          Bijective p
+        ∧ @IsIncremental n (@cyclicSquare n p h hn) :=
+  Conjecture n h hn
+
+/-!
+## Non-Cyclic Incremental Latin Squares for `n = 4` and `n = 6` and Full Existence for `n ≥ 4`
+-/
+
+/-- Explicit (non-cyclic) `4 × 4` incremental Latin square:
+    `2 0 1 3`
+    `1 3 2 0`
+    `0 2 3 1`
+    `3 1 0 2` -/
+def L4_nat : ℕ → ℕ → ℕ
+  | 0, 0 => 2 | 0, 1 => 0 | 0, 2 => 1 | 0, _ => 3
+  | 1, 0 => 1 | 1, 1 => 3 | 1, 2 => 2 | 1, _ => 0
+  | 2, 0 => 0 | 2, 1 => 2 | 2, 2 => 3 | 2, _ => 1
+  | _, 0 => 3 | _, 1 => 1 | _, 2 => 0 | _, _ => 2
+
+def L4 (i j : Fin 4) : Fin 4 :=
+  ⟨L4_nat i.val j.val % 4, mod_lt _ (by decide)⟩
+
+/-- Explicit (non-cyclic) `6 × 6` incremental Latin square:
+    `1 0 2 3 5 4`
+    `3 1 4 0 2 5`
+    `4 3 5 2 1 0`
+    `0 2 1 5 4 3`
+    `2 5 0 4 3 1`
+    `5 4 3 1 0 2` -/
+def L6_nat : ℕ → ℕ → ℕ
+  | 0, 0 => 1 | 0, 1 => 0 | 0, 2 => 2 | 0, 3 => 3 | 0, 4 => 5 | 0, _ => 4
+  | 1, 0 => 3 | 1, 1 => 1 | 1, 2 => 4 | 1, 3 => 0 | 1, 4 => 2 | 1, _ => 5
+  | 2, 0 => 4 | 2, 1 => 3 | 2, 2 => 5 | 2, 3 => 2 | 2, 4 => 1 | 2, _ => 0
+  | 3, 0 => 0 | 3, 1 => 2 | 3, 2 => 1 | 3, 3 => 5 | 3, 4 => 4 | 3, _ => 3
+  | 4, 0 => 2 | 4, 1 => 5 | 4, 2 => 0 | 4, 3 => 4 | 4, 4 => 3 | 4, _ => 1
+  | _, 0 => 5 | _, 1 => 4 | _, 2 => 3 | _, 3 => 1 | _, 4 => 0 | _, _ => 2
+
+def L6 (i j : Fin 6) : Fin 6 :=
+  ⟨L6_nat i.val j.val % 6, mod_lt _ (by decide)⟩
+
+/-- Helper lemma to verify `IsIncremental` on a finite board using `decide`. -/
+lemma isIncremental_of_fin_decide (n : ℕ) (L : Fin n → Fin n → Fin n)
+    (h_decide :
+      (∀ i j₁ j₂ : Fin n, L i j₁ = L i j₂ → j₁ = j₂) ∧
+      (∀ j i₁ i₂ : Fin n, L i₁ j = L i₂ j → i₁ = i₂) ∧
+      (∀ k : Fin n, ∀ s : Fin (2 * n - 1),
+        #(sumDiagOk n s.val k.val L) ≤ k.val + 1) ∧
+      (∀ k : Fin n, ∀ d : Fin (2 * n - 1),
+        #(diffDiagOk n ((d.val : ℤ) - ((n : ℤ) - 1)) k.val L) ≤ k.val + 1)) :
+    IsIncremental n L := by
+  rcases h_decide with ⟨hrow, hcol, hsum, hdiff⟩
+  refine ⟨?_, ?_, ?_⟩
+  · intro i
+    rw [Fintype.bijective_iff_injective_and_card]
+    exact ⟨hrow i, rfl⟩
+  · intro j
+    rw [Fintype.bijective_iff_injective_and_card]
+    exact ⟨hcol j, rfl⟩
+  · intro k hk
+    refine ⟨?_, ?_⟩
+    · intro s
+      by_cases hs : s < 2 * n - 1
+      · exact hsum ⟨k, hk⟩ ⟨s, hs⟩
+      · have hemp : sumDiagOk n s k L = ∅ := by
+          ext ⟨i, j⟩
+          simp only [sumDiagOk, Finset.mem_filter, Finset.mem_univ, true_and,
+            Finset.notMem_empty, iff_false]
+          have := i.isLt; have := j.isLt; omega
+        rw [hemp, Finset.card_empty]; omega
+    · intro d
+      by_cases hd : -(n : ℤ) + 1 ≤ d ∧ d ≤ (n : ℤ) - 1
+      · let d_nat : ℕ := (d + ((n : ℤ) - 1)).toNat
+        have hd_lt : d_nat < 2 * n - 1 := by omega
+        have hd_eq : ((d_nat : ℤ) - ((n : ℤ) - 1)) = d := by omega
+        rw [← hd_eq]
+        exact hdiff ⟨k, hk⟩ ⟨d_nat, hd_lt⟩
+      · have hemp : diffDiagOk n d k L = ∅ := by
+          ext ⟨i, j⟩
+          simp only [diffDiagOk, Finset.mem_filter, Finset.mem_univ, true_and,
+            Finset.notMem_empty, iff_false]
+          have := i.isLt; have := j.isLt; omega
+        rw [hemp, Finset.card_empty]; omega
+
+lemma isIncremental_L4 : IsIncremental 4 L4 :=
+  isIncremental_of_fin_decide 4 L4 (by decide)
+
+lemma isIncremental_L6 : IsIncremental 6 L6 :=
+  isIncremental_of_fin_decide 6 L6 (by decide)
+
+/-- **Intermediate Theorem:**
+    For every `n ≥ 4`, there exists an incremental `n × n` Latin square `L`
+    (cyclic for `n ∉ {4, 6}`, and non-cyclic `L4`, `L6` for `n ∈ {4, 6}`). -/
+theorem exists_incremental_ge_4
+    (n : ℕ) (hge : n ≥ 4) :
+    ∃ L : Fin n → Fin n → Fin n, IsIncremental n L := by
+  by_cases h4 : n = 4
+  · subst h4
+    exact ⟨L4, isIncremental_L4⟩
+  · by_cases h6 : n = 6
+    · subst h6
+      exact ⟨L6, isIncremental_L6⟩
+    · obtain ⟨p, _hp_bij, hInc⟩ := exists_cyclic_incremental n hge ⟨h4, h6⟩
+      exact ⟨@cyclicSquare n p hge ⟨h4, h6⟩, hInc⟩
+
+/-- **Combined Main Theorem (Part 1 + Part 2):**
+    For every `n ≥ 4`, there exists an incremental `n × n` Latin square `L`
+    (satisfying all row, column, and diagonal constraints), and `L` simultaneously
+    represents `(n, c)`-coins solutions for all `0 ≤ c ≤ n` (`c ∈ [0, n]`). -/
+theorem exists_incremental_representing_nc_coins
+    (n : ℕ) (hge : n ≥ 4) :
+    ∃ L : Fin n → Fin n → Fin n,
+          IsIncremental n L
+        ∧ ∀ c : ℕ, c ≤ n → IsNCCoinsSolution n c (coinsFromSquare n c L) := by
+  obtain ⟨L, hInc⟩ := exists_incremental_ge_4 n hge
+  exact ⟨L, hInc, fun c hc => incremental_represents_nc_coins n c hge hc L hInc⟩
 
 end IncrementalCyclic
