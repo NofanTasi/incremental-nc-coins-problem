@@ -1,16 +1,13 @@
 notation "ℕ" => Nat
-/-!
-# Executable Incremental Latin Square (Incremental Board) Generator
 
-This program directly implements the constructive definitions from `IncrementalCyclic.lean`
-and `n_c_coins_from_incremental.lean`.
+/-!
+# Executable cyclic incremental Latin square Generator
 
 ## Time and Space Complexity
-- Evaluating the permutation `p(j)` takes **$O(1)$ time** (a few arithmetic operations and `if-then-else`).
+- Evaluating the permutation `p(j)` takes **$O(1)$ time**.
 - Computing any cell `L(i, j) = (i + p(j)) % n` takes **$O(1)$ time**.
-- Generating the complete $n \times n$ grid takes **$O(n^2)$ time and space**, which is asymptotically
-  optimal (the grid has $n^2$ entries).
-- Formatting and printing the board also runs in **$O(n^2)$ time**.
+- Generating the complete $n \times n$ square takes **$O(n^2)$ time and space**.
+- Formatting and printing the square also runs in **$O(n^2)$ time**.
 -/
 
 namespace IncrementalCyclicProgram
@@ -27,7 +24,8 @@ def p2 (n j : ℕ) : ℕ :=
   if j < m then
     if 2 * j + m + 1 < n then 2 * j + m + 1 else 2 * j + m + 1 - n
   else
-    if 2 * (j - m) + m + 4 < n then 2 * (j - m) + m + 4 else 2 * (j - m) + m + 4 - n
+    if 2 * (j - m) + m + 4 < n then 2 * (j - m) + m + 4
+    else 2 * (j - m) + m + 4 - n
 
 /-- Family 3: `n ≡ 3 (mod 6)`, `n ≥ 27` -/
 def p3 (n j : ℕ) : ℕ :=
@@ -35,9 +33,11 @@ def p3 (n j : ℕ) : ℕ :=
   if j < k then
     if 3 * j + 2 * k < n then 3 * j + 2 * k else 3 * j + 2 * k - n
   else if j < 2 * k then
-    if 3 * (j - k) + 2 * k + 4 < n then 3 * (j - k) + 2 * k + 4 else 3 * (j - k) + 2 * k + 4 - n
+    if 3 * (j - k) + 2 * k + 4 < n then 3 * (j - k) + 2 * k + 4
+    else 3 * (j - k) + 2 * k + 4 - n
   else
-    if 3 * (j - 2 * k) + 2 * k + 8 < n then 3 * (j - 2 * k) + 2 * k + 8 else 3 * (j - 2 * k) + 2 * k + 8 - n
+    if 3 * (j - 2 * k) + 2 * k + 8 < n then 3 * (j - 2 * k) + 2 * k + 8
+    else 3 * (j - 2 * k) + 2 * k + 8 - n
 
 /-- Family 4: `n ≡ 0 (mod 6)`, `n ≥ 12` -/
 def p4 (n j : ℕ) : ℕ :=
@@ -70,7 +70,7 @@ def p21 : ℕ → ℕ
 
 /-- Returns the column permutation `p : Fin n → Fin n` for all valid cyclic dimensions
     (`n ∉ {2, 3, 4, 6}`). Evaluates in O(1) time per column! -/
-def getC (n : ℕ) (j : ℕ) : ℕ :=
+def p (n : ℕ) (j : ℕ) : ℕ :=
   if n % 6 = 1 ∨ n % 6 = 5 then p1 n j
   else if n = 8 then p8 j
   else if (n % 6 = 2 ∨ n % 6 = 4) ∧ n ≥ 10 then p2 n j
@@ -101,28 +101,29 @@ def L6 : ℕ → ℕ → ℕ
 def cellValue (n : ℕ) (i j : ℕ) : ℕ :=
   if n = 4 then L4 i j
   else if n = 6 then L6 i j
-  else (i + getC n j) % n
+  else (i + p n j) % n
 
-/-- Generates the complete n × n incremental Latin square board as an `Array (Array ℕ)` in O(n²) time. -/
-def generateBoard (n : ℕ) : Array (Array ℕ) :=
+/-- Generates the complete n × n incremental Latin square square as an `Array (Array ℕ)`
+    in O(n²) time. -/
+def generateSquare (n : ℕ) : Array (Array ℕ) :=
   Array.ofFn (fun (i : Fin n) =>
     Array.ofFn (fun (j : Fin n) => cellValue n i.val j.val))
 
-/-- Pretty-prints the n × n incremental board. -/
-def printBoard (n : ℕ) : IO Unit := do
+/-- Pretty-prints the n × n incremental square. -/
+def printSquare (n : ℕ) : IO Unit := do
   if n = 2 ∨ n = 3 then
-    IO.println s!"No incremental board exists for n = {n}."
+    IO.println s!"No incremental square exists for n = {n}."
   else
-    -- IO.println s!"=== Incremental Board ({n} × {n}) ==="
+    -- IO.println s!"=== incremental square ({n} × {n}) ==="
     for i in [:n] do
       let mut rowStr := ""
       for j in [:n] do
         rowStr := rowStr ++ s!"{cellValue n i j} "
       IO.println rowStr
 
-/-- Pretty-prints the (n, c)-coins solution obtained by thresholding the incremental board at `< c`.
-    A cell is marked with 'C' (or '1') if occupied by a coin/coin, and '.' (or '0') otherwise. -/
-def printCoinsBoard (n c : ℕ) : IO Unit := do
+/-- Pretty-prints the (n, c)-coins solution obtained by thresholding the incremental square at `< c`.
+    A cell is marked with 'C' if occupied by a coin/coin, and '.' (or '0') otherwise. -/
+def printCoinsSquare (n c : ℕ) : IO Unit := do
   if n = 2 ∨ n = 3 then
     IO.println s!"No generalized coins solution exists for n = {n}."
   else if c > n then
@@ -143,11 +144,13 @@ def verifyCoinsPlacement (n c : ℕ) : Bool :=
   else
     -- 1. Check every row has at most c coins (in fact exactly c)
     let rowsOk := (List.range n).all fun i =>
-      let count := (List.range n).foldl (fun cnt j => if cellValue n i j < c then cnt + 1 else cnt) 0
+      let count := (List.range n).foldl
+        (fun cnt j => if cellValue n i j < c then cnt + 1 else cnt) 0
       count == c
     -- 2. Check every column has at most c coins (in fact exactly c)
     let colsOk := (List.range n).all fun j =>
-      let count := (List.range n).foldl (fun cnt i => if cellValue n i j < c then cnt + 1 else cnt) 0
+      let count := (List.range n).foldl
+        (fun cnt i => if cellValue n i j < c then cnt + 1 else cnt) 0
       count == c
     -- 3. Check downward diagonals (sum s) have at most c coins
     let sumOk := (List.range (2 * n - 1)).all fun s =>
@@ -167,7 +170,7 @@ def verifyCoinsPlacement (n c : ℕ) : Bool :=
       count ≤ c
     rowsOk && colsOk && sumOk && diffOk
 
-/-- Diagnostic verifier: checks in O(n³) time that the generated board is indeed incremental. -/
+/-- Diagnostic verifier: checks in O(n³) time that the generated square is indeed incremental. -/
 def verifyIncremental (n : ℕ) : Bool :=
   -- 1. Check rows and cols are permutations
   let rowsOk := (List.range n).all fun i =>
@@ -203,21 +206,21 @@ def main (args : List String) : IO Unit := do
   match args with
   | ["-incremental", nStr] =>
     let n := nStr.toNat?.getD 8
-    printBoard n
+    printSquare n
   | ["-coins", nStr, cStr] =>
     let n := nStr.toNat?.getD 8
     let c := cStr.toNat?.getD 1
-    printCoinsBoard n c
+    printCoinsSquare n c
   | ["-incremental", "-v", nStr] =>
     let n := nStr.toNat?.getD 8
-    printBoard n
+    printSquare n
     IO.println s!"Verifying incremental property for n = {n}..."
     let ok := verifyIncremental n
     IO.println s!"Result: {ok}"
   | ["-coins", "-v", nStr, cStr] =>
     let n := nStr.toNat?.getD 8
     let c := cStr.toNat?.getD 1
-    printCoinsBoard n c
+    printCoinsSquare n c
     IO.println s!"Verifying ({n}, {c})-coins constraints..."
     let ok := verifyCoinsPlacement n c
     IO.println s!"Result: {ok}"
@@ -225,20 +228,24 @@ def main (args : List String) : IO Unit := do
     IO.println ""
 
 
-#eval printBoard 8
+#eval printSquare 10
 #eval IO.println ""
-#eval printCoinsBoard 8 1
+#eval printCoinsSquare 10 1
 #eval IO.println ""
-#eval printCoinsBoard 8 2
+#eval printCoinsSquare 10 2
 #eval IO.println ""
-#eval printCoinsBoard 8 3
+#eval printCoinsSquare 10 3
 #eval IO.println ""
-#eval printCoinsBoard 8 4
+#eval printCoinsSquare 10 4
 #eval IO.println ""
-#eval printCoinsBoard 8 5
+#eval printCoinsSquare 10 5
 #eval IO.println ""
-#eval printCoinsBoard 8 6
+#eval printCoinsSquare 10 6
 #eval IO.println ""
-#eval printCoinsBoard 8 7
+#eval printCoinsSquare 10 7
 #eval IO.println ""
-#eval printCoinsBoard 8 8
+#eval printCoinsSquare 10 8
+#eval IO.println ""
+#eval printCoinsSquare 10 9
+#eval IO.println ""
+#eval printCoinsSquare 10 10

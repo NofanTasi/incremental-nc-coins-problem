@@ -1,5 +1,3 @@
--- cfr. https://puzzling.stackexchange.com/questions/138939
-
 import Mathlib
 
 namespace IncrementalCyclic
@@ -10,11 +8,9 @@ open Finset (univ)
 
 open scoped Finset
 
--- Given a natural number `n : ℕ` and a function `p : Fin n → Fin n`,
--- the function `cyclicSquare` of type `Fin n → Fin n → Fin n`
--- encodes a cyclic nxn square.
--- Notice that `p` does not need to be a bijection
--- but it will be required to a bijection in `Conjecture` below.
+-- Given a natural number `n : ℕ` and a permutation `p : Fin n → Fin n`,
+-- `cyclicSquare` of type `Fin n → Fin n → Fin n`
+-- encodes a cyclic nxn Latin square.
 def cyclicSquare
     (n : ℕ)
     (p : Fin n → Fin n)
@@ -64,7 +60,7 @@ def IsIncremental
         ∧ (∀ d : ℤ, #(diffDiagOk n d k L) ≤ k + 1)
 
 /-!
-## Part 1: Every Incremental Latin Square Represents `(n, c)`-Coins Solutions for `0 ≤ c ≤ n`
+## Part 1: Every incremental Latin square 6epresents `(n, c)`-coins solutions for `0 ≤ c ≤ n`
 
 For `0 ≤ c ≤ n` (`c ∈ [0, n]`), a subset `S` of cells of the `n × n` square is a solution of the
 `(n, c)`-coins problem if:
@@ -272,7 +268,7 @@ theorem incremental_represents_nc_coins
    coinsFromSquare_diffDiag_le n c hc L hL.2.2⟩
 
 /-!
-## Part 2: Cyclic Incremental Latin Squares for `n ≥ 4, n ∉ {4, 6}` via a Permutation `p`
+## Part 2: Cyclic incremental Latin Squares for `n ≥ 4, n ∉ {4, 6}` via a Permutation `p`
 -/
 
 /-- Conditional-subtraction form of `(i + p_nat j) % n` for `i < n` and `p_nat j < n`. -/
@@ -477,7 +473,7 @@ i.e. `m ≥ 5`, ensures `m + 4 < 2m = n`, so `v(i, j) = i + m - 2 + 2δ` never w
 - **Diff-diagonals (`i - j = d`):** Inside each half, `i + p₂(j) = (d + j) + 2j + ...` has step `+3`.
   Since `gcd(3, n) = 1` (from `hmod : n % 6 = 2 ∨ n % 6 = 4`), a collision between `j₁ < m ≤ j₂`
   satisfies `3(j₂ - j₁) + 3 ≡ 0 (mod n) ⇔ j₂ - j₁ = n - 1`. This happens ONLY at a **single pair
-  of cells on the entire board**: `(0, 0)` and `(n - 1, n - 1)` on the main diagonal `d = 0`.
+  of cells on the entire square**: `(0, 0)` and `(n - 1, n - 1)` on the main diagonal `d = 0`.
   `f2_diff` shifts the bottom-right cell `(n - 1, n - 1)` down to `1`, which is vacant on `d = 0`.
 -/
 
@@ -589,7 +585,7 @@ lemma solve_family2 (n : ℕ) (h : n ≥ 4) (hn : n ≠ 4 ∧ n ≠ 6)
     by_cases h1 : j < n / 2
     · exact (f2_diff_lt_prop n i j hge heven hi h1).1
     · exact (f2_diff_ge_prop n i j hge heven hi hj h1).1
-  -- 5. Sum-diagonal injectivity of `f2_sum` across the 2×2 half-board combinations
+  -- 5. Sum-diagonal injectivity of `f2_sum` across the 2×2 half-square combinations
   · intro i₁ hi₁ j₁ hj₁ i₂ hi₂ j₂ hj₂ hs hfeq
     by_cases h1 : j₁ < n / 2 <;> by_cases h2 : j₂ < n / 2
     · have := f2_sum_lt_prop n i₁ j₁ hge heven hi₁ h1
@@ -650,7 +646,8 @@ def p3_nat (n j : ℕ) : ℕ :=
   else if j < 2 * k then
     if 3 * (j - k) + 2 * k + 4 < n then 3 * (j - k) + 2 * k + 4 else 3 * (j - k) + 2 * k + 4 - n
   else
-    if 3 * (j - 2 * k) + 2 * k + 8 < n then 3 * (j - 2 * k) + 2 * k + 8 else 3 * (j - 2 * k) + 2 * k + 8 - n
+    if 3 * (j - 2 * k) + 2 * k + 8 < n then 3 * (j - 2 * k) + 2 * k + 8
+    else 3 * (j - 2 * k) + 2 * k + 8 - n
 
 lemma p3_nat_0 (n j : ℕ) (hj : j < n / 3) :
     (3 * j + 2 * (n / 3) < n ∧ p3_nat n j = 3 * j + 2 * (n / 3)) ∨
@@ -1307,7 +1304,7 @@ theorem exists_cyclic_incremental
   Conjecture n h hn
 
 /-!
-## Non-Cyclic Incremental Latin Squares for `n = 4` and `n = 6` and Full Existence for `n ≥ 4`
+## Non-Cyclic incremental Latin Squares for `n = 4` and `n = 6` and Full Existence for `n ≥ 4`
 -/
 
 /-- Explicit (non-cyclic) `4 × 4` incremental Latin square:
@@ -1342,7 +1339,7 @@ def L6_nat : ℕ → ℕ → ℕ
 def L6 (i j : Fin 6) : Fin 6 :=
   ⟨L6_nat i.val j.val % 6, mod_lt _ (by decide)⟩
 
-/-- Helper lemma to verify `IsIncremental` on a finite board using `decide`. -/
+/-- Helper lemma to verify `IsIncremental` on a finite square using `decide`. -/
 lemma isIncremental_of_fin_decide (n : ℕ) (L : Fin n → Fin n → Fin n)
     (h_decide :
       (∀ i j₁ j₂ : Fin n, L i j₁ = L i j₂ → j₁ = j₂) ∧

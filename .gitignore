@@ -7,5 +7,6 @@
 *.rej
 .lake/
 /doc/tbd
-p_and_f.hs
+/doc/tex/annex.tex
+/src/haskell/p_and_f.hs
 

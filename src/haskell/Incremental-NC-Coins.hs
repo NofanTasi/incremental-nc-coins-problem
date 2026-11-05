@@ -1,6 +1,5 @@
--- module Main where
-
 import System.IO
+    ( hFlush, hSetBuffering, stdout, BufferMode(NoBuffering) )
 import System.Environment (getArgs)
 import Text.Read (readMaybe)
 import Control.Concurrent (threadDelay)
@@ -8,10 +7,7 @@ import Control.Monad (forM_, when)
 import Text.Printf (printf)
 
 {-!
-# Incremental Cyclic Latin Square & Generalized (n, c)-Coins in Haskell
-
-This Haskell implementation translates the constructive incremental Latin square
-from Lean 4 (`IncrementalCyclic.lean` & `n_c_coins_from_incremental.lean`).
+# Incremental cyclic Latin square & (n, c)-coins solutions in Haskell
 
 ## The Power of Laziness
 In traditional backtracking n-coins solvers, laziness is famous for pruning
@@ -24,13 +20,13 @@ determined in O(1) arithmetic operations:
 Haskell's laziness provides powerful advantages here:
 1. **On-Demand Subgrid Evaluation**: To get the coin positions in row `i`,
    or to query the first `k` coins, laziness never computes or allocates
-   the rest of the n × n board. For n = 1,000,000, `take 5 (coinsPositions n c)`
+   the rest of the n × n square. For n = 1,000,000, `take 5 (coinsPositions n c)`
    runs in less than a millisecond!
-2. **O(1) Streaming Memory**: Streaming an n × n board row-by-row runs in
+2. **O(1) Streaming Memory**: Streaming an n × n square row-by-row runs in
    O(n) line-buffer memory (or O(1) beyond the current row) because consumed
    rows are immediately garbage-collected.
 3. **Short-Circuiting Verification**: Verifying properties (e.g. `all (== c) rowCounts`)
-   aborts at the very first violation without evaluating the remaining board.
+   aborts at the very first violation without evaluating the remaining square.
 -}
 
 --------------------------------------------------------------------------------
@@ -59,8 +55,10 @@ p3 n j =
   in if j < k
      then if 3 * j + 2 * k < n then 3 * j + 2 * k else 3 * j + 2 * k - n
      else if j < 2 * k
-          then if 3 * (j - k) + 2 * k + 4 < n then 3 * (j - k) + 2 * k + 4 else 3 * (j - k) + 2 * k + 4 - n
-          else if 3 * (j - 2 * k) + 2 * k + 8 < n then 3 * (j - 2 * k) + 2 * k + 8 else 3 * (j - 2 * k) + 2 * k + 8 - n
+          then if 3 * (j - k) + 2 * k + 4 < n then 3 * (j - k) + 2 * k + 4 
+               else 3 * (j - k) + 2 * k + 4 - n
+          else if 3 * (j - 2 * k) + 2 * k + 8 < n then 3 * (j - 2 * k) + 2 * k + 8 
+               else 3 * (j - 2 * k) + 2 * k + 8 - n
 
 -- | Family 4: n ≡ 0 (mod 6), n ≥ 12
 p4 :: Int -> Int -> Int
@@ -82,21 +80,21 @@ p21 j = [0, 18, 15, 12, 9, 6, 3, 7, 4, 1, 14, 17, 10, 16, 2, 5, 11, 8, 20, 13, 1
 -- | Master permutation dispatch
 p :: Int -> Int -> Int
 p n j
-  | n == 8        = p8 j
-  | n == 9        = p9 j
-  | n == 15       = p15 j
-  | n == 21       = p21 j
+  | n == 8           = p8 j
+  | n == 9           = p9 j
+  | n == 15          = p15 j
+  | n == 21          = p21 j
   | r == 1 || r == 5 = p1 n j
   | r == 2 || r == 4 = p2 n j
-  | r == 3        = p3 n j
-  | otherwise     = p4 n j
+  | r == 3           = p3 n j
+  | otherwise        = p4 n j
   where r = n `mod` 6
 
 --------------------------------------------------------------------------------
--- 2. Cell Values and Lazy Square Generators
+-- 2. Cell values and lazy square generators
 --------------------------------------------------------------------------------
 
--- | Value of cell (i, j) in the Incremental Latin Square
+-- | Value of cell (i, j) in the incremental Latin square
 cellValue :: Int -> Int -> Int -> Int
 cellValue n i j = (i + p n j) `mod` n
 
@@ -104,15 +102,15 @@ cellValue n i j = (i + p n j) `mod` n
 isCoin :: Int -> Int -> Int -> Int -> Bool
 isCoin n c i j = cellValue n i j < c
 
--- | Lazy representation of the Incremental Square as a list of rows
-incrementalBoard :: Int -> [[Int]]
-incrementalBoard n = [ [ cellValue n i j | j <- [0 .. n - 1] ] | i <- [0 .. n - 1] ]
+-- | lazy representation of the incremental square as a list of rows
+incrementalSquare :: Int -> [[Int]]
+incrementalSquare n = [ [ cellValue n i j | j <- [0 .. n - 1] ] | i <- [0 .. n - 1] ]
 
--- | Lazy representation of the (n, c)-Coins board as a list of rows of Bools
-coinsBoard :: Int -> Int -> [[Bool]]
-coinsBoard n c = [ [ isCoin n c i j | j <- [0 .. n - 1] ] | i <- [0 .. n - 1] ]
+-- | lazy representation of the (n, c)-coins square as a list of rows of Bools
+coinsSquare :: Int -> Int -> [[Bool]]
+coinsSquare n c = [ [ isCoin n c i j | j <- [0 .. n - 1] ] | i <- [0 .. n - 1] ]
 
--- | Lazy stream of all coin coordinates (row, col) in order
+-- | lazy stream of all coin coordinates (row, col) in order
 coinsPositions :: Int -> Int -> [(Int, Int)]
 coinsPositions n c =
   [ (i, j)
@@ -126,7 +124,7 @@ rowCoinCols :: Int -> Int -> Int -> [Int]
 rowCoinCols n c i = [ j | j <- [0 .. n - 1], isCoin n c i j ]
 
 --------------------------------------------------------------------------------
--- 3. Verification (Lazy short-circuiting)
+-- 3. Verification (lazy short-circuiting)
 --------------------------------------------------------------------------------
 
 -- | Verify (n, c)-coins constraints with early-exit if any constraint fails
@@ -151,17 +149,17 @@ verifyCoins n c =
       in cnt <= c) [-(n - 1) .. n - 1]
 
 --------------------------------------------------------------------------------
--- 4. Pretty Printing
+-- 4. Pretty printing
 --------------------------------------------------------------------------------
 
 printIncremental :: Int -> IO ()
 printIncremental n = do
-  putStrLn $ "=== Incremental Square (" ++ show n ++ " × " ++ show n ++ ") ==="
-  mapM_ (putStrLn . unwords . map show) (incrementalBoard n)
+  putStrLn $ "=== Incremental square (" ++ show n ++ " × " ++ show n ++ ") ==="
+  mapM_ (putStrLn . unwords . map show) (incrementalSquare n)
 
--- | Stream the Incremental Square cell-by-cell on the fly with an adjustable delay.
+-- | Stream the incremental square cell-by-cell on the fly with an adjustable delay.
 -- Each cell is computed and flushed to standard output immediately as it is generated,
--- demonstrating lazy, demand-driven evaluation without waiting for or allocating the whole board.
+-- demonstrating lazy, demand-driven evaluation without waiting for or allocating the whole square.
 streamIncremental :: Int -> Int -> IO ()
 streamIncremental n delayMs = do
   hSetBuffering stdout NoBuffering
@@ -175,7 +173,7 @@ streamIncremental n delayMs = do
       when (delayMs > 0) $ threadDelay (delayMs * 1000)
     putStrLn ""
 
--- | Stream the (n, c)-Coins Square cell-by-cell on the fly with adjustable delay.
+-- | Stream the (n, c)-coins square cell-by-cell on the fly with adjustable delay.
 streamCoins :: Int -> Int -> Int -> IO ()
 streamCoins n c delayMs = do
   hSetBuffering stdout NoBuffering
@@ -191,35 +189,35 @@ streamCoins n c delayMs = do
 printCoins :: Int -> Int -> IO ()
 printCoins n c = do
   putStrLn $ "(" ++ show n ++ ", " ++ show c ++ ")"
-  mapM_ (putStrLn . unwords . map (\b -> if b then "C" else ".")) (coinsBoard n c)
+  mapM_ (putStrLn . unwords . map (\b -> if b then "C" else ".")) (coinsSquare n c)
 
 --------------------------------------------------------------------------------
 -- 4. Examples
 --------------------------------------------------------------------------------
 
---  ghci -e "example01" Incremental-NC-Coins.hs
+--  ghci -e "example01" Incremental-NC-coins.hs
 example01 :: IO ()
 example01 = do
-    printIncremental 8
+  printIncremental 10
 
---  ghci -e "example02" Incremental-NC-Coins.hs
+--  ghci -e "example02" Incremental-NC-coins.hs
 example02 :: IO ()
-example02 = forM_ [1 .. 8] $ \n -> do
-  printCoins 8 n
+example02 = forM_ [1 .. 10] $ \n -> do
+  printCoins 10 n
   putStr "verification ok = "
-  print (verifyCoins 8 n)
+  print (verifyCoins 10 n)
   putStrLn ""
 
---  ghci -e "example03" Incremental-NC-Coins.hs
+--  ghci -e "example03" Incremental-NC-coins.hs
 example03 :: IO ()
 example03 = do
-    streamIncremental 60 3
+  streamIncremental 50 3
 
---  ghci -e "example04" Incremental-NC-Coins.hs
+--  ghci -e "example04" Incremental-NC-coins.hs
 example04 :: IO ()
-example04 = forM_ [1 .. 60] $ \n -> do
-  streamCoins 60 n 3
+example04 = forM_ [1 .. 50] $ \n -> do
+  streamCoins 50 n 3
   putStr "verification ok = "
-  print (verifyCoins 60 n)
+  print (verifyCoins 50 n)
   putStrLn ""
 
