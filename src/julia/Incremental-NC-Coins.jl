@@ -1,9 +1,5 @@
 # ============================================================================
 # Incremental (n,c)-Coins Generator, Verifier, and Display Engine
-#  twin Based
-# on Luc Duponcheel's Lean formalization
-#  and
-# on some Marc Duponcheel's ideas and reports
 # ============================================================================
 
 # ============================================================================
