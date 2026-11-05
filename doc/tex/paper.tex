@@ -109,7 +109,7 @@ difference-diagonal, no more than $c$ coins (for the $n$-queens problem $c = 1$)
 \emph{incremental $n \!\times\! n$ Latin square} represents $n + 1$ solutions of
 $(n,c)$-coins problems for all $c \in \mathbb{N}$ with $0 \le c \le n$.
 \item For every natural number $n \in \mathbb{N}$ with $n \ge 4, \; n \notin \{4, 6\}$, 
-\emph{there exists an incremental cyclic $n \!\times\! n$ Latin square}. This proposition,
+there exists an \emph{incremental cyclic $n \!\times\! n$ Latin square}. This proposition,
 conjectured by Marc, turned out to be true.
 \end{itemize}
 
@@ -124,7 +124,7 @@ conjectured by Marc, turned out to be true.
 the authors know, any knowledge about the conjecture, let alone a proof of it.
 \item The proofs used the \emph{injective-majorization principle}, avoiding intensive
 cardinality counting on each diagonal, which would computationally explode for large $n$.
-\item The proofs came up with four subsets of $\mathbb{N}$\\ covering all $n$ except
+\item The proofs came up with four subsets of $\mathbb{N}$ covering all $n$ except
 $n \in \{8, 9, 15, 21\}$~:
 \begin{itemize}
 \item $n \equiv 1,5 \pmod 6$, $n \ge 5$,
@@ -141,8 +141,8 @@ elements.
 
 \vspace{8pt}
 
-\noindent Constructing a cyclic Latin square for the four uncovered natural numbers
-$n \in \{8, 9, 15, 21\}$ is handled individually.
+\noindent Constructing a cyclic Latin square for the four uncovered natural numbers is handled
+individually.
 
 \vspace{8pt}
 
@@ -263,7 +263,7 @@ For a Latin square, we write $L^{n,p}$ for $S^{n,p}$ and $l^{n,p}_{i,j}$ for $s^
 
 \begin{definition}\label{def:cs}
 \hspace{1pt} \\ A square $S^n$ is a \emph{cyclic square} $\Leftrightarrow$
-$s^n_{i + 1, j} = s^n_{i,j} + 1 \bmod n, \; \forall i \in [0, n[$.
+$s^n_{i + 1, j} = s^n_{i,j} + 1 \bmod n, \; \forall i, j \in [0, n[$.
 \end{definition}
 
 \vspace{8pt}
@@ -277,7 +277,7 @@ $s^{n,p}_{i,j} = (i + p(j)) \bmod n, \; \forall i,j \in [0, n[$.
 
 \vspace{8pt}
 
-Clearly, $L^{n,p} = S^{n,p}$ is a cyclic Latin square.
+Clearly, $S^{n,p}$ is a cyclic Latin square, so we use notation $L^{n,p}$ and $l^{n,p}_{i,j}$.
 
 \section{Theorem Statements}
 
