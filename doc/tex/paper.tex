@@ -87,7 +87,7 @@ constructor, forall, exists, import, namespace, end, open, use, by_cases, split_
 
 \vspace{8pt}
 
-\noindent The \emph{$n$-queens problem} on an $n \!\times\! n$ square, allows, on any row, column,
+\noindent The \emph{$n$-queens problem} on an $n \!\times\! n$ square allows, on any row, column,
 sum-diagonal or diff-diagonal, no more than $1$ queen. The $n = 1$ case has a trivial single
 solution, and the $n = 2$ and $n = 3$ cases have no solution, so, in this paper, 
 \emph{we limit ourselves to $n \ge 4$}.
@@ -100,7 +100,7 @@ difference-diagonal, no more than $c$ coins (for the $n$-queens problem $c = 1$)
 
 \vspace{8pt}
 
-\noindent \emph{We prove the following~}:
+\noindent \emph{We prove the following}:
 
 \vspace{8pt}
 
@@ -115,7 +115,7 @@ conjectured by Marc, turned out to be true.
 
 \vspace{8pt}
 
-\noindent \emph{The following is remarkable about AI in general, and Gemini 4 (Argon), in particular~}:
+\noindent \emph{The following is remarkable about AI in general, and Gemini 4 (Argon), in particular}:
 
 \vspace{8pt}
 
@@ -125,7 +125,7 @@ the authors know, any knowledge about the conjecture, let alone a proof of it.
 \item The proofs used the \emph{injective-majorization principle}, avoiding intensive
 cardinality counting on each diagonal, which would computationally explode for large $n$.
 \item The proofs came up with four subsets of $\mathbb{N}$ covering all $n$ except
-$n \in \{8, 9, 15, 21\}$~:
+$n \in \{8, 9, 15, 21\}$:
 \begin{itemize}
 \item $n \equiv 1,5 \pmod 6$, $n \ge 5$,
 \item $n \equiv 2,4 \pmod 6$, $n \ge 10$,
@@ -162,69 +162,65 @@ In what follows, $n \in \mathbb{N}$ is a natural number with $n \ge 4$.
 
 \vspace{8pt}
 
-We write $[m, n]$ for $\{m, \dots, n\}$ (in particular, $[0, n]$ for
+For all $m \le n$, we write $[m,n]$ for $\{m, \dots, n\}$ (in particular, $[0,n]$ for
 $\{0, \dots, n\}$).
 
 \vspace{8pt}
 
-We write $[m, n[$ for $\{m, \dots, n - 1\}$ (in particular, $[0, n[$ for
-$\{0, \dots, n - 1\}$).
+In what follows, $S^n : [0,n-1]^2 \to [0,n-1]$ is referred to as a square.
 
 \vspace{8pt}
 
-In what follows, $S^n : [0, n[^2 \to [0, n[$ is referred to as a square.
+When dealing with squares and related concepts, like rows, columns, diagonals and cells,
+it is important to distinguish them from their values. 
 
 \vspace{8pt}
 
-When dealing with things, like squares, rows, columns, diagonals and cells, it is important to
-distinguish them from their values. 
-
-\vspace{8pt}
-
-Notation for things is the same, in \emph{uppercase}, as for their values, in \emph{lowercase}, for
-example, $s^n_{i,j}$ for the value of the $(i,j)$-cell, $S^n_{i,j}$, of square $S^n$.
+For squares and related concepts we use \emph{uppercase} notation, whereas for their values
+we use corresponding \emph{lowercase} notation. For example, we write $s^n_{i,j}$ for the 
+value of the $(i,j)$-cell, $S^n_{i,j}$, of square $S^n$.
 
 \vspace{8pt}
 
 We write $S^n_{i,j}$ ($s^n_{i,j}$) for (the value of) the $(i,j)$-cell of $S^n$,
-$\forall i,j \in [0, n[$.
+$\forall i,j \in [0,n-1]$.
 
 \vspace{8pt}
 
-We write $R^n_i$ ($r^n_{i,j}$) for (the values of) $\{S^n_{i,j} \mid j \in [0, n[\}$, the $i$-row of 
-$S^n$, $\forall i \in [0, n[$.
+We write $R^n_i$ ($r^n_{i,j}$) for (the values of) $\{S^n_{i,j} \mid j \in [0,n-1]\}$, the $i$-row
+of  $S^n$, $\forall i \in [0,n-1]$.
 
 \vspace{8pt}
 
-We write $C^n_j$ ($c^n_{i,j}$) for (the values of) $\{S^n_{i,j} \mid i \in [0, n[\}$, the $j$-column
-of $S^n$, $\forall j \in [0, n[$.
+We write $C^n_j$ ($c^n_{i,j}$) for (the values of) $\{S^n_{i,j} \mid i \in [0,n-1]\}$, the $j$-column
+of $S^n$, $\forall j \in [0,n-1]$.
 
 \vspace{8pt}
 
 We write $D^n_{i+j=s}$ ($d^n_{i+j=s}$) for (the values of) 
-$\{S_{i,j} \mid i,j \in [0, n[, \; i + j = s\}$, the $s$-sum-diagonal, also called $s$-diagonal, of
-$S^n$, $\forall s \in [0, 2(n - 1)]$.
+$\{S^n_{i,j} \mid i,j \in [0,n-1], \; i + j = s\}$, the $s$-sum-diagonal, also called $s$-diagonal, of
+$S^n$, $\forall s \in [0,2(n-1)]$.
 
 \vspace{8pt}
 
 We write $D^n_{i-j=d}$ ($d^n_{i-j=d}$) for (the values of)
-$\{S_{i,j} \mid i,j \in [0, n[, \; i - j = d\}$, the $d$-diff-diagonal, also called $d$-diagonal, of
-$S^n$, $\forall d \in [-(n - 1), n - 1]$.
+$\{S^n_{i,j} \mid i,j \in [0,n-1], \; i - j = d\}$, the $d$-diff-diagonal, also called $d$-diagonal, of
+$S^n$, $\forall d \in [-(n-1),n-1]$.
 
 \vspace{8pt}
 
 We write $D^{n,k}_{i+j=s}$ for $\{S^n_{i,j} \mid S^n_{i,j} \in D^n_{i+j=s}, \; s^n_{i,j} \le k\}$, 
-$\forall s \in [0, 2(n - 1)] \, , \, \forall k \in [0, n]$.
+$\forall s \in [0,2(n-1)] \, , \, \forall k \in [0,n-1]$.
 
 \vspace{8pt}
 
 We write $D^{n,k}_{i-j=d}$ for $\{S^n_{i,j} \mid S^n_{i,j} \in D^n_{i-j=d}, \; s^n_{i,j} \le k\}$, 
-$\forall d \in [-(n - 1), n - 1] \, , \, \forall k \in [0, n]$.
+$\forall d \in [-(n-1),n-1] \, , \, \forall k \in [0,n-1]$.
 
 \vspace{8pt}
 
 \begin{definition}\label{def:nc}
-\hspace{1pt} \\ A solution of an $(n,c)$-coins problem, for $c \in [0, n]$, is a subset $S^n_c$ of
+\hspace{1pt} \\ A solution of an $(n,c)$-coins problem, for $c \in [0,n]$, is a subset $S^n_c$ of
 $n\,.\,c$ cells of a square $S^n$ such that every row $R^n_i$, column $C^n_j$,
 diagonal $D^n_{i+j=s}$, and diagonal $D^n_{i-j=d}$, contains at most $c$ cells of $S^n_c$.
 \end{definition}
@@ -236,22 +232,22 @@ Le, Li and Wang~\cite{LLW1990} construct solutions of $(n,c)$-coins problems \em
 \vspace{8pt}
 
 \begin{definition}\label{def:is}
-\hspace{1pt} \\ A square $S^n$ is an \emph{incremental square} $\Leftrightarrow$
+\hspace{1pt} \\ A square $S^n$ is an \emph{incremental} square $\Leftrightarrow$
 \begin{itemize}
 \item $|\,D^{n,k}_{i+j=s}\,| \le k + 1$, 
-$\forall s \in [0, 2(n - 1)] \, , \, \forall k \in [0, n[$,
+$\forall s \in [0,2(n-1)] \, , \, \forall k \in [0,n-1]$,
 \item $|\,D^{n,k}_{i-j=d}\,| \le k + 1$, 
-$\forall d \in [-(n - 1), n - 1] \, , \, \forall k \in [0, n[$.
+$\forall d \in [-(n-1),n-1] \, , \, \forall k \in [0,n-1]$.
 \end{itemize}
 \end{definition}
 
 \vspace{8pt}
 
 \begin{definition}\label{def:ls}
-\hspace{1pt} \\ A square $S^n$ is a \emph{Latin square} $\Leftrightarrow$ 
+\hspace{1pt} \\ A square $S^n$ is a \emph{Latin} square $\Leftrightarrow$ 
 \begin{itemize}
-\item $r^n_i$ is a permutation of $[0, n[$, $\, \forall i \in [0, n[ \;$,
-\item $c^n_j$ is a permutation of $[0, n[$, $\, \forall j \in [0, n[ \;$.
+\item $r^n_i$ is a permutation of $[0,n-1]$, $\, \forall i \in [0,n-1] \;$,
+\item $c^n_j$ is a permutation of $[0,n-1]$, $\, \forall j \in [0,n-1] \;$.
 \end{itemize}
 \end{definition}
 
@@ -262,18 +258,18 @@ For a Latin square, we write $L^{n,p}$ for $S^{n,p}$ and $l^{n,p}_{i,j}$ for $s^
 \vspace{8pt}
 
 \begin{definition}\label{def:cs}
-\hspace{1pt} \\ A square $S^n$ is a \emph{cyclic square} $\Leftrightarrow$
-$s^n_{i + 1, j} = s^n_{i,j} + 1 \bmod n, \; \forall i, j \in [0, n[$.
+\hspace{1pt} \\ A square $S^n$ is a \emph{cyclic} square $\Leftrightarrow$
+$s^n_{i + 1, j} = s^n_{i,j} + 1 \bmod n, \; \forall i,j \in [0,n-1]$.
 \end{definition}
 
-\vspace{8pt}
+\vspace{12pt}
 
-In what follows, $p : [0, n[ \to [0, n[$ is a permutation of $[0, n[$.
+In what follows, $p$ is a permutation of $[0,n-1]$.
 
 \vspace{8pt}
 
 We write $S^{n,p}$ for the square with cell values 
-$s^{n,p}_{i,j} = (i + p(j)) \bmod n, \; \forall i,j \in [0, n[$.
+$s^{n,p}_{i,j} = (i + p(j)) \bmod n, \; \forall i,j \in [0,n-1]$.
 
 \vspace{8pt}
 
@@ -290,15 +286,15 @@ $S^n_c = \{L^n_{i,j} \mid l^n_{i,j} < c\}$ (notice that $S^n_0 = \emptyset$).
 \vspace{8pt}
 
 \begin{theorem}\label{thm:main2}
-\hspace{1pt} \\ $\forall n \in \mathbb{N}, \; n \ge 4, \; n \notin \{4, 6\}$, $\exists p$ such that
-$L^{n,p}$ is an incremental cyclic Latin square.
+\hspace{1pt} \\ $\forall n \in \mathbb{N}, \; n \ge 4, \; n \notin \{4, 6\} \; \exists L^{n,p}$ that
+is an \emph{incremental} cyclic Latin square.
 \end{theorem}
 
 \section{Injective Majorization}
 
 Instead of using direct cardinality counting, which would computationally explode for large $n$, we
-use a principle that reduces the problem for \emph{all} thresholds $k \in [0, n[$ simultaneously to
-constructing, for each diagonal direction, a single majorized injection.
+use a principle that reduces the problem for \emph{all} thresholds $k \in [0,n-1]$ simultaneously to
+constructing, for each diagonal, a single majorized injection.
 
 \subsection{The Injective-Majorization Principle}
 
@@ -308,18 +304,18 @@ diagonal.
 \vspace{8pt} 
 
 \begin{lemma}\label{lem:inj-maj}
-If there exists a function $f : \mathbb{N} \times \mathbb{N} \to \mathbb{N}$ such that:
+If there exists a function $f : [0,n-1]^2 \to \mathbb{N}$ such that:
 
 \vspace{8pt}
 
 \begin{enumerate}[nosep,label=(\arabic*)]
-  \item Majorization~: $\forall i,j : 0 \le i,j < n, f(i,j) \le l^{n,p}_{i,j}$ on $D$.
-  \item Diagonal Injectivity~: $f$ is injective on $D$.
+  \item Majorization: $\forall i,j \in [0,n-1], f(i,j) \le l^{n,p}_{i,j}$ on $D$.
+  \item Diagonal Injectivity: $f$ is injective on $D$.
 \end{enumerate}
 
 \vspace{8pt}
 
-Then for every threshold $k \in [0,n[$, the set
+Then for every threshold $k \in [0,n-1]$, the set
 $D^k$ ($D^{n,k}_{i+j=s}$ or $D^{n,k}_{i-j=d}$) has cardinality at most $k + 1$.
 \end{lemma}
 
@@ -328,10 +324,10 @@ $D^k$ ($D^{n,k}_{i+j=s}$ or $D^{n,k}_{i-j=d}$) has cardinality at most $k + 1$.
 \vspace{8pt}
 
 \hspace{1pt} \\ By condition~(1), $0 \le f(i,j) \le l^{n,p}_{i,j} \le k$ on $D^k$. 
-\\ Therefore $f(i,j) \in [0,k + 1[$
+\\ Therefore $f(i,j) \in [0,k]$.
 \vspace{8pt}
-\\ By condition~(2), the restriction of $f$ to $D^k$ is an injective map into $[0,k + 1[$.
-\\ Therefore $|D^k| \le |\,[0,k + 1[\,| = k + 1$.
+\\ By condition~(2), the restriction of $f$ to $D^k$ is an injective map into $[0,k]$.
+\\ Therefore $|D^k| \le |\,[0,k]\,| = k + 1$.
 
 \end{proof}
 
