@@ -109,8 +109,7 @@ difference-diagonal, no more than $c$ coins (for the $n$-queens problem $c = 1$)
 \emph{incremental $n \!\times\! n$ Latin square} represents $n + 1$ solutions of
 $(n,c)$-coins problems for all $c \in \mathbb{N}$ with $0 \le c \le n$.
 \item For every natural number $n \in \mathbb{N}$ with $n \ge 4, \; n \notin \{4, 6\}$, 
-there exists an \emph{incremental cyclic $n \!\times\! n$ Latin square}. This proposition,
-conjectured by Marc, turned out to be true.
+there exists an \emph{incremental cyclic $n \!\times\! n$ Latin square}.
 \end{itemize}
 
 \vspace{8pt}
@@ -120,11 +119,11 @@ conjectured by Marc, turned out to be true.
 \vspace{8pt}
 
 \begin{itemize}
-\item The propositions were proved, agreed, with some help from Luc, \emph{without}, as far as
-the authors know, any knowledge about the conjecture, let alone a proof of it.
-\item The proofs used the \emph{injective-majorization principle}, avoiding intensive
+\item The propositions were proved without, as far as the we know, any public (published) knowledge
+about them, let alone a proof of them.
+\item The proofs introduced the \emph{injective-majorization principle}, avoiding intensive
 cardinality counting on each diagonal, which would computationally explode for large $n$.
-\item The proofs came up with four subsets of $\mathbb{N}$ covering all $n$ except
+\item The proofs introduced four subsets of $\mathbb{N}$ covering all $n$ except
 $n \in \{8, 9, 15, 21\}$:
 \begin{itemize}
 \item $n \equiv 1,5 \pmod 6$, $n \ge 5$,
@@ -227,7 +226,8 @@ diagonal $D^n_{i+j=s}$, and diagonal $D^n_{i-j=d}$, contains at most $c$ cells o
 
 \vspace{8pt}
 
-Le, Li and Wang~\cite{LLW1990} construct solutions of $(n,c)$-coins problems \emph{separately}. 
+Le, Li and Wang~\cite{LLW1990} construct solutions of $(n,c)$-coins problems \emph{separately} for
+each $c \in [0,n]$.
 
 \vspace{8pt}
 
@@ -294,7 +294,8 @@ is an \emph{incremental} cyclic Latin square.
 
 Instead of using direct cardinality counting, which would computationally explode for large $n$, we
 use a principle that reduces the problem for \emph{all} thresholds $k \in [0,n-1]$ simultaneously to
-constructing, for each diagonal, a single majorized injection.
+constructing, for each diagonal direction, a single majorized injection, for \emph{all} diagonals
+involved.
 
 \subsection{The Injective-Majorization Principle}
 
@@ -331,6 +332,8 @@ $D^k$ ($D^{n,k}_{i+j=s}$ or $D^{n,k}_{i-j=d}$) has cardinality at most $k + 1$.
 
 \end{proof}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{thebibliography}{9}
 \bibitem{LLW1990}
 Mao-Hua Le, Wen Li, and Edward T. Wang,
@@ -340,6 +343,8 @@ Journal of Systems Science and Mathematical Sciences \textbf{3} (1990), no.~2, 1
 \end{thebibliography}
 
 \end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Explanantion and Illustation of the Lean Proof}
 

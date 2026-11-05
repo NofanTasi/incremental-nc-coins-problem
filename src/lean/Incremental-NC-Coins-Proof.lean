@@ -14,7 +14,7 @@ open scoped Finset
 -- the function `cyclicSquare` of type `Fin n → Fin n → Fin n`
 -- encodes a cyclic nxn square.
 -- Notice that `p` does not need to be a bijection
--- but it will be required to a bejection in `IsIncremental` below.
+-- but it will be required to a bijection in `Conjecture` below.
 def cyclicSquare
     (n : ℕ)
     (p : Fin n → Fin n)

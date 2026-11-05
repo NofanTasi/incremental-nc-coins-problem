@@ -7,3 +7,5 @@
 *.rej
 .lake/
 /doc/tbd
+p_and_f.hs
+
