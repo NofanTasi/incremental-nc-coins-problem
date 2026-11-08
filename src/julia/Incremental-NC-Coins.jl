@@ -120,7 +120,7 @@ Generates, optionally benchmarks, verifies, displays any range of n and its nc's
 """
 function solve(range;
                print_P=true,   # print permutation p
-               print_L=true,   # print latin square L solution
+               print_L=true,   # print Latin square L solution
                print_I=false,  # print incremental squares
                verify=true,    # verify solution
                benchmark=false # benchmark execution
