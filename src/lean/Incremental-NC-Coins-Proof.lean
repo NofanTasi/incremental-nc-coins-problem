@@ -60,7 +60,7 @@ def IsIncremental
         ∧ (∀ d : ℤ, #(diffDiagOk n d k L) ≤ k + 1)
 
 /-!
-## Part 1: Every incremental Latin square 6epresents `(n, c)`-coins solutions for `0 ≤ c ≤ n`
+## Part 1: Every incremental Latin square represents `(n, c)`-coins solutions for `0 ≤ c ≤ n`
 
 For `0 ≤ c ≤ n` (`c ∈ [0, n]`), a subset `S` of cells of the `n × n` square is a solution of the
 `(n, c)`-coins problem if:
