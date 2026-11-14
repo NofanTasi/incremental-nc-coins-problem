@@ -24,6 +24,7 @@ Scripts in directory `doc/sh`.
 ## references
 
 https://aixiv.science/abs/aixiv.261114.000001
+
 https://palomar-registry.org/entry?id=PALOMAR-2026-11-14-000018
 
 
