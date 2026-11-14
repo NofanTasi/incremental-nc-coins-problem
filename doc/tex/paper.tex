@@ -112,6 +112,10 @@ difference-diagonal, no more than $c$ coins (for the $n$-queens problem $c = 1$)
 $(n,c)$-coins problems for all $c \in \mathbb{N}$ with $0 \le c \le n$.
 \item For every natural number $n \in \mathbb{N}$ with $n \ge 4, \; n \notin \{4, 6\}$, 
 there \emph{exists} an incremental \emph{cyclic} $n \!\times\! n$ Latin square.
+\item For $n \in \{4, 6\}$, there \emph{exists} a non-cyclic incremental $n \!\times\! n$ Latin
+square, and hence for every natural number $n \in \mathbb{N}$ with $n \ge 4$, there \emph{exists} an
+incremental $n \!\times\! n$ Latin square representing $n + 1$ solutions of $(n,c)$-coins problems
+for all $c \in \mathbb{N}$ with $0 \le c \le n$.
 \end{itemize}
 
 \vspace{8pt}
@@ -147,7 +151,9 @@ all its elements.
 
 \vspace{8pt}
 
-\noindent See \href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub}
+\noindent See
+\href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub (companion paper \& exploration)},
+\href{https://github.com/LucDuponcheelAtGitHub/incremental-nc-coins}{GitHub (Palomar Lean~4 formalization)},
 and also
 \noindent
 \href{https://mathoverflow.net/questions/510135}{MO\hspace{-0.5pt}\#\hspace{-0.5pt}510135},
@@ -255,7 +261,7 @@ $\forall d \in [-(n-1),n-1] \, , \, \forall k \in [0,n-1]$.
 
 \vspace{8pt}
 
-For a Latin square, we write $L^{n,p}$ for $S^{n,p}$ and $l^{n,p}_{i,j}$ for $s^{n,p}_{i,j}$.
+For a Latin square, we write $L^n$ for $S^n$ and $l^n_{i,j}$ for $s^n_{i,j}$.
 
 \vspace{8pt}
 
@@ -277,24 +283,44 @@ $s^{n,p}_{i,j} = (i + p(j)) \bmod n, \; \forall i,j \in [0,n-1]$.
 
 Clearly, $S^{n,p}$ is a cyclic Latin square, so we use notation $L^{n,p}$ and $l^{n,p}_{i,j}$.
 
-\section{Theorem Statements}
+\section[Incremental Latin Squares and (n,c)-Coins Problems]{Incremental Latin Squares and $(n,c)$-Coins Problems}
 
 \begin{theorem}\label{thm:main1}
 \hspace{1pt} \\ $\forall n \in \mathbb{N}, \; n \ge 4$, an incremental Latin $n \!\times\! n$ square
-represents $n + 1$ solutions of $(n,c)$-coins problems \emph{simultaneously} for $c \in [0,n]$ as
-$S^n_c = \{L^n_{i,j} \mid l^n_{i,j} < c\}$ (notice that $S^n_0 = \emptyset$).
+$L^n$ represents $n + 1$ solutions of $(n,c)$-coins problems \emph{simultaneously} for $c \in [0,n]$
+as $S^n_c = \{L^n_{i,j} \mid l^n_{i,j} < c\}$ (notice that $S^n_0 = \emptyset$).
 \end{theorem}
+
+\begin{proof}
 
 \vspace{8pt}
 
-\begin{theorem}\label{thm:main2}
-\hspace{1pt} \\ $\forall n \in \mathbb{N}, \; n \ge 4, \; n \notin \{4, 6\} \; \exists L^{n,p}$ that
-is an \emph{incremental} cyclic Latin square.
-\end{theorem}
+\hspace{1pt} \\ For $c = 0$, $S^n_0 = \emptyset$ has $|\,S^n_0\,| = 0 = n\,.\,0$, and every row,
+column, sum-diagonal, and diff-diagonal contains $0 \le 0$ cells of $S^n_0$.
 
 \vspace{8pt}
 
-Notice that the first theorem is not constructive, whereas the second theorem is constructive.
+For $c \in [1,n]$, we have $c - 1 \in [0,n-1]$ and
+$S^n_c = \{L^n_{i,j} \mid l^n_{i,j} \le c - 1\}$. By Definition~\ref{def:ls} and
+Definition~\ref{def:is}:
+\begin{itemize}
+\item Since each row $r^n_i$ is a permutation of $[0,n-1]$, restricting $j \mapsto l^n_{i,j}$ to
+$\{j \in [0,n-1] \mid l^n_{i,j} \le c - 1\}$ yields a bijection onto $[0,c-1]$, so
+$|\,S^n_c \cap R^n_i\,| = |\,[0,c-1]\,| = c \le c, \; \forall i \in [0,n-1]$.
+\item Summing over all $n$ rows gives
+$|\,S^n_c\,| = \sum_{i=0}^{n-1} |\,S^n_c \cap R^n_i\,| = n\,.\,c$.
+\item Since each column $c^n_j$ is a permutation of $[0,n-1]$, restricting $i \mapsto l^n_{i,j}$ to
+$\{i \in [0,n-1] \mid l^n_{i,j} \le c - 1\}$ yields a bijection onto $[0,c-1]$, so
+$|\,S^n_c \cap C^n_j\,| = |\,[0,c-1]\,| = c \le c, \; \forall j \in [0,n-1]$.
+\item For every sum-diagonal $D^n_{i+j=s}$, $S^n_c \cap D^n_{i+j=s} = D^{n,c-1}_{i+j=s}$, and since
+$L^n$ is incremental, $|\,D^{n,c-1}_{i+j=s}\,| \le (c - 1) + 1 = c, \; \forall s \in [0,2(n-1)]$.
+\item For every diff-diagonal $D^n_{i-j=d}$, $S^n_c \cap D^n_{i-j=d} = D^{n,c-1}_{i-j=d}$, and since
+$L^n$ is incremental, $|\,D^{n,c-1}_{i-j=d}\,| \le (c - 1) + 1 = c, \; \forall d \in [-(n-1),n-1]$.
+\end{itemize}
+Therefore $S^n_c$ is a solution of the $(n,c)$-coins problem (Definition~\ref{def:nc}) for every
+$c \in [0,n]$.
+
+\end{proof}
 
 \section{Injective Majorization}
 
@@ -310,7 +336,7 @@ to a single majorized injection, for \emph{all} diagonals involved.
 \vspace{8pt} 
 
 \begin{lemma}\label{lem:inj-maj}
-If there exists a function $f : [0,n-1]^2 \to \mathbb{N}$ such that:
+\hspace{1pt} \\ If there exists a function $f : [0,n-1]^2 \to \mathbb{N}$ such that:
 
 \vspace{8pt}
 
@@ -336,11 +362,13 @@ therefore $|D^k| \le |\,[0,k]\,| = k + 1$.
 
 \end{proof}
 
-\section[Proof of Theorem 2.2]{Proof of Theorem 2.2}
+\section{Incremental Cyclic Latin Squares}
 
-The proof uses families, Family $f$, for $f \in \{1, 2, 3, 4\}$, corresponding to the subsets of the
-abstract. It defines $m := n/2$ for families $f = 2$ and $f = 4$, and $k := n/3$ for families $f = 3$ 
-and $f = 4$. Where used, $m$ and $k$ are integers according to the corresponding subsets.
+We construct an incremental cyclic Latin square $L^{n,p}$ for every $n \ge 4$ with $n \notin \{4,6\}$
+using families, Family $f$, for $f \in \{1, 2, 3, 4\}$, corresponding to the subsets of the
+abstract, together with the four small cases $n \in \{8, 9, 15, 21\}$. We define $m := n/2$ for
+families $f = 2$ and $f = 4$, and $k := n/3$ for families $f = 3$ and $f = 4$. Where used, $m$ and
+$k$ are integers according to the corresponding subsets.
 
 \vspace{8pt}
 
@@ -438,7 +466,7 @@ Since no collision can occur on any diagonal, we define
 \vspace{8pt}
 
 \begin{lemma}\label{lem:fam1}
-$L^{n,p_1}$ is an incremental cyclic Latin square.
+\hspace{1pt} \\ $L^{n,p_1}$ is an incremental cyclic Latin square.
 \end{lemma}
 
 \begin{proof}
@@ -590,7 +618,7 @@ We shift the bottom-right corner cell:
 \]
 
 \begin{lemma}\label{lem:fam2}
-$L^{n,p_2}$ is an incremental cyclic Latin square.
+\hspace{1pt} \\ $L^{n,p_2}$ is an incremental cyclic Latin square.
 \end{lemma}
 
 \begin{proof}
@@ -843,7 +871,7 @@ We shift the bottom-right $2 \times 2$ corner of the square in a column-dependen
 \]
 
 \begin{lemma}\label{lem:fam3}
-$L^{n,p_3}$ is an incremental cyclic Latin square.
+\hspace{1pt} \\ $L^{n,p_3}$ is an incremental cyclic Latin square.
 \end{lemma}
 
 \begin{proof}
@@ -1134,7 +1162,7 @@ defines:
 \]
 
 \begin{lemma}\label{lem:fam4}
-$L^{n,p_4}$ is an incremental cyclic Latin square.
+\hspace{1pt} \\ $L^{n,p_4}$ is an incremental cyclic Latin square.
 \end{lemma}
 
 \begin{proof}
@@ -1295,7 +1323,7 @@ The four families above cover all $n \ge 4$ with $n \notin \{4, 6\}$ except the 
 $n \in \{8, 9, 15, 21\}$, which fall below the thresholds $n \ge 10$ of family $F_2$ and
 $n \ge 27$ of family $F_3$. For each of these we define $p_n$ and the two majorants
 explicitly and verify incrementality by direct finite enumeration (the same enumeration has
-been formalized in the Lean~4 companion \texttt{IncrementalCyclic.lean}, see the GitHub
+been formalized in the Lean~4 companion \texttt{IncrementalNCCoins.lean}, see the GitHub
 repository).
 
 \vspace{8pt}
@@ -1378,41 +1406,132 @@ $p_{21} = (0, 18, 15, 12, 9, 6, 3, 7, 4, 1, 14, 17, 10, 16, 2, 5, 11, 8, 20, 13,
 \end{align*}
 
 \begin{lemma}\label{lem:small}
-For each $n \in \{8, 9, 15, 21\}$ with $p_n$, $f^{sum}_n$, $f^{diff}_n$ as above,
+\hspace{1pt} \\ For each $n \in \{8, 9, 15, 21\}$ with $p_n$, $f^{sum}_n$, $f^{diff}_n$ as above,
 $L^{n,p_n}$ is an incremental cyclic Latin square.
 \end{lemma}
 
 \begin{proof}
-By direct finite enumeration of the conditions of Definitions \ref{def:is} and \ref{def:ls}
-(the enumeration is $O(n^3)$ per case and has been checked in the Lean~4 companion).
+
+\vspace{8pt}
+
+\hspace{1pt} \\ By Lemma~\ref{lem:inj-maj} and direct finite enumeration of majorization and
+injectivity on $[0,n-1]^2$ for each $n \in \{8, 9, 15, 21\}$ (the enumeration is $O(n^3)$ per case
+and has been checked in the Lean~4 companion).
+
 \end{proof}
 
-\subsection[Conclusion]{Conclusion}
+\subsection[Existence of Incremental Cyclic Latin Squares]{Existence of Incremental Cyclic Latin Squares}
 
-By Lemmas \ref{lem:fam1}, \ref{lem:fam2}, \ref{lem:fam3}, \ref{lem:fam4} and \ref{lem:small},
-every $n \in \mathbb{N}$ with $n \ge 4$ and $n \notin \{4, 6\}$ admits an incremental cyclic
-Latin square $L^{n,p_f}$ (or $L^{n,p_n}$ in the four small cases). This concludes the proof
-of Theorem \ref{thm:main2}.
+\begin{theorem}\label{thm:main2}
+\hspace{1pt} \\ $\forall n \in \mathbb{N}, \; n \ge 4, \; n \notin \{4, 6\} \; \exists L^{n,p}$ that
+is an \emph{incremental} cyclic Latin square.
+\end{theorem}
 
-\vspace{8pt}
-
-\noindent For $n \in \{4, 6\}$, incremental Latin squares exist but are necessarily
-non-cyclic; explicit examples are given in the Lean companion
-(\texttt{L4}, \texttt{L6}). These are outside the scope of Theorem \ref{thm:main2}.
+\begin{proof}
 
 \vspace{8pt}
 
-\noindent For every $n$ covered, the square $L^{n,p_f}$ represents $n+1$ solutions of
-$(n,c)$-coins problems simultaneously for $c \in [0,n]$ as described in Theorem
-\ref{thm:main1}, giving $S^n_c = \{L^n_{i,j} \mid l^n_{i,j} < c\}$.
+\hspace{1pt} \\ Let $n \in \mathbb{N}$ with $n \ge 4$ and $n \notin \{4, 6\}$. Partitioning $n$ by
+its residue modulo~$6$:
+\begin{itemize}
+\item If $n = 1, 5 \bmod 6$, then $n \ge 5$, so $L^{n,p_1}$ is incremental by Lemma~\ref{lem:fam1}.
+\item If $n = 2, 4 \bmod 6$, then since $n \notin \{4, 6\}$, either $n = 8$ (covered by
+Lemma~\ref{lem:small}) or $n \ge 10$ (covered by Lemma~\ref{lem:fam2}).
+\item If $n = 3 \bmod 6$, then either $n \in \{9, 15, 21\}$ (covered by Lemma~\ref{lem:small}) or
+$n \ge 27$ (covered by Lemma~\ref{lem:fam3}).
+\item If $n = 0 \bmod 6$, then since $n \ne 6$, we have $n \ge 12$ (covered by
+Lemma~\ref{lem:fam4}).
+\end{itemize}
+In all cases, there exists an incremental cyclic Latin square $L^{n,p}$.
+
+\end{proof}
+
+\section[Non-Cyclic Cases and Combined Existence]{Non-Cyclic Cases $n \in \{4, 6\}$ and Combined Existence for All $n \ge 4$}
+
+For $n \in \{4, 6\}$, no cyclic Latin square is incremental, but explicit non-cyclic incremental
+Latin squares $L^4$ and $L^6$ exist:
+\[
+    L^4 :=
+    \begin{pmatrix}
+        2 & 0 & 1 & 3 \\
+        1 & 3 & 2 & 0 \\
+        0 & 2 & 3 & 1 \\
+        3 & 1 & 0 & 2
+    \end{pmatrix},
+    \qquad
+    L^6 :=
+    \begin{pmatrix}
+        1 & 0 & 2 & 3 & 5 & 4 \\
+        3 & 1 & 4 & 0 & 2 & 5 \\
+        4 & 3 & 5 & 2 & 1 & 0 \\
+        0 & 2 & 1 & 5 & 4 & 3 \\
+        2 & 5 & 0 & 4 & 3 & 1 \\
+        5 & 4 & 3 & 1 & 0 & 2
+    \end{pmatrix}.
+\]
+
+\vspace{8pt}
+
+\begin{lemma}\label{lem:L4L6}
+\hspace{1pt} \\ $L^4$ and $L^6$ are incremental Latin squares.
+\end{lemma}
+
+\begin{proof}
+
+\vspace{8pt}
+
+\hspace{1pt} \\ Each row and column of $L^4$ is a permutation of $[0,3]$, each row and column of
+$L^6$ is a permutation of $[0,5]$, and direct finite verification of Definition~\ref{def:is} on all
+sum-diagonals and diff-diagonals shows $|\,D^{n,k}_{i+j=s}\,| \le k + 1$ and
+$|\,D^{n,k}_{i-j=d}\,| \le k + 1$ for every $k \in [0,n-1]$.
+
+\end{proof}
+
+\vspace{8pt}
+
+\begin{theorem}\label{thm:main3}
+\hspace{1pt} \\ $\forall n \in \mathbb{N}, \; n \ge 4 \; \exists L^n$ that is an \emph{incremental}
+Latin square.
+\end{theorem}
+
+\begin{proof}
+
+\vspace{8pt}
+
+\hspace{1pt} \\ If $n \in \{4, 6\}$, Lemma~\ref{lem:L4L6} provides the incremental Latin square
+$L^4$ or $L^6$. If $n \notin \{4, 6\}$, Theorem~\ref{thm:main2} provides the incremental cyclic
+Latin square $L^{n,p}$.
+
+\end{proof}
+
+\vspace{8pt}
+
+\begin{theorem}\label{thm:main4}
+\hspace{1pt} \\ $\forall n \in \mathbb{N}, \; n \ge 4 \; \exists L^n$ that is an \emph{incremental}
+Latin square representing $n + 1$ solutions of $(n,c)$-coins problems \emph{simultaneously} for
+$c \in [0,n]$ as $S^n_c = \{L^n_{i,j} \mid l^n_{i,j} < c\}$.
+\end{theorem}
+
+\begin{proof}
+
+\vspace{8pt}
+
+\hspace{1pt} \\ By Theorem~\ref{thm:main3}, there exists an incremental Latin square $L^n$, and by
+Theorem~\ref{thm:main1}, $L^n$ represents a solution $S^n_c$ of the $(n,c)$-coins problem for every
+$c \in [0,n]$.
+
+\end{proof}
 
 \vspace{8pt}
 
 \begin{remark}
-The complete proofs, including the finite enumerations of Lemma \ref{lem:small} and the
-non-cyclic examples for $n \in \{4, 6\}$, have been formalized in Lean~4 and deposited
-in the Palomar registry; see
-\href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub}.
+\hspace{1pt} \\ The complete proofs of Theorems~\ref{thm:main1}, \ref{thm:main2}, \ref{thm:main3},
+and \ref{thm:main4}, including the finite enumerations of Lemmas~\ref{lem:small} and \ref{lem:L4L6},
+have been formalized in Lean~4 (\texttt{IncrementalNCCoins.lean} and \texttt{Solution.lean}) and
+deposited in the Palomar registry; see
+\href{https://github.com/NofanTasi/incremental-nc-coins-problem}{GitHub (companion paper \& exploration)}
+and
+\href{https://github.com/LucDuponcheelAtGitHub/incremental-nc-coins}{GitHub (Palomar Lean~4 formalization)}.
 \end{remark}
 
 \begin{thebibliography}{9}
@@ -1420,7 +1539,7 @@ in the Palomar registry; see
 Mao-Hua Le, Wen Li, and Edward T. Wang,
 \emph{A generalization of the $n$-queen problem},
 Journal of Systems Science and Mathematical Sciences \textbf{3} (1990), no.~2, 183--192, \\
-\url{https://sysmath.cjoe.ac.cn/jssc/CN/Y1990/V3/I2/183}.
+\url{https://zbmath.org/4212061}.
 \end{thebibliography}
 
 \end{document}
