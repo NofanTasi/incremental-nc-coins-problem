@@ -1,0 +1,619 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{placeins}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  urlcolor=blue!60!black,
+  citecolor=blue!60!black
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+\newcommand{\val}{\operatorname{val}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+
+% \newcommand{\cl}[1]{[#1]}
+% \newcommand{\card}[1]{\lvert #1 \rvert}
+
+\title{\textbf{
+  Cyclic $n \!\times\! n$ Latin squares \\ 
+  representing solutions of \\
+  $(n,c)$-coins problems for $0 \le c \le n$
+}}
+\author{Marc Duponcheel and Luc Duponcheel}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\noindent The \emph{$n$-queens problem} on an $n \!\times\! n$ square allows at most $1$ queen on any
+row, column, sum-diagonal, or diff-diagonal ($n = 1$ is trivial and $n \in \{2,3\}$ have no solution,
+so \emph{we limit ourselves to $n \ge 4$}). The \emph{$(n,c)$-coins problem} ($0 \le c \le n$)
+generalizes $n$-queens by allowing at most $c$ coins on any row, column, sum-diagonal, or
+diff-diagonal ($c = 1$ is $n$-queens). \emph{We prove}:
+\begin{itemize}[nosep]
+\item For every $n \ge 4$, an \emph{incremental $n \!\times\! n$ Latin square} represents $n + 1$
+nested solutions $S^n_0 \subset S^n_1 \subset \dots \subset S^n_n$ of $(n,c)$-coins problems
+\emph{simultaneously} for all $0 \le c \le n$ (Theorem~\ref{thm:main1}).
+\item For every $n \ge 4$ with $n \notin \{4, 6\}$, there \emph{exists} an incremental \emph{cyclic}
+$n \!\times\! n$ Latin square, given by four infinite modular families modulo~$6$ for
+$n \notin \{4, 6, 8, 9, 15, 21\}$ and explicit cyclic constructions for $n \in \{8, 9, 15, 21\}$
+(Theorem~\ref{thm:main2}, Appendix~\ref{app:small}, and~\cite{PalomarLean,CompanionRepo}).
+\item For $n \in \{4, 6\}$, no \emph{cyclic} incremental Latin square exists (by exhaustive search
+over all $4! = 24$ and $6! = 720$ permutations), whereas explicit \emph{non-cyclic} incremental Latin
+squares $L^4, L^6$ exist (Appendix~\ref{app:noncyclic} and~\cite{PalomarLean,CompanionRepo}); thus an
+incremental $n \!\times\! n$ Latin square exists for every $n \ge 4$ (Theorems~\ref{thm:main3}--\ref{thm:main4}).
+\end{itemize}
+
+\noindent \emph{Key methodology}:
+\begin{itemize}[nosep]
+\item Whereas Le, Li and Wang~\cite{LLW1990} construct $(n,c)$-coins solutions \emph{separately} for
+each fixed $c$, an incremental Latin square partitions the board into $n$ disjoint transversals whose
+sublevel sets solve all $0 \le c \le n$ \emph{simultaneously} (Section~2).
+\item The \emph{injective-majorization principle} (Lemma~\ref{lem:inj-maj}, Section~3) replaces
+$O(n^3)$ diagonal prefix counting by a single majorized injection per diagonal direction.
+\item All $n \notin \{4, 6, 8, 9, 15, 21\}$ are partitioned into four infinite families modulo~$6$
+(Section~4): (1)~$n = 1,5 \bmod 6$ ($n \ge 5$), (2)~$n = 2,4 \bmod 6$ ($n \ge 10$),
+(3)~$n = 3 \bmod 6$ ($n \ge 27$), and (4)~$n = 0 \bmod 6$ ($n \ge 12$), each $O(1)$-time per entry. All
+results (including $n \in \{8, 9, 15, 21\}$ and $n \in \{4, 6\}$) are mechanized in
+Lean~4~\cite{PalomarLean,CompanionRepo}.
+\end{itemize}
+
+\noindent Repositories and discussions:
+\begin{itemize}[nosep]
+\item Companion repo~\cite{CompanionRepo}: {\scriptsize\url{https://github.com/NofanTasi/incremental-nc-coins-problem}}
+\item Palomar Lean~4~\cite{PalomarLean}: {\scriptsize\url{https://github.com/LucDuponcheelAtGitHub/incremental-nc-coins}}
+\item Discussions: \href{https://mathoverflow.net/questions/510135}{MO \#510135}~\cite{MO510135}, \href{https://puzzling.stackexchange.com/questions/138939}{PSE \#138939}~\cite{PSE138939}, \href{https://mathoverflow.net/questions/516225}{MO \#516225}~\cite{MO516225}.
+\end{itemize}
+
+\end{abstract}
+
+\section{Assumptions, Notation and Definitions}
+
+Throughout, $n \in \mathbb{N}$ satisfies $n \ge 4$, $[m,n] := \{m, \dots, n\}$ ($m \le n$), and
+$S^n : [0,n-1]^2$ is a $0$-based $n \!\times\! n$ square. We use \emph{uppercase} for cell sets and
+\emph{lowercase} for their values:
+\begin{itemize}[nosep]
+\item $S^n_{i,j}$ ($s^n_{i,j}$): (the value of) the $(i,j)$-cell of $S^n$ ($i,j \in [0,n-1]$).
+\item $R^n_i$ ($r^n_{i,j}$): $\{S^n_{i,j} \mid j \in [0,n-1]\}$, the $i$-row of $S^n$ ($i \in [0,n-1]$).
+\item $C^n_j$ ($c^n_{i,j}$): $\{S^n_{i,j} \mid i \in [0,n-1]\}$, the $j$-column of $S^n$ ($j \in [0,n-1]$).
+\item $D^n_{i+j=s}$ ($d^n_{i+j=s}$): $\{S^n_{i,j} \mid i + j = s\}$, the $s$-sum-diagonal ($s \in [0,2(n-1)]$).
+\item $D^n_{i-j=d}$ ($d^n_{i-j=d}$): $\{S^n_{i,j} \mid i - j = d\}$, the $d$-diff-diagonal ($d \in [-(n-1),n-1]$).
+\end{itemize}
+
+\begin{definition}\label{def:nc}
+A solution of an $(n,c)$-coins problem ($c \in [0,n]$) is a subset $S^n_c \subseteq S^n$ of $n\,.\,c$
+cells such that every row $R^n_i$, column $C^n_j$, sum-diagonal $D^n_{i+j=s}$, and diff-diagonal
+$D^n_{i-j=d}$ contains at most $c$ cells of $S^n_c$.
+\end{definition}
+
+\begin{definition}\label{def:is}
+For each threshold $k \in [0,n-1]$, define the diagonal sublevel sets
+\[
+    D^{n,k}_{i+j=s} := \{S^n_{i,j} \in D^n_{i+j=s} \mid s^n_{i,j} \le k\}
+    \;\;\text{and}\;\;
+    D^{n,k}_{i-j=d} := \{S^n_{i,j} \in D^n_{i-j=d} \mid s^n_{i,j} \le k\}.
+\]
+A square $S^n$ is \emph{incremental} iff for every $k \in [0,n-1]$,
+$|\,D^{n,k}_{i+j=s}\,| \le k + 1$ for all $s \in [0,2(n-1)]$ and $|\,D^{n,k}_{i-j=d}\,| \le k + 1$
+for all $d \in [-(n-1),n-1]$.
+\end{definition}
+
+\begin{definition}\label{def:ls}
+A square $S^n$ is a \emph{Latin} square ($L^n$, with values $l^n_{i,j}$) iff every row $r^n_i$ and
+column $c^n_j$ is a permutation of $[0,n-1]$.
+\end{definition}
+
+\begin{definition}\label{def:cs}
+A square $S^n$ is \emph{cyclic} iff $s^n_{i + 1, j} = (s^n_{i,j} + 1) \bmod n$ for all
+$i,j \in [0,n-1]$. Given a permutation $p$ of $[0,n-1]$, $L^{n,p}$ denotes the cyclic Latin square
+with values $l^{n,p}_{i,j} = (i + p(j)) \bmod n$.
+\end{definition}
+
+\subsection{Related Work}
+
+\emph{Survey of related work}: Bell and Stevens~\cite{BS2009} survey $n$-queens results, including
+modular/toroidal queens and Latin square transversals. By the Hall--Paige condition, the unpermuted
+Cayley table of $\mathbb{Z}_n$ decomposes into transversals iff $n$ is odd, and into toroidal $n$-queens
+transversals iff $\gcd(n,6) = 1$~\cite{BS2009,CW2010}.
+
+\emph{Directly related work}: Le, Li and Wang~\cite{LLW1990} introduced the $(n,c)$-coins problem,
+constructing $S^n_c$ \emph{separately} for each fixed $c \in [0,n]$. Motivated
+by~\cite{MO510135,PSE138939,MO516225}, an incremental Latin square $L^n$ encodes $n + 1$ nested
+solutions $S^n_0 \subset S^n_1 \subset \dots \subset S^n_n$ in one square, solving all $c \in [0,n]$
+\emph{simultaneously} (Theorem~\ref{thm:main1}).
+
+\emph{Other works on $n$-queens and cyclic Latin squares}:
+\begin{itemize}[nosep]
+\item Pratt~\cite{Pratt2016} gives permanent formulas counting $n$-queens ($c = 1$) and Latin squares;
+it is purely \emph{enumerative} ($c = 1$) and does not construct incremental squares or $(n,c)$-coins
+solutions for $c > 1$.
+\item Cavenagh and Wanless~\cite{CW2010} bound transversal counts in the \emph{unpermuted} Cayley table
+$(i + j) \bmod n$ for odd $n$. By contrast, our cyclic squares permute columns via
+$l^{n,p}_{i,j} = (i + p(j)) \bmod n$, exist for both odd and even $n \notin \{4,6\}$, and satisfy
+\emph{non-modular} diagonal prefix bounds $|\,D^{n,k}\,| \le k + 1$ for all $k \in [0,n-1]$.
+\item Mirzavaziri and Yaqubi~\cite{MY2026} study cyclic Latin Eulerian numbers (column ascents),
+unrelated to diagonal coin capacities.
+\end{itemize}
+
+\section[Incremental Latin Squares and (n,c)-Coins Problems]{Incremental Latin Squares and $(n,c)$-Coins Problems}
+
+\begin{theorem}\label{thm:main1}
+For every $n \ge 4$, an incremental $n \!\times\! n$ Latin square $L^n$ represents $n + 1$ solutions
+of $(n,c)$-coins problems \emph{simultaneously} for all $c \in [0,n]$ as
+$S^n_c = \{L^n_{i,j} \mid l^n_{i,j} < c\}$ ($S^n_0 = \emptyset$).
+\end{theorem}
+
+\begin{proof}
+For $c = 0$, $|\,S^n_0\,| = 0 = n\,.\,0$. For $c \in [1,n]$,
+$S^n_c = \{L^n_{i,j} \mid l^n_{i,j} \le c - 1\}$. Since each row $r^n_i$ and column $c^n_j$ is a
+permutation of $[0,n-1]$, $|\,S^n_c \cap R^n_i\,| = |\,S^n_c \cap C^n_j\,| = |\,[0,c-1]\,| = c$ and
+$|\,S^n_c\,| = n\,.\,c$. By Definition~\ref{def:is} with $k = c - 1$,
+$|\,S^n_c \cap D^n_{i+j=s}\,| = |\,D^{n,c-1}_{i+j=s}\,| \le c$ and
+$|\,S^n_c \cap D^n_{i-j=d}\,| = |\,D^{n,c-1}_{i-j=d}\,| \le c$.
+\end{proof}
+
+\section{Injective Majorization}
+
+To avoid $O(n^3)$ cardinality checks across all $n$ thresholds and $4n - 2$ diagonals, the
+\emph{injective-majorization principle} reduces Definition~\ref{def:is} on any diagonal $D$
+($D^n_{i+j=s}$ or $D^n_{i-j=d}$) to a single majorized injection.
+
+\begin{lemma}\label{lem:inj-maj}
+If $f : [0,n-1]^2 \to \mathbb{N}$ satisfies (1)~$f(i,j) \le l^{n,p}_{i,j}$ on $D$ and (2)~$f$ is
+injective on $D$, then $|\,D^k\,| \le k + 1$ for every threshold $k \in [0,n-1]$.
+\end{lemma}
+
+\begin{proof}
+By (1), $f$ maps $D^k = \{(i,j) \in D \mid l^{n,p}_{i,j} \le k\}$ into $[0,k]$; by (2), $f|_{D^k}$ is
+injective, so $|\,D^k\,| \le |\,[0,k]\,| = k + 1$.
+\end{proof}
+
+\section{Incremental Cyclic Latin Squares}
+
+We construct an incremental cyclic Latin square $L^{n,p}$ for every $n \ge 4$ ($n \notin \{4,6\}$) via
+four infinite families $F_1$--$F_4$ and four small cases $n \in \{8, 9, 15, 21\}$
+(Appendix~\ref{app:small} and~\cite{PalomarLean,CompanionRepo}). Set $m := n/2$ when $2 \mid n$ and
+$k := n/3$ when $3 \mid n$. For $x \in \mathbb{Z}$, $x \bmod n \in [0,n-1]$ is the remainder
+modulo~$n$. Each modular equality or equivalence is checked in two steps: (i)~\emph{modular reduction}
+$(x + qn) \bmod n = x \bmod n$ ($q \in \mathbb{Z}$) to $r \bmod n$, and (ii)~\emph{range verification}
+$0 \le r < n$ so $r \bmod n = r$. For brevity, we spell out the intermediate equality and equivalence
+steps for Family~$F_2$ as a model and state the resulting reduced forms for $F_3$ and $F_4$ (all steps
+are mechanized in~\cite{PalomarLean,CompanionRepo}).
+
+Since $i = s - j$ on $D^n_{i+j=s}$ and $i = d + j$ on $D^n_{i-j=d}$, substituting into
+$l^{n,p}_{i,j} = (i + p(j)) \bmod n$ separates $s$ and $d$ from the column \emph{step functions}
+\[
+    s^{sum}_{p,j} := (p(j) - j) \bmod n
+    \;\;\text{and}\;\;
+    s^{dif\!f}_{p,j} := (p(j) + j) \bmod n,
+\]
+giving $l^{n,p}_{s-j,j} = (s + s^{sum}_{p,j}) \bmod n$ and
+$l^{n,p}_{d+j,j} = (d + s^{dif\!f}_{p,j}) \bmod n$. Thus $l^{n,p}$ is injective along $D^n_{i+j=s}$
+(resp.\ $D^n_{i-j=d}$) iff $j \mapsto s^{sum}_{p,j}$ (resp.\ $j \mapsto s^{dif\!f}_{p,j}$) is
+injective on the columns meeting that diagonal. When $\gcd(n,6) > 1$, step collisions are unavoidable
+(Section~\ref{sec:combined}); our majorants $f^+_f$ (sum) and $f^-_f$ (diff) lower one colliding
+column into a vacant step residue so Lemma~\ref{lem:inj-maj} applies. Within $F_f$, we write
+$\val(i,j) := l^{n,p_f}_{i,j}$, $s^+_j := s^{sum}_{p_f,j}$, and $s^-_j := s^{dif\!f}_{p_f,j}$.
+
+\subsection[Family 1]{Family $F_1$\,: $n = 1,5 \bmod 6$, $n \ge 5$}
+
+Define $p_1(0) := 0$, $p_1(j) := n - 2j$ for $0 < 2j < n$, and $p_1(j) := 2n - 2j$ for $2j \ge n$, so
+$p_1(j) = (-2j) \bmod n$. Since $\gcd(2,n) = \gcd(3,n) = 1$, $p_1$, $s^+_j = (-3j) \bmod n$, and
+$s^-_j = (-j) \bmod n$ are bijections on $[0,n-1]$. Setting $f^+_1 := f^-_1 := \val$ gives:
+
+\begin{lemma}\label{lem:fam1}
+$L^{n,p_1}$ is an incremental cyclic Latin square.
+\end{lemma}
+
+\begin{proof}
+Immediate from Lemma~\ref{lem:inj-maj} since $f^+_1 = f^-_1 = \val$ and $s^+_j, s^-_j$ are bijections
+on $[0,n-1]$.
+\end{proof}
+
+\subsection[Family 2]{Family $F_2$\,: $n = 2,4 \bmod 6$, $n \ge 10$}
+
+Here $n = 2m$ ($m \ge 5$, $\gcd(3,n) = 1$). Define $p_2(j) := (2j + m + 1) \bmod n$ on $[0,m-1]$ and
+$p_2(j) := (2(j-m) + m + 4) \bmod n$ on $[m,n-1]$. Since $2m = n$, the two blocks step by $+2$
+through opposite parities $(m+1) \bmod 2$ and $(m+4) \bmod 2$, so $p_2$ is a permutation of $[0,n-1]$,
+with step functions $s^+_j = (j + m + 1) \bmod n$, $s^-_j = (3j + m + 1) \bmod n$ on $[0,m-1]$ and
+$s^+_j = (j - m + 4) \bmod n$, $s^-_j = (3j - m + 4) \bmod n$ on $[m,n-1]$ (injective on each block
+since $\gcd(3,n) = 1$).
+
+\emph{Collisions and majorants.}
+For $j_1 \in [0,m-1]$ and $j_2 \in [m,n-1]$ ($1 \le j_2 - j_1 \le n - 1$, $2m = n$):
+\begin{itemize}[nosep]
+  \item \emph{Sum}: $s^+_{j_1} = s^+_{j_2} \iff (j_2 - j_1 + 3) \bmod n = 0 \iff j_2 - j_1 = n - 3$
+  ($4 \le j_2 - j_1 + 3 \le n + 2$, $n \ge 10$). On $i_1 + j_1 = i_2 + j_2$,
+  $i_1 - i_2 = j_2 - j_1 = n - 3$ forces $j_1, i_2 \in [0,2]$ and $i_1, j_2 \in [n-3,n-1]$. Shifting
+  the top-right $3 \times 3$ corner defines $f^+_2(i,j) := j - (n - 3)$ for $i < 3, \; j \ge n - 3$,
+  and $\val(i,j)$ otherwise.
+  \item \emph{Diff}: $s^-_{j_1} = s^-_{j_2} \iff 3(j_2 - j_1 + 1) \bmod n = 0 \iff j_2 - j_1 = n - 1$
+  ($\gcd(3,n) = 1$). On $i_2 - i_1 = j_2 - j_1 = n - 1$, this forces $(i_1,j_1) = (0,0)$ and
+  $(i_2,j_2) = (n-1,n-1)$ ($d = 0$). Shifting $(n-1,n-1)$ defines $f^-_2(n-1,n-1) := 1$, and
+  $\val(i,j)$ otherwise.
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Dir. & Shifted region & Unshifted $\val(i,j)$ & Majorant $f_2(i,j)$ & Step offset on diagonal \\
+\midrule
+Sum & $i \in [0,2], \; j = n - 3 + l$ ($l \in [0,2]$) & $i + m - 2 + 2l \ge 3$ & $l \in [0,2]$ & $(2l - i - n + 3) \bmod n$ \\
+Diff & $(i,j) = (n-1,n-1)$ ($d = 0$) & $m + 1 \ge 6$ & $1$ & $1 \notin \{s^-_j \mid j < n-1\}$ \\
+\bottomrule
+\end{tabular}
+\caption{Collision regions and majorant shifts for Family~$F_2$ ($n = 2m \ge 10$).}
+\label{tab:fam2}
+\end{table}
+
+\begin{lemma}\label{lem:fam2}
+$L^{n,p_2}$ is an incremental cyclic Latin square.
+\end{lemma}
+
+\begin{proof}
+We verify Lemma~\ref{lem:inj-maj} (Table~\ref{tab:fam2}) using $2m = n$.
+\emph{Sum (1)}: For $i \in [0,2]$ and $j = n - 3 + l \ge m$ ($l \in [0,2]$),
+$2(n - 3 + l - m) + m + 4 = n + m - 2 + 2l$ ($2m = n$) and $3 \le m - 2 \le i + m - 2 + 2l \le m + 4 < n$,
+so $\val(i,n-3+l) = i + m - 2 + 2l \ge 3 > l = f^+_2(i,n-3+l) \ge 0$.
+\emph{Sum (2)}: On $D^n_{i+j=s}$, shifted cells have $f^+_2(s-j_2,j_2) = j_2 - (n-3)$ (injective in
+$j_2$), and unshifted cells have distinct $\val$-values. For unshifted $(i_1,j_1)$ and shifted
+$(i_2,j_2)$ ($i_2 \in [0,2]$, $i_1 = i_2 + j_2 - j_1$), $(\val(i_1,j_1) - f^+_2(i_2,j_2)) \bmod n$
+reduces (via $2m = n$) to $i_2 + j_1 + m - 2 \in [m-2, n-1]$ if $j_1 \in [0,m-1]$ and to
+$i_2 + (j_1 - m) + 1 \in [1, m+2]$ if $j_1 \in [m,n-1]$; both lie in $[1,n-1]$ (no collision).
+\emph{Diff (1)}: At $(n-1,n-1)$, $n - 1 + 2(n - 1 - m) + m + 4 = 2n + m + 1$ ($2m = n$, $6 \le m + 1 < n$),
+so $\val(n-1,n-1) = m + 1 > 1 = f^-_2(n-1,n-1) > 0$.
+\emph{Diff (2)}: On $d = 0$, unshifted $(j,j)$ ($j \le n-2$) are distinct, and $\val(j,j) \ne 1$
+(using $2m = n$ and $\gcd(3,n) = 1$):
+$(3j + m + 1) \bmod n = 1 \iff 3(j - m) \bmod n = 0 \iff j = m \notin [0,m-1]$, and
+$(3j - m + 4) \bmod n = 1 \iff 3(j + 1 - m) \bmod n = 0 \iff j = m - 1 \notin [m,n-2]$.
+\end{proof}
+
+\subsection[Family 3]{Family $F_3$\,: $n = 3 \bmod 6$, $n \ge 27$}
+
+Here $n = 3k$ ($k \ge 9$, $\gcd(2,n) = \gcd(4,n) = 1$). On the blocks $I_u := [uk, (u+1)k-1]$
+($u \in \{0,1,2\}$), define $p_3(j) := (3j + 2k + 4u) \bmod n$. Since $3k = n$ and $\gcd(4,3) = 1$,
+the blocks $I_u$ step by $+3$ through the residue classes $(2k + 4u) \bmod 3$, so $p_3$ is a
+permutation of $[0,n-1]$, with step functions $s^+_j = (2j + 2k + 4u) \bmod n$ and
+$s^-_j = (4j + 2k + 4u) \bmod n$ on $I_u$ (injective on each $I_u$ since $\gcd(2,n) = \gcd(4,n) = 1$).
+
+\emph{Collisions and majorants.}
+For $j_1 \in I_{u_1}$ and $j_2 \in I_{u_2}$ ($0 \le u_1 < u_2 \le 2$):
+\begin{itemize}[nosep]
+  \item \emph{Sum}: $s^+_{j_1} = s^+_{j_2} \iff (j_2 - j_1 + 2(u_2 - u_1)) \bmod n = 0$, which has no
+  solution for $u_2 - u_1 = 1$ ($3 \le j_2 - j_1 + 2 \le 2k + 1 < n$) and forces $u_1 = 0, u_2 = 2,
+  \; j_2 - j_1 = n - 4$, so $j_1, i_2 \in [0,3]$ and $i_1, j_2 \in [n-4,n-1]$ on $i_1 + j_1 = i_2 + j_2$.
+  Shifting the top-right $4 \times 4$ corner defines $f^+_3(i,j) := \val(i,j) - k$
+  ($i < 4, \; j \in \{n-4,n-3\}$), $\val(i,j) - 2k$ ($i < 4, \; j \in \{n-2,n-1\}$), and $\val(i,j)$
+  otherwise.
+  \item \emph{Diff}: $s^-_{j_1} = s^-_{j_2} \iff (j_2 - j_1 + u_2 - u_1) \bmod n = 0$, which fails for
+  $u_2 - u_1 = 1$ and forces $u_1 = 0, u_2 = 2, \; j_2 - j_1 = n - 2$, so $i_1, j_1 \in \{0,1\}$ and
+  $i_2, j_2 \in \{n-2,n-1\}$ on $i_2 - i_1 = j_2 - j_1$. Shifting the bottom-right $2 \times 2$ corner
+  defines $f^-_3(i,n-2) := \val(i,n-2) - 2k$ and $f^-_3(i,n-1) := \val(i,n-1) - k$ ($i \ge n - 2$),
+  and $\val(i,j)$ otherwise.
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Dir. & Shifted corner column & Unshifted $\val(i,j)$ & Majorant $f_3(i,j)$ & Offset $v_l$ \\
+\midrule
+Sum & $i \in [0,3], \; j = n - 4 + l, \; l \in \{0,1\}$ & $i + 2k - 4 + 3l \ge 2k - 4$ & $\val(i,j) - k$ & $v_0 = k, \; v_1 = k + 2$ \\
+Sum & $i \in [0,3], \; j = n - 4 + l, \; l \in \{2,3\}$ & $i + 2k - 4 + 3l \ge 2k + 2$ & $\val(i,j) - 2k$ & $v_2 = 4, \; v_3 = 6$ \\
+Diff & $i \in [n-2,n-1], \; j = n - 2$ ($r = i - n + 2$) & $r + 2k \ge 2k$ & $r$ & $0$ \\
+Diff & $i \in [n-2,n-1], \; j = n - 1$ ($r = i - n + 2$) & $r + 2k + 3 > k$ & $r + k + 3$ & $k + 4$ \\
+\bottomrule
+\end{tabular}
+\caption{Corner collision regions and majorant shifts for Family~$F_3$ ($n = 3k \ge 27$).}
+\label{tab:fam3}
+\end{table}
+
+\begin{lemma}\label{lem:fam3}
+$L^{n,p_3}$ is an incremental cyclic Latin square.
+\end{lemma}
+
+\begin{proof}
+We verify Lemma~\ref{lem:inj-maj} (Table~\ref{tab:fam3}) using $3k = n$.
+\emph{Sum (1)}: For $i \in [0,3]$ and $j = n - 4 + l \in I_2$ ($l \in [0,3]$), reduction modulo~$n$
+($3k = n$) gives $\val(i,n-4+l) = i + 2k - 4 + 3l \in [2k-4, 2k+8]$, exceeding $k$ ($l \in \{0,1\}$)
+and $2k$ ($l \in \{2,3\}$), so $0 < f^+_3(i,j) < \val(i,j)$.
+\emph{Sum (2)}: On $D^n_{i+j=s}$, $f^+_3(i,n-4+l) = (s + v_l) \bmod n$ with distinct
+$v_0 = k, v_1 = k + 2, v_2 = 4, v_3 = 6$ ($k \ge 9$). None equals $s^+_{j_1}$ ($j_1 \in I_{u_1}$):
+using $3k = n$ and $\gcd(2,n) = 1$, $s^+_{j_1} = v_l \bmod n$ reduces to $j_1 = k - 2u_1 + l \notin I_{u_1}$
+($l \in \{0,1\}$) and $j_1 = 2k - 2u_1 + l \notin I_{u_1}$ ($l \in \{2,3\}$).
+\emph{Diff (1)}: For $i = n - 2 + r$ and $j = n - 2 + l$ ($r, l \in \{0,1\}$), reduction modulo~$n$
+($3k = n$) gives $\val(i,j) = r + 2k + 3l \in [2k, 2k+4]$, so $f^-_3(i,n-2) = r \ge 0$ and
+$f^-_3(i,n-1) = r + k + 3 > 0$.
+\emph{Diff (2)}: On $D^n_{i-j=d}$, $r = d + l$ gives shifted values $(d + 0) \bmod n$ and
+$(d + k + 4) \bmod n$. Using $3k = n$ and $\gcd(4,n) = 1$, $s^-_{j_1} = 0$ and
+$s^-_{j_1} = (k + 4) \bmod n$ reduce to $j_1 = k - u_1 \notin I_{u_1}$ and
+$j_1 = 2k + 1 - u_1 \notin I_{u_1}$.
+\end{proof}
+
+\subsection[Family 4]{Family $F_4$\,: $n = 0 \bmod 6$, $n \ge 12$}
+
+Here $n = 2m = 3k$ ($m \ge 6, \; k \ge 4$). Define $p_4(0) := n - 2$, $p_4(j) := 2j + 2$ on
+$[1, m-3]$, $p_4(m-2) := 0$, $p_4(j) := 2(j - m + 1) + 1$ on $[m-1, n-2]$, and $p_4(n-1) := 2$. The
+pins $\{0, m-2, n-1\}$ cover $\{n-2, 0, 2\}$, $[1,m-3]$ covers $\{4, 6, \dots, n-4\}$, and
+$[m-1,n-2]$ covers $\{1, 3, \dots, n-1\}$, so $p_4$ is a permutation of $[0,n-1]$. Using $2m = n$,
+its step functions $(s^+_j, s^-_j)$ modulo~$n$ are $(n-2, n-2)$ at $j = 0$, $(j+2, 3j+2)$ on
+$[1,m-3]$, $(m+2, m-2)$ at $j = m-2$, $(j+3, 3j+3)$ on $[m-1,n-2]$, and $(3, 1)$ at $j = n-1$.
+
+\emph{Collisions and majorants.}
+\begin{itemize}[nosep]
+  \item \emph{Sum}: $s^+_j$ omits $\{2, m, m+1\}$ and repeats $m + 2$ at $\{m-2, m-1\}$ ($i_2 < n - 1$),
+  $n - 2$ at $\{0, n-5\}$ ($i_2 < 5$, i.e.\ $i_2 + j_2 < n$), and $3$ at $\{1, n-1\}$ ($i_2 < 2$).
+  Shifting these seams into $\{m+1, m, 2\}$ defines $f^+_4(i,m-1) := \val(i,m-1) - 1$ ($i < n-1$),
+  $f^+_4(i,n-5) := \val(i,n-5) - (m-2)$ ($i + j < n$), $f^+_4(i,n-1) := \val(i,n-1) - 1$ ($i < 2$),
+  and $\val(i,j)$ otherwise.
+  \item \emph{Diff}: Since $n = 3k$, on $D^n_{i-j=d}$ the block $[1,m-3]$ has values
+  $\equiv d + 2 \pmod 3$, $[m-1,n-2]$ has values $\equiv d \pmod 3$, and $d + 1 \pmod 3$ is vacant
+  across both blocks. Within either block, $j_1 < j_2$ collide iff $j_2 - j_1 = k$, forcing
+  $j_2 \ge 1 + k$ or $j_2 \ge m - 1 + k$ and $i_2 = i_1 + k \ge k$. Shifting into $d + 1 \pmod 3$
+  defines $f^-_4(i,j) := \val(i,j) - 1$ on Region~A ($1+k \le j \le m-3, \; i \ge k$) and Region~B
+  ($j = m-1+k, \; k \le i < 2k$), $\val(i,j) - 4$ on Region~C$_{12}$ ($j = 9, \; i \ge 8, \; n = 12$),
+  $\val(i,j) - 5$ on Region~C$_{\ge 18}$ ($j = m-1+k, \; i \ge 2k, \; n \ge 18$), $\val(i,j) - 2$ on
+  Region~D ($m+k \le j \le n-2, \; i \ge k$), and $\val(i,j)$ otherwise.
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Dir. & Shifted region / pin & Unshifted $\val(i,j)$ & Majorant $f_4(i,j)$ & Offset on diagonal \\
+\midrule
+Sum & Seams $j = m - 1, \; n - 5, \; n - 1$ & $i+1, \; i+n-7, \; i+2$ & $i, \; i+m-5, \; i+1$ & $m+1, \; m, \; 2 \pmod n$ \\
+Diff & Region A ($1+k \le j \le m-3, \; i \ge k$) & $i + 2j + 2 - n \ge 4$ & $\val(i,j) - 1$ & $[4, m-8]$ \\
+Diff & Region B ($j = m-1+k, \; k \le i < 2k$) & $i - k + 1 \ge 1$ & $\val(i,j) - 1$ & $m - 1$ \\
+Diff & Region C ($j = m-1+k, \; i \ge 2k$) & $i - k + 1 \ge k + 1$ & $\val - 4$ ($n=12$), $\val - 5$ & $2$ ($n=12$), $m - 5$ \\
+Diff & Region D ($m+k \le j \le n-2, \; i \ge k$) & $i + 2j - 2n + 3 \ge 3$ & $\val(i,j) - 2$ & $[m+1, n-5]$ \\
+Diff & Pins $j = 0, \; m - 2, \; n - 1$ & $(i + p_4(j)) \bmod n$ & $\val(i,j)$ & $-2, \; m - 2, \; n + 1$ \\
+\bottomrule
+\end{tabular}
+\caption{Seam and block collision regions and offsets for Family~$F_4$ ($n = 2m = 3k \ge 12$).}
+\label{tab:fam4}
+\end{table}
+
+\begin{lemma}\label{lem:fam4}
+$L^{n,p_4}$ is an incremental cyclic Latin square.
+\end{lemma}
+
+\begin{proof}
+We verify Lemma~\ref{lem:inj-maj} (Table~\ref{tab:fam4}) using $2m = 3k = n$.
+\emph{Sum (1) \& (2)}: On the three seams, reduction modulo~$n$ ($2m = n$) gives $\val(i,m-1) = i + 1 \ge 1$,
+$\val(i,n-5) = i + n - 7 > m - 2$, and $\val(i,n-1) = i + 2 \ge 2$, so $0 \le f^+_4(i,j) < \val(i,j)$,
+and on $D^n_{i+j=s}$ the shifted seams take the vacant step values $\{m+1, m, 2\}$, making $f^+_4$
+injective.
+\emph{Diff (1)}: Reduction modulo~$n$ gives $\val(i,j) = i + 2j + 2 - n \ge 4$ on~A,
+$\val(i,j) = i - k + 1 \ge 1$ on~B ($\ge 5$ on C$_{12}$, $\ge 7$ on C$_{\ge 18}$), and
+$\val(i,j) = i + 2j - 2n + 3 \ge 3$ on~D, so $0 \le f^-_4(i,j) < \val(i,j)$.
+\emph{Diff (2)}: On $D^n_{i-j=d}$, the unshifted parts of $[1,m-3]$ and $[m-1,n-2]$ are injective in
+$d + 2$ and $d \pmod 3$. Substituting $i = d + j$, Regions A--D and pin $j = m - 2$ lie in
+$d + 1 \pmod 3$, while pins $j = 0$ and $j = n - 1$ have offsets $-2$ ($i \ge 2$; for $i \in \{0,1\}$,
+$\val(i,0) \in \{n-2,n-1\}$ exceeds all other values) and $n + 1$ ($i \le n - 3$; for
+$i \in \{n-2,n-1\}$, $\val(i,n-1) \in \{0,1\}$ is below all other values). Using $3k = 2m$, the
+offsets $f^-_4(i,j) - d$ satisfy
+\[
+    -2 < 4 \le 3(j - k) + 1 \le m - 8 < m - 5 < m - 2 < m - 1 < m + 1 \le 3(j - m - k) + m + 1 \le n - 5 < n + 1
+\]
+for $n \ge 18$ (and $-2 < 2 < 4 < 5 < 7 < 13$ for $n = 12$, where Region~A is empty), separating all
+pieces.
+\end{proof}
+
+\subsection[Existence of Incremental Cyclic Latin Squares]{Existence of Incremental Cyclic Latin Squares}
+
+Families $F_1$--$F_4$ cover all $n \ge 4$ ($n \notin \{4, 6\}$) except $n \in \{8, 9, 15, 21\}$ below
+$n \ge 10$ ($F_2$) and $n \ge 27$ ($F_3$). Verifying these four small cases is a finite check
+(mechanized in Lean~4~\cite{PalomarLean,CompanionRepo}); explicit witnesses are in
+Appendix~\ref{app:small} (Lemma~\ref{lem:small}).
+
+\begin{theorem}\label{thm:main2}
+For every $n \in \mathbb{N}$ with $n \ge 4$ and $n \notin \{4, 6\}$, there exists an
+\emph{incremental} cyclic Latin square $L^{n,p}$.
+\end{theorem}
+
+\begin{proof}
+Partition $n \ge 4$ ($n \notin \{4, 6\}$) by $n \bmod 6$ and apply Lemma~\ref{lem:fam1}
+($n = 1, 5 \bmod 6$), Lemma~\ref{lem:small} or \ref{lem:fam2} ($n = 2, 4 \bmod 6$),
+Lemma~\ref{lem:small} or \ref{lem:fam3} ($n = 3 \bmod 6$), and Lemma~\ref{lem:fam4}
+($n = 0 \bmod 6, \; n \ge 12$).
+\end{proof}
+
+\section[Combined Existence, Obstructions, and Complexity]{Combined Existence, Obstructions, and Complexity}\label{sec:combined}
+
+\emph{Why no cyclic solution exists for $n \in \{4, 6\}$.}
+When $\gcd(n,6) > 1$, the Hall--Paige / toroidal $n$-queens obstruction shows that no permutation $p$
+of $\mathbb{Z}_n$ makes both $j \mapsto (p(j) \mp j) \bmod n$ bijections (summing $p(j) - j$ modulo~$n$
+gives a parity contradiction when $2 \mid n$, and similarly when $3 \mid n$). Thus every $L^{n,p}$ with
+$\gcd(n,6) > 1$ has step collisions. For $n \ge 8$, the board is large enough to lower colliding
+corners/seams into vacant step residues; for $n \in \{4, 6\}$, exhaustive search over all $4! = 24$ and
+$6! = 720$ permutations confirms that every $L^{n,p}$ violates
+$|\,D^{n,k}\,| \le k + 1$~\cite{CompanionRepo}. Explicit non-cyclic incremental Latin squares $L^4, L^6$
+(\cite{PalomarLean,CompanionRepo}) are in Appendix~\ref{app:noncyclic} (Lemma~\ref{lem:L4L6}).
+
+\emph{Algorithmic complexity.}
+Since $p_1$--$p_4$ are piecewise-linear, computing $p(j)$ takes $O(1)$ time per column ($O(n)$ for $p$),
+and evaluating $l^{n,p}_{i,j}$ or $(i,j) \in S^n_c$ ($l^{n,p}_{i,j} < c$) takes $O(1)$ time per cell
+($O(n^2)$ for the full square, vs.\ $O(n^3)$ for naive diagonal prefix checking).
+
+\begin{theorem}\label{thm:main3}
+For every $n \in \mathbb{N}$ with $n \ge 4$, there exists an \emph{incremental} Latin square $L^n$.
+\end{theorem}
+
+\begin{proof}
+Combine Theorem~\ref{thm:main2} ($n \notin \{4,6\}$) with Lemma~\ref{lem:L4L6} in
+Appendix~\ref{app:noncyclic} ($n \in \{4,6\}$)~\cite{PalomarLean,CompanionRepo}.
+\end{proof}
+
+\begin{theorem}\label{thm:main4}
+For every $n \in \mathbb{N}$ with $n \ge 4$, there exists an \emph{incremental} Latin square $L^n$
+representing $n + 1$ solutions of $(n,c)$-coins problems \emph{simultaneously} for all $c \in [0,n]$
+as $S^n_c = \{L^n_{i,j} \mid l^n_{i,j} < c\}$.
+\end{theorem}
+
+\begin{proof}
+Immediate from Theorems~\ref{thm:main1} and \ref{thm:main3}.
+\end{proof}
+
+\begin{remark}
+All definitions and proofs—developed with the assistance of Gemini (Google DeepMind Antigravity)—are
+mechanized in Lean~4~\cite{PalomarLean,CompanionRepo}: {\small\texttt{IncrementalNCCoins.lean}}
+formalizes Definitions~\ref{def:nc}--\ref{def:cs}, while {\small\texttt{Solution.lean}} proves
+Lemma~\ref{lem:inj-maj} ({\small\texttt{val\_le\_of\_inj\_le}}), discharges $F_1$--$F_4$ via modular
+linear arithmetic ({\small\texttt{omega}}), and verifies $n \in \{4, 6, 8, 9, 15, 21\}$ by kernel
+evaluation ({\small\texttt{decide}}).
+\end{remark}
+
+\appendix
+
+\section[Small Cyclic Cases]{Small Cyclic Cases $n \in \{8, 9, 15, 21\}$}\label{app:small}
+
+We record the explicit permutations $p_n$ and majorants $f^+, f^-$ (equal to
+$\val(i,j) := l^{n,p_n}_{i,j}$ outside the shifted cells listed below) for $n \in \{8, 9, 15, 21\}$
+(\cite{PalomarLean,CompanionRepo}):
+\begin{itemize}[nosep]\raggedright
+  \item \emph{$n = 8$}: $p_8 = (0, 4, 1, 3, 6, 2, 7, 5)$ ($s^+_j$ repeats $0$ at $\{0,3\}$, omitting
+  $4$; $s^-_j$ repeats $5$ at $\{1,6\}$, omitting $1$). Shifted cells: $f^+(i,3) = i + 1$ ($i < 4$),
+  $f^+(4,3) = 3$; $f^-(i,6) = i - 5$ ($i \in \{5,6\}$), $f^-(7,6) = 5$.
+  \item \emph{$n = 9$}: $p_9 = (0, 6, 3, 1, 8, 5, 2, 4, 7)$ ($s^-_j$ is a permutation; $s^+_j$ repeats
+  at $\{0,5\}, \{1,6\}$, omitting $2, 3$). Shifted cells: $f^+(i,5) = i + 4$ ($i < 3$), $f^+(3,5) = 2$;
+  $f^+(i,6) = i$ ($i < 2$), $2i - 3$ ($i \in \{2,3\}$).
+  \item \emph{$n = 15$}: $p_{15} = (0, 3, 6, 9, 12, 8, 5, 2, 13, 1, 4, 7, 10, 14, 11)$ ($s^+_j$ is a
+  permutation; $s^-_j$ repeats at $\{3,13\}, \{9,14\}$, omitting $2, 5$). Shifted cells:
+  $f^-(10,13) = 5$, $f^-(i,13) = i - 8$ ($i \in [11,14]$); $f^-(i,14) = i - 5$ ($i \in \{5,6\}$),
+  $i - 6$ ($i \in [7,10]$), $2$ ($i \in \{11,12,14\}$), $1$ ($i = 13$).
+  \item \emph{$n = 21$}: $p_{21} = (0, 18, 15, 12, 9, 6, 3, 7, 4, 1, 14, 17, 10, 16, 2, 5, 11, 8, 20, 13, 19)$
+  ($s^+_j$ repeats at $\{0,7\}, \{1,8\}, \{2,9\}, \{3,14\}$, omitting $7,8,10,14$; $s^-_j$ repeats at
+  $\{2,18\}, \{5,19\}$, omitting $2,5$). Shifted cells: $f^+(i,7) = i + 6$ ($i \le 12$), $13$
+  ($i = 13$); $f^+(i,8) = i + 3$ ($i \le 7$), $i + 2$ ($i \in [8,10]$), $i + 1$ ($i \in \{11,13\}$),
+  $9$ ($i = 12$); $f^+(i,9) = i$ ($i \le 7$), $i - 2$ ($i \in \{8,9,10,12,13\}$), $7$ ($i = 11$);
+  $f^+(i,14) = i + 1$ ($i \in [0,5] \cup [7,9]$), $6$ ($i = 6$); $f^-(i,18) = i - 13$ ($i \in [16,20]$);
+  $f^-(i,19) = i - 14$ ($i \in [14,16]$), $i - 17$ ($i \in [17,20]$).
+\end{itemize}
+
+\begin{lemma}\label{lem:small}
+For each $n \in \{8, 9, 15, 21\}$, $L^{n,p_n}$ is an incremental cyclic Latin square.
+\end{lemma}
+
+\begin{proof}
+Finite verification of $0 \le f^\pm_n(i,j) \le \val(i,j)$ and diagonal injectivity into the omitted
+step residues proves Lemma~\ref{lem:inj-maj} in each case~\cite{PalomarLean,CompanionRepo}.
+\end{proof}
+
+\section[Non-Cyclic Cases]{Non-Cyclic Cases $n \in \{4, 6\}$}\label{app:noncyclic}
+
+Explicit non-cyclic incremental Latin squares $L^4$ and $L^6$~\cite{PalomarLean,CompanionRepo} are:
+\[
+    L^4 :=
+    \begin{pmatrix}
+        2 & 0 & 1 & 3 \\
+        1 & 3 & 2 & 0 \\
+        0 & 2 & 3 & 1 \\
+        3 & 1 & 0 & 2
+    \end{pmatrix},
+    \qquad
+    L^6 :=
+    \begin{pmatrix}
+        1 & 0 & 2 & 3 & 5 & 4 \\
+        3 & 1 & 4 & 0 & 2 & 5 \\
+        4 & 3 & 5 & 2 & 1 & 0 \\
+        0 & 2 & 1 & 5 & 4 & 3 \\
+        2 & 5 & 0 & 4 & 3 & 1 \\
+        5 & 4 & 3 & 1 & 0 & 2
+    \end{pmatrix}.
+\]
+
+\begin{lemma}\label{lem:L4L6}
+$L^4$ and $L^6$ are incremental Latin squares.
+\end{lemma}
+
+\begin{proof}
+A sorted diagonal $(v_0 \le \dots \le v_{r-1})$ satisfies $|\,D^{n,k}\,| \le k + 1$ for all $k$ iff
+$v_m \ge m$ ($m < r$). Inspecting the diagonals of $L^4$ (main diagonals sort to $[2,2,3,3]$) and
+$L^6$ (main diagonals sort to $[1,2,2,4,5,5]$ and $[1,1,2,3,5,5]$) verifies $v_m \ge m$ on every
+diagonal~\cite{PalomarLean,CompanionRepo}.
+\end{proof}
+
+\begin{thebibliography}{99}
+\raggedright
+\bibitem{BS2009}
+J. Bell and B. Stevens,
+\emph{A survey of known results and research areas for $n$-queens},
+Discrete Math.\ \textbf{309} (2009), no.~1, 1--31,
+\url{https://www.sciencedirect.com/science/article/pii/S0012365X07010394}.
+
+\bibitem{LLW1990}
+M.-H. Le, W. Li, and E. T. Wang,
+\emph{A generalization of the $n$-queen problem},
+J. Systems Sci.\ Math.\ Sci.\ \textbf{3} (1990), no.~2, 183--192,
+\url{https://zbmath.org/4212061}.
+
+\bibitem{Pratt2016}
+K. Pratt,
+\emph{Closed-form expressions for the $n$-queens problem and related problems},
+Int.\ Math.\ Res.\ Not.\ (2019), no.~22, 6978--6988,
+\url{https://arxiv.org/abs/1609.09585}.
+
+\bibitem{CW2010}
+N. J. Cavenagh and I. M. Wanless,
+\emph{On the number of transversals in Cayley tables of cyclic groups},
+Discrete Appl.\ Math.\ \textbf{158} (2010), no.~2, 136--146,
+\url{https://doi.org/10.1016/j.dam.2009.09.006}.
+
+\bibitem{MY2026}
+M. Mirzavaziri and D. Yaqubi,
+\emph{Cyclic Latin Eulerian numbers},
+arXiv:2609.28808 (2026),
+\url{https://arxiv.org/abs/2609.28808}.
+
+\bibitem{CompanionRepo}
+M. Duponcheel and L. Duponcheel,
+\emph{Companion repository: Incremental $(n,c)$-coins problem},
+\url{https://github.com/NofanTasi/incremental-nc-coins-problem}.
+
+\bibitem{PalomarLean}
+L. Duponcheel and M. Duponcheel,
+\emph{Palomar Lean~4 formalization (\texttt{IncrementalNCCoins.lean}, \texttt{Solution.lean})},
+\url{https://github.com/LucDuponcheelAtGitHub/incremental-nc-coins}.
+
+\bibitem{MO510135}
+M. Duponcheel, \emph{MathOverflow \#510135}, \url{https://mathoverflow.net/questions/510135}.
+
+\bibitem{PSE138939}
+M. Duponcheel, \emph{Puzzling SE \#138939}, \url{https://puzzling.stackexchange.com/questions/138939}.
+
+\bibitem{MO516225}
+M. Duponcheel, \emph{MathOverflow \#516225}, \url{https://mathoverflow.net/questions/516225}.
+\end{thebibliography}
+
+\end{document}
