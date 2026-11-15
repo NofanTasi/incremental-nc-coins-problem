@@ -61,42 +61,75 @@ solution, so \emph{we limit ourselves to $n \ge 4$}. The \emph{$(n,q)$-queens pr
 ($0 \le q \le n$)~\cite{LLW1990} generalizes the $n$-queens problem by allowing at most $q$ queens
 on any row, column, sum-diagonal, or diff-diagonal. 
 
+\vspace{6pt}
+
 \noindent We construct, for every $n \ge 4$, an \emph{$n \!\times\! n$ square} representing
-\emph{incremental} solutions of $(n,q)$-queens problems \emph{simultaneously} for all 
-$0 \le q \le n$ (Theorem~\ref{thm:main1})\footnote{
+\emph{incremental} solutions of $(n,q)$-queens problems for all  $0 \le q \le n$
+(Theorem~\ref{thm:main1})\footnote{
 Do not worry about the ({\bf ??}). This is normal because what the reference refers to is not part
-of the paper yet.}.
-% \begin{itemize}[nosep]
-% \item For every $n \ge 4$ with $n \notin \{4, 6\}$, there \emph{exists} an incremental \emph{cyclic}
-% $n \!\times\! n$ Latin square, given by four infinite modular families modulo~$6$ for
-% $n \notin \{4, 6, 8, 9, 15, 21\}$ and explicit cyclic constructions for $n \in \{8, 9, 15, 21\}$
-% (Theorem~\ref{thm:main2}, Appendix~\ref{app:small}, and~\cite{PalomarLean,CompanionRepo}).
-% \item For $n \in \{4, 6\}$, no \emph{cyclic} incremental Latin square exists (by exhaustive search
-% over all $4! = 24$ and $6! = 720$ permutations), whereas explicit \emph{non-cyclic} incremental Latin
-% squares $L^4, L^6$ exist (Appendix~\ref{app:noncyclic} and~\cite{PalomarLean,CompanionRepo}); thus an
-% incremental $n \!\times\! n$ Latin square exists for every $n \ge 4$ (Theorems~\ref{thm:main3}--\ref{thm:main4}).
-% \end{itemize}
+of the paper yet.
+}.
 
-% \noindent \emph{Key methodology}:
-% \begin{itemize}[nosep]
-% \item Whereas Le, Li and Wang~\cite{LLW1990} construct $(n,q)$-queens solutions \emph{separately} for
-% each fixed $q$, an incremental Latin square partitions the board into $n$ disjoint transversals whose
-% sublevel sets solve all $0 \le q \le n$ \emph{simultaneously} (Section~2).
-% \item The \emph{injective-majorization principle} (Lemma~\ref{lem:inj-maj}, Section~3) replaces
-% $O(n^3)$ diagonal prefix counting by a single majorized injection per diagonal direction.
-% \item All $n \notin \{4, 6, 8, 9, 15, 21\}$ are partitioned into four infinite families modulo~$6$
-% (Section~4): (1)~$n = 1,5 \bmod 6$ ($n \ge 5$), (2)~$n = 2,4 \bmod 6$ ($n \ge 10$),
-% (3)~$n = 3 \bmod 6$ ($n \ge 27$), and (4)~$n = 0 \bmod 6$ ($n \ge 12$), each $O(1)$-time per entry. All
-% results (including $n \in \{8, 9, 15, 21\}$ and $n \in \{4, 6\}$) are mechanized in
-% Lean~4~\cite{PalomarLean,CompanionRepo}.
-% \end{itemize}
+\vspace{6pt}
 
-% \noindent Repositories and discussions:
-% \begin{itemize}[nosep]
-% \item Companion repo~\cite{CompanionRepo}: {\scriptsize\url{https://github.com/NofanTasi/incremental-nc-queens-problem}}
-% \item Palomar Lean~4~\cite{PalomarLean}: {\scriptsize\url{https://github.com/LucDuponcheelAtGitHub/incremental-nc-queens}}
-% \item Discussions: \href{https://mathoverflow.net/questions/510135}{MO \#510135}~\cite{MO510135}, \href{https://puzzling.stackexchange.com/questions/138939}{PSE \#138939}~\cite{PSE138939}, \href{https://mathoverflow.net/questions/516225}{MO \#516225}~\cite{MO516225}.
-% \end{itemize}
+\noindent More precisely, for every $n \ge 4$ with $n \notin \{4, 6\}$, we construct a common
+\emph{incremental cyclic $n \!\times\! n$ Latin square}, using four families modulo~$6$, not
+covering $n \in \{8, 9, 15, 21\}$,
+\begin{enumerate}
+\item $n = 1,5 \bmod 6$ ($n \ge 5$),
+\item $n = 2,4 \bmod 6$ ($n \ge 10$),
+\item $n = 3 \bmod 6$ ($n \ge 27$),
+\item $n = 0 \bmod 6$ ($n \ge 12$),
+\end{enumerate}
+\noindent (Theorem~\ref{thm:main2}) and we construct an incremental cyclic $n \!\times\! n$ Latin
+square for $n \in \{8, 9, 15, 21\}$ individually (Appendix~\ref{app:small}).
+
+\vspace{6pt}
+
+\noindent For $n \in \{4, 6\}$, a \emph{cyclic} incremental Latin square \emph{cannot} be 
+constructed, whereas a \emph{non-cyclic} incremental Latin square \emph{can} be constructed 
+(Appendix~\ref{app:noncyclic}).
+
+\vspace{6pt}
+
+\noindent All results (including $n \in \{8, 9, 15, 21\}$ and $n \in \{4, 6\}$) are mechanized in
+Lean~4~\cite{PalomarLean,CompanionRepo}.
+
+\vspace{6pt}
+
+\noindent Whereas Le, Li and Wang~\cite{LLW1990} construct $(n,q)$-queens solutions for each $q$
+\emph{separately}, an incremental Latin square constructs them for all $0 \le q \le n$ 
+\emph{simultaneously} (Section~\ref{sec:2}).
+
+\vspace{6pt}
+
+
+\noindent The \emph{injective-majorization principle} (Lemma~\ref{lem:inj-maj}, Section\ref{sec:3})
+replaces $O(n^?)$ diagonal counting\footnote{
+  I am not sure about this $O(n^?)$ (should we keep it (reviewer asked for it)?).
+} by a single $O(n^?)$ majorized injection per diagonal direction.\footnote{
+  I am not sure about this $O(n^?)$ either (should we keep it (reviewer asked for it)?).
+}.
+
+\vspace{6pt}
+
+\noindent Repositories:
+\begin{itemize}[nosep]
+\item Companion repo~\cite{CompanionRepo}: {\scriptsize\url{https://github.com/NofanTasi/incremental-nc-queens-problem}}
+\item Palomar Lean~4~\cite{PalomarLean}: {\scriptsize\url{https://github.com/LucDuponcheelAtGitHub/incremental-nc-queens}}
+\end{itemize}
+
+\vspace{6pt}
+
+\noindent Other (where \emph{queens} terminology is replaced by \emph{coins} terminology):
+
+\vspace{6pt}
+
+\begin{itemize}[nosep]
+\item \href{https://mathoverflow.net/questions/510135}{MO \#510135}~\cite{MO510135}, 
+\item \href{https://puzzling.stackexchange.com/questions/138939}{PSE \#138939}~\cite{PSE138939},
+\item \href{https://mathoverflow.net/questions/516225}{MO \#516225}~\cite{MO516225}.
+\end{itemize}
 
 \end{abstract}
 
@@ -604,24 +637,25 @@ J. Systems Sci.\ Math.\ Sci.\ \textbf{3} (1990), no.~2, 183--192,
 % arXiv:2609.28808 (2026),
 % \url{https://arxiv.org/abs/2609.28808}.
 
-% \bibitem{CompanionRepo}
-% M. Duponcheel and L. Duponcheel,
-% \emph{Companion repository: Incremental $(n,q)$-queens problem},
-% \url{https://github.com/NofanTasi/incremental-nc-queens-problem}.
+\bibitem{PalomarLean}
+L. Duponcheel and M. Duponcheel,
+\emph{Palomar Lean~4 formalization \\ 
+(\texttt{Challenge.lean}, \texttt{IncrementalNCCoins.lean}, \texttt{Solution.lean})},
+\url{https://github.com/LucDuponcheelAtGitHub/incremental-nc-queens}.
 
-% \bibitem{PalomarLean}
-% L. Duponcheel and M. Duponcheel,
-% \emph{Palomar Lean~4 formalization (\texttt{IncrementalNCCoins.lean}, \texttt{Solution.lean})},
-% \url{https://github.com/LucDuponcheelAtGitHub/incremental-nc-queens}.
+\bibitem{CompanionRepo}
+M. Duponcheel and L. Duponcheel,
+\emph{Companion repository: Incremental $(n,q)$-queens problem},
+\url{https://github.com/NofanTasi/incremental-nc-queens-problem}.
 
-% \bibitem{MO510135}
-% M. Duponcheel, \emph{MathOverflow \#510135}, \url{https://mathoverflow.net/questions/510135}.
+\bibitem{MO510135}
+M. Duponcheel, \emph{MathOverflow \#510135}, \url{https://mathoverflow.net/questions/510135}.
 
-% \bibitem{PSE138939}
-% M. Duponcheel, \emph{Puzzling SE \#138939}, \url{https://puzzling.stackexchange.com/questions/138939}.
+\bibitem{PSE138939}
+M. Duponcheel, \emph{Puzzling SE \#138939}, \url{https://puzzling.stackexchange.com/questions/138939}.
 
-% \bibitem{MO516225}
-% M. Duponcheel, \emph{MathOverflow \#516225}, \url{https://mathoverflow.net/questions/516225}.
+\bibitem{MO516225}
+L. Duponcheel, \emph{MathOverflow \#516225}, \url{https://mathoverflow.net/questions/516225}.
 
 \end{thebibliography}
 
