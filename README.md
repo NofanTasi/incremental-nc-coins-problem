@@ -29,11 +29,11 @@ https://palomar-registry.org/entry?id=PALOMAR-2026-11-14-000018
 
 ## games
 
-the following 1 person game let's you experiment with solving (n,c)-coins placements
+the following 1 person game lets you experiment solving (n,c)-coins placements
 
 https://numisma-square-board-challenge-564364450410.europe-west1.run.app/
 
-the following 2 person game let's you experiment with forcing a draw in co-op mode and forcing a lose for opponent in adv mode.
+the following 2 person game lets you experiment forcing a draw in co-op mode and forcing a lose for opponent in adv mode.
 
 https://linelimit-45.ai.studio/
 
