@@ -92,49 +92,18 @@ constructed.
 
 \vspace{4pt}
 
-\noindent Le, Li and Wang~\cite{LLW1990} construct $(n,q)$-queens solutions for each $q$
-\emph{apart}.
-
-\vspace{4pt}
-
-\noindent An incremental Latin square constructs them all \emph{together} for  $0 \le q \le n$.
-
-\vspace{4pt}
-
-\noindent The \emph{injective-majorization principle} (Lemma~\ref{lem:inj-maj}) replaces the
-$O(n^3)$ diagonal verification of Le, Li and Wang~\cite{LLW1990} by defining a majorized injection
-for both diagonal directions.
-
-\vspace{4pt}
-
-\noindent Le, Li and Wang~\cite{LLW1990} construct a square representing $1$ solution in
-$O(n^2)$ time.
-
-\vspace{4pt}
-
-\noindent We construct a square representing $n+1$ solutions in $O(n^2)$ time.
-
-\vspace{4pt}
-
 \noindent All results (including $n \in \{8, 9, 15, 21\}$ and $n \in \{4, 6\}$) are formalized in
 Lean~4~\cite{CompanionRepo,PalomarLean}.
 
 \vspace{8pt}
 
-\noindent Repositories:
-\begin{itemize}[nosep]
+\noindent Repositories, Mathoverflow and Puzzling (where \emph{coins} instead of \emph{queens}
+terminology is used):
+\begin{itemize}
 \item Companion repo~\cite{CompanionRepo}: 
-{\scriptsize\url{https://github.com/NofanTasi/incremental-nc-queens-problem}},
+{\scriptsize\url{https://github.com/NofanTasi/incremental-nc-coins-problem}},
 \item Palomar Lean~4 repo~\cite{PalomarLean}:
-{\scriptsize\url{https://github.com/LucDuponcheelAtGitHub/incremental-nc-queens}}.
-\end{itemize}
-
-\vspace{8pt}
-
-\noindent Mathoverflow and Puzzling (where \emph{queens} instead of \emph{queens} terminology is
-used):
-
-\begin{itemize}[nosep]
+{\scriptsize\url{https://github.com/LucDuponcheelAtGitHub/incremental-nc-coins}}.
 \item \href{https://mathoverflow.net/questions/510135}{MO \#510135}~\cite{MO510135}, 
 \item \href{https://puzzling.stackexchange.com/questions/138939}{PSE \#138939}~\cite{PSE138939},
 \item \href{https://mathoverflow.net/questions/516225}{MO \#516225}~\cite{MO516225}.
@@ -144,55 +113,34 @@ used):
 
 \newpage
 
-\subsection{Related Work}\label{sec:related}
+\subsection{Related Work, Improvements and Innovation}\label{sec:related}
 
-\emph{Transversal decompositions versus incremental squares}: In the classic theory, a Latin
-square partitions a square into $n$ disjoint transversals, each having $1$ cell per row and column,
-and having different values. However, classical transversals impose \emph{no constraints} on
-diagonals. An incremental Latin square requires that every diagonal contains at most $c$ cells on
-every diagonal. This nested property provides layered conflict avoidance (e.g., in multi-priority
-resource scheduling, VLSI channel routing, and collision-free memory interleavers for parallel turbo
-decoders) where capacity can be expanded dynamically from $c$ to $c+1$.
+\emph{Bell and Stevens}~\cite{BS2009} is a survey of $n$-queens and Latin squares related
+results.
 
-\emph{Bell and Stevens}~\cite{BS2009}: Is a survey of $n$-queens related results,
-including modular/toroidal queens and Latin square transversals. By the Hall--Paige condition, the
-unpermuted Cayley square of $\mathbb{Z}_n$ decomposes into transversals iff $n$ is odd, and into
-toroidal $n$-queens transversals iff $\gcd(n,6) = 1$~\cite{BS2009,CW2010}.
+\emph{Le, Li and Wang~\cite{LLW1990}} introduced the $(n,q)$-queens problem. Constructing
+solutions is done \emph{separately} for each $q \in [0,n]$ through an intricate case analysis. 
+Generating \emph{one} solution takes $O(n^2)$ time. Diagonal verification takes $O(n^3)$ time.
 
-\emph{Le, Li and Wang~\cite{LLW1990}}: Le, Li and Wang introduced the $(n,q)$-queens
-problem, constructing solutions \emph{separately} for each $q \in [0,n]$ through an
-intricate case analysis. In contrast, an incremental Latin square partitions the square
-into $n$ disjoint transversals whose sublevel sets solve all $q \in [0,n]$ \emph{simultaneously}
-(Theorem~\ref{thm:main1}). Generating all $n + 1$ solutions via~\cite{LLW1990} requires
-$\sum_{q=1}^n O(n \cdot q) = O(n^3)$ queen placements, whereas our single square provides all
-solutions in $O(n^2)$ time ($O(1)$ time per entry).
+Our \emph{incremental} Latin squares construct $(n,q)$-queens solutions \emph{together} for
+$0 \le q \le n$. Generating \emph{all} solutions takes $O(n^2)$ time. The
+\emph{injective-majorization principle} (Lemma~\ref{lem:inj-maj}) replaces diagonal verification
+by defining a majorized injection for both diagonal directions.
 
-\begin{table}[htbp]
-\centering
-\scriptsize
-\begin{tabular}{@{}llllll@{}}
-\toprule
-Approach & Squares & Range & Simultaneous & Time & Palomar \\
-\midrule
-Le, Li, Wang~\cite{LLW1990} & Many squares & $n \ge 4$ & No & $O(n^3)$ & Not yet \\
-Our work & One square & $n \ge 4$ & Yes & $O(n^2)$ & Yes \\
-\bottomrule
-\end{tabular}
-\caption{Comparison of approaches.}
-\label{tab:comparison}
-\end{table}
+\emph{N. J. Cavenagh and I. M. Wanless}~\cite{CW2010} deal with \emph{cyclic} Latin squares that are
+\emph{unpermuted} Cayley squares $(i, j) \mapsto (i + j) \bmod n$ of $\mathbb{Z}_n$. They show that 
+such squares decompose into transversals iff $n$ is odd, and into \emph{toroidal} $n$-queens
+transversals iff $\gcd(n,6) = 1$. Their squares impose no diagonal constraints. Their work
+\emph{does not} deal with the Le, Li and Wang $(n,q)$-queens problem.
 
-\emph{Other work}:
-\begin{itemize}[nosep]
-\item Pratt~\cite{Pratt2016} gives formulas counting $n$-queens solutions and Latin squares.
-It is purely and does not construct incremental squares or $(n,q)$-queens solutions for $q > 1$.
-\item Cavenagh and Wanless~\cite{CW2010} bound transversal counts in the unpermuted Cayley square
-$(i + j) \bmod n$ for odd $n$. By contrast, our cyclic squares permute columns via
-$l^{n,p}_{i,j} = (i + p(j)) \bmod n$, they exist for both odd and even $n \notin \{4,6\}$, and
-they satisfy diagonal queen bounds for all $q \in [0,n]$.
-\item Mirzavaziri and Yaqubi~\cite{MY2026} study cyclic Latin Eulerian numbers (column ascents),
-unrelated to diagonal queen bounds.
-\end{itemize}
+Our incremental Latin squares, require that all sum-diagonals and diff-diagonals contain at most $q$
+cells. Our work \emph{does} deal with the Le, Li and Wang $(n,q)$-queens problem. Our
+\emph{cyclic incremental Latin squares} are \emph{colomn permuted} Cayley squares
+$(i, j) \mapsto (i + p(j)) \bmod n$ of $\mathbb{Z}_n$. We show that they exist for \emph{all}
+$n \notin \{4, 6\}$.
+
+\emph{Mirzavaziri and Yaqubi}~\cite{MY2026} study cyclic Latin Eulerian numbers (column ascents).
+Their work is unrelated to our cyclic incremental Latin squares.
 
 \newpage
 
@@ -326,12 +274,14 @@ unrelated to diagonal queen bounds.
 
 % \begin{proof}
 % By (1), $f$ maps $D^k = \{(i,j) \in D \mid l^{n,p}_{i,j} \le k\}$ into $[0,k]$; by (2), $f|_{D^k}$ is
+
 % injective, so $|\,D^k\,| \le |\,[0,k]\,| = k + 1$.
+
 % \end{proof}
 
-% \section{Incremental Cyclic Latin Squares}\label{sec:icls}
+% \section{Cyclic Incremental Latin Squares}\label{sec:icls}
 
-% We construct an incremental cyclic Latin square $L^{n,p}$ for every $n \ge 4$ ($n \notin \{4,6\}$) via
+% We construct an cyclic incremental Latin square $L^{n,p}$ for every $n \ge 4$ ($n \notin \{4,6\}$) via
 % four infinite families $F_1$--$F_4$ and four small cases $n \in \{8, 9, 15, 21\}$
 % (Appendix~\ref{app:small} and~\cite{PalomarLean,CompanionRepo}). Set $m := n/2$ when $2 \mid n$ and
 % $k := n/3$ when $3 \mid n$. For $x \in \mathbb{Z}$, $x \bmod n \in [0,n-1]$ is the remainder
@@ -363,7 +313,7 @@ unrelated to diagonal queen bounds.
 % $s^-_j = (-j) \bmod n$ are bijections on $[0,n-1]$. Setting $f^+_1 := f^-_1 := \val$ gives:
 
 % \begin{lemma}\label{lem:fam1}
-% $L^{n,p_1}$ is an incremental cyclic Latin square.
+% $L^{n,p_1}$ is an cyclic incremental Latin square.
 % \end{lemma}
 
 % \begin{proof}
@@ -410,7 +360,7 @@ unrelated to diagonal queen bounds.
 % \end{table}
 
 % \begin{lemma}\label{lem:fam2}
-% $L^{n,p_2}$ is an incremental cyclic Latin square.
+% $L^{n,p_2}$ is an cyclic incremental Latin square.
 % \end{lemma}
 
 % \begin{proof}
@@ -473,7 +423,7 @@ unrelated to diagonal queen bounds.
 % \end{table}
 
 % \begin{lemma}\label{lem:fam3}
-% $L^{n,p_3}$ is an incremental cyclic Latin square.
+% $L^{n,p_3}$ is an cyclic incremental Latin square.
 % \end{lemma}
 
 % \begin{proof}
@@ -540,7 +490,7 @@ unrelated to diagonal queen bounds.
 % \end{table}
 
 % \begin{lemma}\label{lem:fam4}
-% $L^{n,p_4}$ is an incremental cyclic Latin square.
+% $L^{n,p_4}$ is an cyclic incremental Latin square.
 % \end{lemma}
 
 % \begin{proof}
@@ -657,7 +607,7 @@ unrelated to diagonal queen bounds.
 % \end{itemize}
 
 % \begin{lemma}\label{lem:small}
-% For each $n \in \{8, 9, 15, 21\}$, $L^{n,p_n}$ is an incremental cyclic Latin square.
+% For each $n \in \{8, 9, 15, 21\}$, $L^{n,p_n}$ is an cyclic incremental Latin square.
 % \end{lemma}
 
 % \begin{proof}
@@ -740,12 +690,6 @@ N. J. Cavenagh and I. M. Wanless,
 \emph{On the number of transversals in Cayley tables of cyclic groups},
 Discrete Appl.\ Math.\ \textbf{158} (2010), no.~2, 136--146,
 \url{https://doi.org/10.1016/j.dam.2009.09.006}.
-
-\bibitem{Pratt2016}
-K. Pratt,
-\emph{Closed-form expressions for the $n$-queens problem and related problems},
-Int.\ Math.\ Res.\ Not.\ (2019), no.~22, 6978--6988,
-\url{https://arxiv.org/abs/1609.09585}.
 
 \bibitem{MY2026}
 M. Mirzavaziri and D. Yaqubi,
